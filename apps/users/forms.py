@@ -25,6 +25,8 @@ class SignUpForm(UserCreationForm):
             "email",
             "password1",
             "password2",
+            "first_name",
+            "last_name",
         )
 
     @override
@@ -56,6 +58,7 @@ class UpdateProfileForm(forms.ModelForm):
         """Override clean to validate email and username."""
         cleaned_data = super().clean()
         email = cleaned_data.get("email")
+        username = cleaned_data.get("username")
 
         # Get the current user instance
         current_user = self.instance
@@ -63,5 +66,9 @@ class UpdateProfileForm(forms.ModelForm):
         # Check if email has changed and is already in use
         if email != current_user.email and User.objects.filter(email=email).exists():
             self.add_error("email", "Email is already in use.")
+
+        # Check if username has changed and is already in use
+        if username != current_user.username and User.objects.filter(username=username).exists():
+            self.add_error("username", "Username is already in use.")
 
         return cleaned_data
