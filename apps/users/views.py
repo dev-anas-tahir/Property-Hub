@@ -24,7 +24,7 @@ class SignUpView(CreateView):
 
     @override
     def form_valid(self, form):
-        """Override form_valid to save the user and redirect to login."""
+        """Override form_valid to save the user and redirect to log in."""
         user = form.save()
         login(self.request, user)
         return redirect("users:login")
@@ -60,8 +60,9 @@ class UpdateProfileView(LoginRequiredMixin, UpdateView):
 
 
 class CustomLogoutView(LogoutView):
-    """Custom logout view that redirects to home after logout."""
+    """Custom logout view that redirects home after logout."""
 
-    def dispatch(self, request, *args, **kwargs):
+    @staticmethod
+    def dispatch(request, *args, **kwargs):
         logout(request)
         return redirect("users:login")
