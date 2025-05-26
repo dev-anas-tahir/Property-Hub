@@ -19,7 +19,7 @@ class SignUpView(CreateView):
     """View for handling user sign-up."""
 
     form_class = SignUpForm
-    success_url = reverse_lazy("users:login")
+    success_url = reverse_lazy("properties:list")
     template_name = "users/signup.html"
 
     @override
@@ -27,7 +27,7 @@ class SignUpView(CreateView):
         """Override form_valid to save the user and redirect to log in."""
         user = form.save()
         login(self.request, user)
-        return redirect("users:login")
+        return redirect("properties:list")
 
 
 class CustomLoginView(LoginView):
@@ -38,7 +38,7 @@ class CustomLoginView(LoginView):
     @override
     def get_success_url(self):
         """Override get_success_url to redirect to home."""
-        return reverse_lazy("users:profile")
+        return reverse_lazy("properties:list")
 
 
 class UpdateProfileView(LoginRequiredMixin, UpdateView):
@@ -56,7 +56,7 @@ class UpdateProfileView(LoginRequiredMixin, UpdateView):
     @override
     def get_success_url(self):
         """Override get_success_url to redirect to profile."""
-        return reverse_lazy("users:profile")
+        return reverse_lazy("properties:list")
 
 
 class CustomLogoutView(LogoutView):
@@ -65,4 +65,4 @@ class CustomLogoutView(LogoutView):
     @staticmethod
     def dispatch(request, *args, **kwargs):
         logout(request)
-        return redirect("users:login")
+        return redirect("properties:list")
