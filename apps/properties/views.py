@@ -1,4 +1,4 @@
-from django.views.generic import CreateView
+from django.views.generic import CreateView, UpdateView
 from django.urls import reverse_lazy
 from .models import Property
 from .forms import PropertyForm
@@ -31,4 +31,12 @@ class NewPropertyView(LoginRequiredMixin, CreateView):
     def form_valid(self, form):
         form.instance.user = self.request.user
         return super().form_valid(form)
-        
+
+class EditPropertyView(LoginRequiredMixin, UpdateView):
+    model = Property
+    form_class = PropertyForm
+    template_name = "properties/detail.html"
+
+    # user that created the property can edit it
+    def get_queryset(self):
+        return super().get_queryset().filter(user=self.request.user)
