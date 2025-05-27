@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+
+<head>
+    <title>PropertyHub</title>
+    <link rel="stylesheet" href="{% static 'base.css' %}">
+    <link rel="stylesheet" href="{% static 'users/login.css' %}">
+</head>
+
+<body>
+    <nav class="navbar">
+        {% if user.is_authenticated %}
+        <div class="left">
+            <a href="{% url 'properties:new' %}">Add Property</a>
+        </div>
+        <div class="right">
+            <a href="{% url 'users:profile' %}">Profile</a>
+            <a href="{% url 'users:logout' %}">Logout</a>
+        </div>
+        {% else %}
+        <div class="right">
+            <a href="{% url 'users:signup' %}">Sign Up</a>
+            <a href="{% url 'users:login' %}">Login</a>
+        </div>
+        {% endif %}
+    </nav>
+    <hr>
+    {% block content %}{% endblock %}
+</body>
+
+</html>

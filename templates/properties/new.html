@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'properties/new.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<form method="post" enctype="multipart/form-data" class="form">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" >Create Property</button>
+</form>
+
+{% endblock %}

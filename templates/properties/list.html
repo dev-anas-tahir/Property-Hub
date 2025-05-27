@@ -1,0 +1,12 @@
+{% extends 'base.html' %} {% block content %} {% if properties %} 
+{% for property in properties %}
+<div>
+  <h2>{{ property.name }}</h2>
+  <p>{{ property.description }}</p>
+  <p><a href="{% url 'properties:detail' property.pk %}">View More</a></p>
+</div>
+{% endfor %} {% else %}
+<div>
+  <p>No properties found.</p>
+</div>
+{% endif %} {% endblock %}
