@@ -1,12 +1,22 @@
-{% extends 'base.html' %} {% block content %} {% if properties %} 
+{% extends 'base.html' %} 
+{% block content %} 
+{% if properties %} 
 {% for property in properties %}
+{% if property.is_published %}
 <div>
+  {% if property.image %}
+  <img src="{{ property.image.url }}" alt="Property Image" height="200" width="200">
+  {% endif %}
   <h2>{{ property.name }}</h2>
-  <p>{{ property.description }}</p>
+  <p>{{ property.address }}</p>
+  <p>{{ property.price }}</p>
   <p><a href="{% url 'properties:detail' property.pk %}">View More</a></p>
 </div>
-{% endfor %} {% else %}
+{% endif %}
+{% endfor %} 
+{% else %}
 <div>
   <p>No properties found.</p>
 </div>
-{% endif %} {% endblock %}
+{% endif %} 
+{% endblock %}

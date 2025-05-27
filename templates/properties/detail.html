@@ -7,14 +7,22 @@
     <p>{{ property.description }}</p>
     <p>{{ property.price }}</p>
     <p>{{ property.address }}</p>
-    <p>{{ property.is_published }}</p>
     <p>{{ property.created_at }}</p>
-    <p>{{ property.updated_at }}</p>
+    {% if property.image %}
     <img src="{{ property.image.url }}" alt="{{ property.name }}">
+    {% endif %}
 </div>
 
 {% if property.user == request.user %}
-    <p><a href="{% url 'properties:edit' property.pk %}">Edit Property</a></p>
+    <form method="get" action="{% url 'properties:edit' property.pk %}" style="display: inline-block; margin-right: 10px;">
+        <button type="submit">Edit Property</button>
+    </form>
+    <br>
+    <br>
+    <form method="post" action="{% url 'properties:delete' property.pk %}" onsubmit="return confirm('Are you sure you want to delete this property?');">
+        {% csrf_token %}
+        <button type="submit">Delete Property</button>
+    </form>
 {% endif %}
-
+<p><a href="{% url 'properties:list' %}">Back to Lists</a></p>
 {% endblock %}
