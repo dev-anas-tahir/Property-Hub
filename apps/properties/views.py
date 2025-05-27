@@ -35,8 +35,12 @@ class NewPropertyView(LoginRequiredMixin, CreateView):
 class EditPropertyView(LoginRequiredMixin, UpdateView):
     model = Property
     form_class = PropertyForm
-    template_name = "properties/detail.html"
+    template_name = "properties/edit.html"
 
-    # user that created the property can edit it
+    @override
     def get_queryset(self):
         return super().get_queryset().filter(user=self.request.user)
+
+    @override
+    def get_success_url(self):
+        return reverse_lazy("properties:detail", kwargs={"pk": self.object.pk})

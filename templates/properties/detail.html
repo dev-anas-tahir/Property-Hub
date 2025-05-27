@@ -13,4 +13,8 @@
     <img src="{{ property.image.url }}" alt="{{ property.name }}">
 </div>
 
+{% if property.user == request.user %}
+    <p><a href="{% url 'properties:edit' property.pk %}">Edit Property</a></p>
+{% endif %}
+
 {% endblock %}
