@@ -9,6 +9,7 @@ django-environ = "*"
 django = "*"
 
 [dev-packages]
+django-debug-toolbar = "*"
 
 [requires]
 python_version = "3.12"
