@@ -3,7 +3,6 @@ This module contains class-based views for user-related operations such as
 signing up, logging in, and profile management within the Property Hub application.
 """
 
-from typing import override
 from django.views.generic import CreateView, UpdateView
 from django.contrib.auth.views import LoginView, LogoutView
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -22,7 +21,6 @@ class SignUpView(CreateView):
     success_url = reverse_lazy("properties:list")
     template_name = "users/signup.html"
 
-    @override
     def form_valid(self, form):
         """Override form_valid to save the user and redirect to log in."""
         user = form.save()
@@ -35,7 +33,6 @@ class CustomLoginView(LoginView):
 
     template_name = "users/login.html"
 
-    @override
     def get_success_url(self):
         """Override get_success_url to redirect to home."""
         return reverse_lazy("properties:list")
@@ -48,12 +45,10 @@ class UpdateProfileView(LoginRequiredMixin, UpdateView):
     form_class = UpdateProfileForm
     template_name = "users/profile.html"
 
-    @override
     def get_object(self, queryset=None):
         """Override get_object to return the current user."""
         return self.request.user
 
-    @override
     def get_success_url(self):
         """Override get_success_url to redirect to profile."""
         return reverse_lazy("properties:list")

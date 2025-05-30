@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<form method="post" enctype="multipart/form-data" class="form" onsubmit="return confirm('Are you sure you want to update this property?');">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Update Property</button>
+</form>
+
+{% endblock %}
