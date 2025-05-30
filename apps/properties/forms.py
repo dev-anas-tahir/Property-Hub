@@ -3,7 +3,7 @@ from .models import Property
 
 
 class PropertyForm(forms.ModelForm):
-    price = forms.DecimalField(min_value=0)
+    price = forms.DecimalField()
 
     class Meta:
         model = Property
