@@ -2,7 +2,6 @@
 {% block content %} 
 {% if properties %} 
 {% for property in properties %}
-{% if property.is_published %}
 <div>
   {% if property.image %}
   <img src="{{ property.image.url }}" alt="Property Image" height="200" width="200">
