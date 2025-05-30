@@ -12,11 +12,13 @@
     <img src="{{ property.image.url }}" alt="{{ property.name }}">
     {% endif %}
 </div>
-
+<br>
 {% if property.user == request.user %}
     <form method="get" action="{% url 'properties:edit' property.pk %}" style="display: inline-block; margin-right: 10px;">
         <button type="submit">Edit Property</button>
     </form>
+    <br>
+    <br>
     <form method="post" action="{% url 'properties:delete' property.pk %}" class="form-spacing" onsubmit="return confirm('Are you sure you want to delete this property?');">
         {% csrf_token %}
         <button type="submit">Delete Property</button>

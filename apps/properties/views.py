@@ -16,7 +16,10 @@ class PropertiesListView(ListView):
     model = Property
     template_name = "properties/list.html"
     context_object_name = "properties"
-    allow_empty = True
+
+    def get_queryset(self):
+        return super().get_queryset().filter(is_published=True)
+    
 
 class PropertyDetailView(DetailView):
     """View for viewing a specific property."""
