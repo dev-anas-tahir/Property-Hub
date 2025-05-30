@@ -10,6 +10,7 @@ django = "*"
 
 [dev-packages]
 pytest = "*"
+pytest-django = "*"
 django-debug-toolbar = "*"
 
 [requires]
