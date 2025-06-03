@@ -11,6 +11,16 @@
     {% if property.image %}
     <img src="{{ property.image.url }}" alt="{{ property.name }}">
     {% endif %}
+    <form method="post" action="{% url 'properties:toggle_favorite' property.id %}">
+        {% csrf_token %}
+        <button type="submit">
+            {% if property.is_favorited %}
+                💔 Unfavorite
+            {% else %}
+                ❤️ Favorite
+            {% endif %}
+        </button>
+    </form>
 </div>
 <br>
 {% if property.user == request.user %}
