@@ -12,6 +12,8 @@ django = "*"
 pytest = "*"
 pytest-django = "*"
 django-debug-toolbar = "*"
+factory-boy = "*"
+pytest-factoryboy = "*"
 
 [requires]
 python_version = "3.12"
