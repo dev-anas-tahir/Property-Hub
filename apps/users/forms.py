@@ -1,12 +1,20 @@
-"""
-This module contains form classes for user-related operations such as
-signing up, logging in, and profile management within the Property Hub application.
-"""
-
+import string
 from django import forms
 from django.contrib.auth.models import User
-from django.contrib.auth.forms import UserCreationForm
-from typing import override
+from django.core.exceptions import ValidationError
+from django.contrib.auth.forms import UserCreationForm, PasswordChangeForm
+
+
+def validate_password_strength(password: str):
+    """Raise ValidationError if password doesn't meet strength requirements."""
+    if len(password) < 8:
+        raise ValidationError("Password must be at least 8 characters long.")
+    if not any(char.isdigit() for char in password):
+        raise ValidationError("Password must contain at least one digit.")
+    if not any(char.isupper() for char in password):
+        raise ValidationError("Password must contain at least one uppercase letter.")
+    if not any(char in string.punctuation for char in password):
+        raise ValidationError("Password must contain at least one special character.")
 
 
 class SignUpForm(UserCreationForm):
@@ -15,60 +23,52 @@ class SignUpForm(UserCreationForm):
     email = forms.EmailField(
         max_length=254,
         required=True,
-        help_text="Required. Inform a valid email address.",
+        help_text="Required. Enter a valid email address.",
     )
 
     class Meta:
         model = User
-        fields = (
-            "username",
-            "email",
-            "password1",
-            "password2",
-            "first_name",
-            "last_name",
-        )
+        fields = ("username", "email", "first_name", "last_name")
 
-    @override
-    def clean(self):
-        """Override clean to validate email and username."""
-        cleaned_data = super().clean()
-        email = cleaned_data.get("email")
-
+    def clean_email(self):
+        email = self.cleaned_data["email"]
         if User.objects.filter(email=email).exists():
-            self.add_error("email", "Email is already in use.")
+            raise ValidationError("Email is already in use.")
+        return email
 
-        return cleaned_data
+    def clean_password1(self):
+        password1 = self.cleaned_data.get("password1")
+        validate_password_strength(password1)
+        return password1
 
 
 class UpdateProfileForm(forms.ModelForm):
-    """Form for updating user profile."""
+    """Form for updating user profile information (excluding password)."""
 
     class Meta:
         model = User
-        fields = (
-            "username",
-            "email",
-            "first_name",
-            "last_name",
-        )
+        fields = ("username", "email", "first_name", "last_name")
 
-    @override
-    def clean(self):
-        """Override clean to validate email and username."""
-        cleaned_data = super().clean()
-        email = cleaned_data.get("email")
-        username = cleaned_data.get("username")
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.current_user = self.instance
 
-        # Get the current user instance
-        current_user = self.instance
+    def clean_email(self):
+        email = self.cleaned_data.get("email")
+        if email != self.current_user.email and User.objects.filter(email=email).exists():
+            raise ValidationError("Email is already in use.")
+        return email
 
-        # Check if email has changed and is already in use
-        if email != current_user.email and User.objects.filter(email=email).exists():
-            self.add_error("email", "Email is already in use.")
+    def clean_username(self):
+        username = self.cleaned_data.get("username")
+        if username != self.current_user.username and User.objects.filter(username=username).exists():
+            raise ValidationError("Username is already in use.")
+        return username
 
-        # Check if username has changed and is already in use
-        if username != current_user.username and User.objects.filter(username=username).exists():
-            self.add_error("username", "Username is already in use.")
+class CustomPasswordChangeForm(PasswordChangeForm):
+    """Form for changing user password."""
 
-        return cleaned_data
+    def clean_new_password1(self):
+        password = self.cleaned_data.get("new_password1")
+        validate_password_strength(password)
+        return password

@@ -10,7 +10,8 @@ from django.urls import reverse_lazy
 from django.contrib.auth.models import User
 from django.shortcuts import redirect
 from django.contrib.auth import login, logout
-from apps.users.forms import SignUpForm, UpdateProfileForm
+from django.contrib.auth.views import PasswordChangeView
+from apps.users.forms import SignUpForm, UpdateProfileForm, CustomPasswordChangeForm
 
 
 # Create your views here.
@@ -18,7 +19,6 @@ class SignUpView(CreateView):
     """View for handling user sign-up."""
 
     form_class = SignUpForm
-    success_url = reverse_lazy("properties:list")
     template_name = "users/signup.html"
 
     def form_valid(self, form):
@@ -61,3 +61,13 @@ class CustomLogoutView(LogoutView):
     def dispatch(request, *args, **kwargs):
         logout(request)
         return redirect("properties:list")
+
+class CustomPasswordChangeView(LoginRequiredMixin, PasswordChangeView):
+    """Custom password change view that redirects home after password change."""
+
+    template_name = "users/password_change.html"
+    form_class = CustomPasswordChangeForm
+
+    def get_success_url(self):
+        """Override get_success_url to redirect to home."""
+        return reverse_lazy("properties:list")

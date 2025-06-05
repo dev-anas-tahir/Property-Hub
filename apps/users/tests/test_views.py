@@ -48,11 +48,9 @@ def test_signup_view(client):
     }
 
     response = client.post(reverse("users:signup"), data=form_data)
+    assert response.url == reverse("properties:list")  # Verify redirect destination
+    assert response.status_code == 302, f"Form submission failed with errors: {response.context['form'].errors}"
 
-    if response.status_code != 302:
-        print(response.context["form"].errors)
-
-    assert response.status_code == 302
     # now check via the factory-created user
     from django.contrib.auth.models import User
     assert User.objects.filter(username="testuser").exists()
@@ -73,7 +71,8 @@ def test_login_view(client, user_factory):
     }
 
     response = client.post(reverse("users:login"), data=login_data)
-    assert response.status_code == 302  # should redirect after successful login
+    assert response.url == reverse("properties:list")  # Verify redirect destination
+    assert response.status_code == 302, f"Login failed with errors: {response.context['form'].errors}"
 
     # Confirm user is authenticated
     assert "_auth_user_id" in client.session
@@ -86,7 +85,8 @@ def test_logout_view(client, user_factory):
 
     client.force_login(user)
     response = client.get(reverse("users:logout"))
-    assert response.status_code == 302  # should redirect after logout
+    assert response.url == reverse("properties:list")  # Verify redirect destination
+    assert response.status_code == 302
 
     # Confirm user is logged out
     assert "_auth_user_id" not in client.session

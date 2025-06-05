@@ -9,7 +9,7 @@
   {% endif %}
   <h2>{{ property.name }}</h2>
   <p>{{ property.address }}</p>
-  <p>{{ property.price }}</p>
+  <p>$ {{ property.price }}</p>
   <form method="post" action="{% url 'properties:toggle_favorite' property.id %}">
     {% csrf_token %}
     <button type="submit">

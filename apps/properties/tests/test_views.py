@@ -75,4 +75,3 @@ def test_property_edit_form(user, client):
     assert prop.price == 200000
     assert prop.description == "Test description 2"
     assert prop.address == "Test address 2"
-
