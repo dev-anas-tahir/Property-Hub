@@ -77,7 +77,11 @@
                 <form method="post" action="{% url 'properties:toggle_favorite' property.pk %}">
                     {% csrf_token %}
                     <button type="submit" class="btn btn-outline-primary">
-                        {% if is_favorited %}Remove from Favorites{% else %}Add to Favorites{% endif %}
+                        {% if is_favorited %}
+                            💔 Remove from Favorites
+                        {% else %}
+                            ❤️ Add to Favorites
+                        {% endif %}
                     </button>
                 </form>
             {% endif %}

@@ -4,15 +4,14 @@ listing properties, viewing property details, creating new properties, editing e
 and deleting properties within the Property Hub application.
 """
 
-from django.core.files.uploadedfile import UploadedFile
-
 import os
-from .models import Property, Favorite, PropertyImage
+import shutil
+from apps.properties.models import Property, Favorite, PropertyImage
 from django.views import View
-from .forms import PropertyForm
+from apps.properties.forms import PropertyForm
 from django.urls import reverse_lazy
 from django.shortcuts import redirect
-from django.http import HttpResponseNotAllowed
+from django.http import HttpResponseNotAllowed, HttpResponseForbidden, FileResponse
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import (
     ListView,
@@ -24,7 +23,6 @@ from django.views.generic import (
 from django.shortcuts import get_object_or_404
 from django.db import transaction
 from django.contrib import messages
-from django.http import HttpResponseForbidden, FileResponse
 
 
 class PropertiesListView(ListView):
@@ -202,7 +200,9 @@ class EditPropertyView(LoginRequiredMixin, UpdateView):
     model = Property
     form_class = PropertyForm
     template_name = "properties/edit.html"
-    success_url = reverse_lazy("properties:list")
+
+    def get_success_url(self):
+        return reverse_lazy("properties:detail", kwargs={"pk": self.object.pk})
 
     def get_queryset(self):
         return Property.objects.filter(user=self.request.user)
@@ -217,28 +217,80 @@ class EditPropertyView(LoginRequiredMixin, UpdateView):
 
         # Handle image deletions
         delete_image_ids = self.request.POST.getlist("delete_images")
-        if delete_image_ids:
-            PropertyImage.objects.filter(id__in=delete_image_ids, property=self.object).delete()
+
+        # delete from media/images/
+        for delete_image_id in delete_image_ids:
+            image = PropertyImage.objects.get(id=delete_image_id)
+            image.image.delete()
+            image.delete()
 
         # Handle new image uploads
         images = self.request.FILES.getlist("images")
-        for image in images:
-            if isinstance(image, UploadedFile):
-                if image.size > 5 * 1024 * 1024:
-                    form.add_error(None, f"Image {image.name} is too large. Max size is 5MB.")
-                    return self.form_invalid(form)
-                if not image.name.lower().endswith(('.jpg', '.png')):
-                    form.add_error(None, f"Image {image.name} must be JPG or PNG.")
-                    return self.form_invalid(form)
-                PropertyImage.objects.create(property=self.object, image=image)
+
+        if images:
+            # Validate images
+            valid_images = []
+            max_size = 5 * 1024 * 1024  # 5MB limit
+            max_files = 10  # Maximum number of files
+            allowed_extensions = [".jpg", ".jpeg", ".png", ".gif", ".webp"]
+
+            if len(images) > max_files:
+                messages.warning(
+                    self.request,
+                    f"You can upload maximum {max_files} images. Only the first {max_files} will be processed.",
+                )
+                images = images[:max_files]
+
+            for image in images:
+                if not image or image.size == 0:
+                    continue
+
+                # Check file size
+                if image.size > max_size:
+                    messages.warning(
+                        self.request,
+                        f"Image {image.name} is too large (max 5MB). Skipping.",
+                    )
+                    continue
+
+                # Check file extension
+                import os
+
+                ext = os.path.splitext(image.name.lower())[1]
+                if ext not in allowed_extensions:
+                    messages.warning(
+                        self.request,
+                        f"Image {image.name} has invalid format. Allowed: JPG, PNG, GIF, WebP. Skipping.",
+                    )
+                    continue
+
+                valid_images.append(image)
+
+                if valid_images:
+                    # Create PropertyImage instances
+                    property_images = []
+                    for image in valid_images:
+                        property_images.append(
+                            PropertyImage(property=self.object, image=image)
+                        )
+
+                    # Bulk create for better performance
+                    PropertyImage.objects.bulk_create(property_images)
+
+                    # Set the first uploaded image as primary if none exists
+                    if not self.object.images.filter(is_primary=True).exists():
+                        first_image = self.object.images.first()
+                        if first_image:
+                            first_image.is_primary = True
+                            first_image.save()
+
 
         self.object = form.save()
         return super().form_valid(form)
 
 
 class DeletePropertyView(LoginRequiredMixin, DeleteView):
-    """View for deleting a property."""
-
+    """View for deleting a property and its associated files."""
     model = Property
     success_url = reverse_lazy("properties:list")
 

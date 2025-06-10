@@ -1,5 +1,5 @@
 from django import forms
-from .models import Property
+from apps.properties.models import Property
 
 class PropertyForm(forms.ModelForm):
     price = forms.DecimalField(widget=forms.NumberInput(attrs={"class": "form-control"}))
@@ -41,11 +41,10 @@ class PropertyForm(forms.ModelForm):
     
     def clean_documents(self):
         documents = self.cleaned_data.get('documents')
-        if documents:
+        if documents:  # Only validate if a new file was uploaded
             if not documents.name.lower().endswith('.pdf'):
                 raise forms.ValidationError("Only PDF files are allowed.")
-            # Additional check for content type
-            content_type = documents.content_type
-            if content_type != 'application/pdf':
+            # For newly uploaded files, we can check the content type
+            if hasattr(documents, 'content_type') and documents.content_type != 'application/pdf':
                 raise forms.ValidationError("File type is not supported. Please upload a PDF file.")
         return documents

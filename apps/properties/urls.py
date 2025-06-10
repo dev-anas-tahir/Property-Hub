@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import PropertiesListView, PropertyDetailView, NewPropertyView, EditPropertyView, DeletePropertyView, ToggleFavoriteView, FavoritesListView, PropertyDocumentDownloadView
+from apps.properties.views import PropertiesListView, PropertyDetailView, NewPropertyView, EditPropertyView, DeletePropertyView, ToggleFavoriteView, FavoritesListView, PropertyDocumentDownloadView
 
 app_name = "properties"
 
