@@ -76,3 +76,4 @@ coverage.xml
 
 # media files
 media/
+staticfiles/

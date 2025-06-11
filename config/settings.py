@@ -7,7 +7,7 @@ This module contains the default settings configuration for the project. It is i
 from pathlib import Path
 import environ
 
-BASE_DIR = Path(__file__).resolve().parent.parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Set up environment variables
 env = environ.Env(DEBUG=(bool, False))
