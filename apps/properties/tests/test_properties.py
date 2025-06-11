@@ -14,12 +14,15 @@ def test_property_str(user):
 
     # use the `user` fixture for ownership
     prop = Property.objects.create(
-        name="Test House",
         user=user,
+        name="Test House",
+        description="Test description",
+        full_address="Test address",
+        phone_number="+92-3001234567",
+        cnic="12345-1234567-1",
+        property_type=Property.PropertyType.HOUSE,
         price=100000,
         is_published=True,
-        description="Test description",
-        address="Test address",
     )
     assert str(prop) == "Test House"
 
@@ -33,11 +36,15 @@ def test_property_add_form(user, client):
     assert response.status_code == 200
 
     form_data = {
+        "user": user,
         "name": "Test House",
         "price": 100000,
         "is_published": True,
         "description": "Test description",
-        "address": "Test address",
+        "full_address": "Test address",
+        "phone_number": "+92-3001234567",
+        "cnic": "12345-1234567-1",
+        "property_type": Property.PropertyType.HOUSE,
     }
 
     response = client.post(reverse("properties:new"), data=form_data)
@@ -55,22 +62,29 @@ def test_property_edit_form(user, client):
 
     client.force_login(user)
     prop = Property.objects.create(
-        name="Test House",
         user=user,
+        name="Test House",
+        description="Test description",
+        full_address="Test address",
+        phone_number="+92-3001234567",
+        cnic="12345-1234567-1",
+        property_type=Property.PropertyType.HOUSE,
         price=100000,
         is_published=True,
-        description="Test description",
-        address="Test address",
     )
     response = client.get(reverse("properties:edit", args=[prop.id]))
     assert response.status_code == 200
 
     form_data = {
+        "user": user,
         "name": "Test House 2",
         "price": 200000,
         "is_published": True,
         "description": "Test description 2",
-        "address": "Test address 2",
+        "full_address": "Test address 2",
+        "phone_number": "+92-3001234567",
+        "cnic": "12345-1234567-1",
+        "property_type": Property.PropertyType.HOUSE,
     }
 
     response = client.post(reverse("properties:edit", args=[prop.id]), data=form_data)
@@ -83,4 +97,8 @@ def test_property_edit_form(user, client):
     assert prop.name == "Test House 2"
     assert prop.price == 200000
     assert prop.description == "Test description 2"
-    assert prop.address == "Test address 2"
+    assert prop.full_address == "Test address 2"
+    assert prop.phone_number == "+92-3001234567"
+    assert prop.cnic == "12345-1234567-1"
+    assert prop.property_type == Property.PropertyType.HOUSE
+    assert prop.is_published
