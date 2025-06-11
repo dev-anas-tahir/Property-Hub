@@ -1,3 +1,7 @@
+"""
+This module contains template filters for form fields.
+"""
+
 from django import template
 
 register = template.Library()

@@ -6,8 +6,10 @@ from factory.django import DjangoModelFactory
 from django.contrib.auth.models import User
 from factory import Faker, Sequence, LazyAttribute, PostGenerationMethodCall
 
+
 class UserFactory(DjangoModelFactory):
     """Factory for creating test users."""
+
     username = Sequence(lambda n: f"user{n}")
     email = LazyAttribute(lambda obj: f"{obj.username}@example.com")
     first_name = Faker("first_name")

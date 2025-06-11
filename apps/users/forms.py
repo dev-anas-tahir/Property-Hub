@@ -1,3 +1,7 @@
+"""
+This module contains forms for user-related operations.
+"""
+
 import string
 from django import forms
 from django.contrib.auth.models import User
@@ -7,6 +11,7 @@ from django.contrib.auth.forms import UserCreationForm, PasswordChangeForm
 
 def validate_password_strength(password: str):
     """Raise ValidationError if password doesn't meet strength requirements."""
+
     if len(password) < 8:
         raise ValidationError("Password must be at least 8 characters long.")
     if not any(char.isdigit() for char in password):
@@ -55,15 +60,22 @@ class UpdateProfileForm(forms.ModelForm):
 
     def clean_email(self):
         email = self.cleaned_data.get("email")
-        if email != self.current_user.email and User.objects.filter(email=email).exists():
+        if (
+            email != self.current_user.email
+            and User.objects.filter(email=email).exists()
+        ):
             raise ValidationError("Email is already in use.")
         return email
 
     def clean_username(self):
         username = self.cleaned_data.get("username")
-        if username != self.current_user.username and User.objects.filter(username=username).exists():
+        if (
+            username != self.current_user.username
+            and User.objects.filter(username=username).exists()
+        ):
             raise ValidationError("Username is already in use.")
         return username
+
 
 class CustomPasswordChangeForm(PasswordChangeForm):
     """Form for changing user password."""

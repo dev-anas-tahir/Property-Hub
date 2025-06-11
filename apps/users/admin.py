@@ -1,3 +1,5 @@
-from django.contrib import admin
+"""
+This module contains admin configurations for user-related models.
+"""
 
-# Register your models here.
+from django.contrib import admin

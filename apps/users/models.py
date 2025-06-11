@@ -1,3 +1,5 @@
-from django.db import models
+"""
+This module contains models for user-related operations.
+"""
 
-# Create your models here.
+from django.db import models

@@ -14,7 +14,6 @@ from django.contrib.auth.views import PasswordChangeView
 from apps.users.forms import SignUpForm, UpdateProfileForm, CustomPasswordChangeForm
 
 
-# Create your views here.
 class SignUpView(CreateView):
     """View for handling user sign-up."""
 
@@ -61,6 +60,7 @@ class CustomLogoutView(LogoutView):
     def dispatch(request, *args, **kwargs):
         logout(request)
         return redirect("properties:list")
+
 
 class CustomPasswordChangeView(LoginRequiredMixin, PasswordChangeView):
     """Custom password change view that redirects home after password change."""

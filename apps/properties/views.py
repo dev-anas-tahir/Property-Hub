@@ -4,8 +4,6 @@ listing properties, viewing property details, creating new properties, editing e
 and deleting properties within the Property Hub application.
 """
 
-import os
-import shutil
 from apps.properties.models import Property, Favorite, PropertyImage
 from django.views import View
 from apps.properties.forms import PropertyForm
@@ -197,6 +195,8 @@ class NewPropertyView(LoginRequiredMixin, CreateView):
 
 
 class EditPropertyView(LoginRequiredMixin, UpdateView):
+    """View for editing a property."""
+
     model = Property
     form_class = PropertyForm
     template_name = "properties/edit.html"
@@ -284,13 +284,13 @@ class EditPropertyView(LoginRequiredMixin, UpdateView):
                             first_image.is_primary = True
                             first_image.save()
 
-
         self.object = form.save()
         return super().form_valid(form)
 
 
 class DeletePropertyView(LoginRequiredMixin, DeleteView):
     """View for deleting a property and its associated files."""
+
     model = Property
     success_url = reverse_lazy("properties:list")
 

@@ -11,6 +11,7 @@ from apps.properties.models import Property
 @pytest.mark.django_db
 def test_property_str(user):
     """Test the string representation of the Property model."""
+
     # use the `user` fixture for ownership
     prop = Property.objects.create(
         name="Test House",
@@ -18,13 +19,15 @@ def test_property_str(user):
         price=100000,
         is_published=True,
         description="Test description",
-        address="Test address"
+        address="Test address",
     )
     assert str(prop) == "Test House"
+
 
 @pytest.mark.django_db
 def test_property_add_form(user, client):
     """Test adding a new property using the form."""
+
     client.force_login(user)
     response = client.get(reverse("properties:new"))
     assert response.status_code == 200
@@ -34,18 +37,22 @@ def test_property_add_form(user, client):
         "price": 100000,
         "is_published": True,
         "description": "Test description",
-        "address": "Test address"
+        "address": "Test address",
     }
 
     response = client.post(reverse("properties:new"), data=form_data)
-    assert response.status_code == 302  # should redirect after successful form submission
+    assert (
+        response.status_code == 302
+    )  # should redirect after successful form submission
 
     # Check if the property was added
     assert Property.objects.filter(name="Test House").exists()
 
+
 @pytest.mark.django_db
 def test_property_edit_form(user, client):
     """Test editing an existing property using the form."""
+
     client.force_login(user)
     prop = Property.objects.create(
         name="Test House",
@@ -53,7 +60,7 @@ def test_property_edit_form(user, client):
         price=100000,
         is_published=True,
         description="Test description",
-        address="Test address"
+        address="Test address",
     )
     response = client.get(reverse("properties:edit", args=[prop.id]))
     assert response.status_code == 200
@@ -63,11 +70,13 @@ def test_property_edit_form(user, client):
         "price": 200000,
         "is_published": True,
         "description": "Test description 2",
-        "address": "Test address 2"
+        "address": "Test address 2",
     }
 
     response = client.post(reverse("properties:edit", args=[prop.id]), data=form_data)
-    assert response.status_code == 302  # should redirect after successful form submission
+    assert (
+        response.status_code == 302
+    )  # should redirect after successful form submission
 
     # Check if the property was edited
     prop.refresh_from_db()
