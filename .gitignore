@@ -73,3 +73,6 @@ nosetests.xml
 coverage.xml
 *.cover
 .hypothesis/
+
+# media files
+media/
