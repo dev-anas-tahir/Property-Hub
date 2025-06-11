@@ -17,7 +17,7 @@ class Property(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
     full_address = models.CharField(max_length=255)
-    phone_number = models.CharField(max_length=20)
+    phone_number = models.CharField(max_length=15)
     cnic = models.CharField(max_length=15)
     property_type = models.CharField(max_length=10, choices=PropertyType.choices)
     description = models.TextField()

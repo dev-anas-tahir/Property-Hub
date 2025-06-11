@@ -2,8 +2,22 @@
 This module contains forms for property-related operations.
 """
 
+import re
 from django import forms
 from apps.properties.models import Property
+from django.core.exceptions import ValidationError
+
+
+def validate_cnic(value):
+    pattern = r'^\d{5}-\d{7}-\d{1}$'
+    if not re.match(pattern, value):
+        raise ValidationError('CNIC must be in the format 00000-0000000-0')
+
+
+def validate_phone(value):
+    pattern = r'^\+\d{2}-\d{10}$'
+    if not re.match(pattern, value):
+        raise ValidationError('Phone number must be in the format +00-0000000000')
 
 
 class PropertyForm(forms.ModelForm):
@@ -44,8 +58,8 @@ class PropertyForm(forms.ModelForm):
             "name": forms.TextInput(attrs={"class": "form-control"}),
             "description": forms.Textarea(attrs={"class": "form-control"}),
             "full_address": forms.TextInput(attrs={"class": "form-control"}),
-            "phone_number": forms.TextInput(attrs={"class": "form-control"}),
-            "cnic": forms.TextInput(attrs={"class": "form-control"}),
+            "phone_number": forms.TextInput(attrs={"class": "form-control", "placeholder": "+92-3001234567"}),
+            "cnic": forms.TextInput(attrs={"class": "form-control", "placeholder": "12345-1234567-1"}),
             "property_type": forms.Select(attrs={"class": "form-control"}),
             "price": forms.NumberInput(attrs={"class": "form-control"}),
             "documents": forms.FileInput(
@@ -55,6 +69,10 @@ class PropertyForm(forms.ModelForm):
                 }
             ),
             "is_published": forms.CheckboxInput(attrs={"class": "form-check-input"}),
+        }
+        validators = {
+            "phone_number": [validate_phone],
+            "cnic": [validate_cnic],
         }
 
     def clean_documents(self):
