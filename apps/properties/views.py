@@ -89,6 +89,17 @@ class ToggleFavoriteView(LoginRequiredMixin, View):
         )
 
 
+class MyPropertiesListView(LoginRequiredMixin, ListView):
+    """View for listing all properties created by the user."""
+
+    model = Property
+    template_name = "properties/myprops.html"
+    context_object_name = "properties"
+
+    def get_queryset(self):
+        return Property.objects.filter(user=self.request.user)
+
+
 class FavoritesListView(LoginRequiredMixin, ListView):
     """Simplified but optimized version of the favorites list view."""
 

@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block title %}My Properties{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12 mb-4">
+        <h1>My Properties</h1>
+    </div>
+    {% if properties %}
+        {% for property in properties %}
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 shadow-sm">
+                    {% if property.images.first %}
+                        <img src="{{ property.images.first.image.url }}" class="card-img-top" alt="{{ property.name }}" style="height: 200px; object-fit: cover;">
+                    {% else %}
+                        <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                            <span class="text-muted">No Image</span>
+                        </div>
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">{{ property.name }}</h5>
+                        <p class="card-text">{{ property.full_address|truncatewords:20 }}</p>
+                        <p class="card-text"><strong>Price:</strong> ${{ property.price }}</p>
+                        <p class="card-text"><strong>Type:</strong> {{ property.property_type }}</p>
+                    </div>
+                    <div class="card-footer bg-transparent d-flex gap-2">
+                        <a href="{% url 'properties:detail' property.pk %}" class="btn btn-primary flex-grow-1">View Details</a>
+                        <a href="{% url 'properties:edit' property.pk %}" class="btn btn-warning flex-grow-1">Edit</a>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <div class="col-12">
+            <div class="alert alert-info" role="alert">
+                No properties available.
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
