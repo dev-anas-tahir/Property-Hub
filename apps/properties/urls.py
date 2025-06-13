@@ -46,6 +46,5 @@ urlpatterns = [
     path("new/", PropertyView.as_view(), name="new"),                          # GET (form), POST (create)
     path("<int:pk>/", PropertyView.as_view(), name="detail"),                  # GET (detail), POST (update)
     path("<int:pk>/edit/", EditPropertyView.as_view(), name="edit"),           # POST with pk = update fallback route
-    path("<int:pk>/delete/", PropertyView.as_view(), name="delete"),           # DELETE
     path("<int:pk>/download/", PropertyView.as_view(), {"action": "download"}, name="download_document"),
 ]
