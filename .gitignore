@@ -23,6 +23,7 @@ venv/
 
 # Environment variables
 .env
+.env.prod
 
 # IDE specific
 .vscode/
