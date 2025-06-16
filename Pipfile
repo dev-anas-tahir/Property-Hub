@@ -11,6 +11,7 @@ gunicorn = "*"
 whitenoise = "*"
 django-storages = "*"
 boto3 = "*"
+django-extensions = "*"
 
 [dev-packages]
 pytest = "*"

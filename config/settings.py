@@ -2,6 +2,7 @@
 
 import environ
 from pathlib import Path
+from django.contrib import messages
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -92,7 +93,7 @@ LOGIN_URL = "users:login"
 
 if DEBUG:
     MEDIA_ROOT = BASE_DIR / "media"
-    INSTALLED_APPS += ["debug_toolbar"]
+    INSTALLED_APPS += ["debug_toolbar", "django_extensions"]
     MIDDLEWARE.insert(
         MIDDLEWARE.index("django.middleware.security.SecurityMiddleware") + 1,
         "debug_toolbar.middleware.DebugToolbarMiddleware",
@@ -128,3 +129,11 @@ else:
             "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
         },
     }
+
+MESSAGE_TAGS = {
+    messages.DEBUG: "alert-info",
+    messages.INFO: "alert-info",
+    messages.SUCCESS: "alert-success",
+    messages.WARNING: "alert-warning",
+    messages.ERROR: "alert-danger",
+}

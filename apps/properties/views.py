@@ -9,23 +9,24 @@ from django.views import View
 from django.views.generic import ListView, DetailView, UpdateView
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy
-from django.http import HttpResponseForbidden
+from django.core.exceptions import PermissionDenied
 from django.db import transaction
 from django.contrib import messages
+from apps.properties.mixins import (
+    DeletePropertyMixin,
+    PropertyAccessMixin,
+    PropertyFormHandlerMixin,
+)
 from apps.properties.models import Property, Favorite
 from apps.properties.forms import PropertyForm
 from apps.properties.utils import (
     get_properties_with_favorites,
     handle_document_download,
-    handle_document_removal,
-    handle_image_deletion,
-    handle_image_upload,
     render_property_template,
-    delete_property_and_assets,
 )
 
+
 class PropertiesListView(ListView):
-    """View for listing all properties."""
     model = Property
     template_name = "properties/list.html"
     context_object_name = "properties"
@@ -33,31 +34,27 @@ class PropertiesListView(ListView):
     def get_queryset(self):
         return get_properties_with_favorites(self.request.user)
 
-class PropertyDetailView(DetailView):
-    """View for viewing a specific property."""
+
+class PropertyDetailView(LoginRequiredMixin, DetailView, DeletePropertyMixin):
     model = Property
     template_name = "properties/detail.html"
     context_object_name = "property"
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
-        return render_property_template(request, "detail.html", property_obj=self.object)
-    
+        return render_property_template(
+            request, "detail.html", property_obj=self.object
+        )
+
     def post(self, request, *args, **kwargs):
         if request.POST.get("_method") == "DELETE":
             return self.delete(request, *args, **kwargs)
         return super().post(request, *args, **kwargs)
-    
-    @transaction.atomic
-    def delete(self, request, *args, **kwargs):
-        prop = self.get_object()
-        if prop.user != request.user:
-            return HttpResponseForbidden("Not allowed")
-        delete_property_and_assets(request, prop)
-        return redirect("properties:list")
 
-class EditPropertyView(LoginRequiredMixin, UpdateView):
-    """View for editing a property."""
+
+class EditPropertyView(
+    LoginRequiredMixin, PropertyAccessMixin, PropertyFormHandlerMixin, UpdateView
+):
     model = Property
     form_class = PropertyForm
     template_name = "properties/edit.html"
@@ -65,19 +62,20 @@ class EditPropertyView(LoginRequiredMixin, UpdateView):
     def get_success_url(self):
         return reverse_lazy("properties:detail", kwargs={"pk": self.object.pk})
 
-    def get_queryset(self):
-        return Property.objects.filter(user=self.request.user)
-
     def form_valid(self, form):
-        handle_document_removal(self.request, self.object, form)
-        handle_image_deletion(self.request, self.object)
-        self.object = form.save()
-        handle_image_upload(self.request, self.object)
-        messages.success(self.request, "Property updated successfully.")
-        return super().form_valid(form)
+        response = self.process_property_form(self.request, form, instance=self.object)
+        if response:
+            return response
+        return self.form_invalid(form)
+
+    def form_invalid(self, form):
+        messages.error(self.request, "Please correct the form errors.")
+        return render_property_template(
+            self.request, "edit.html", property_obj=self.object, form=form
+        )
+
 
 class ToggleFavoriteView(LoginRequiredMixin, View):
-    """Toggle a property’s favorite status on any HTTP method."""
     def post(self, request, *args, **kwargs):
         prop = get_object_or_404(Property, id=kwargs["pk"])
         fav, created = Favorite.objects.get_or_create(user=request.user, property=prop)
@@ -87,8 +85,8 @@ class ToggleFavoriteView(LoginRequiredMixin, View):
             request.META.get("HTTP_REFERER", reverse_lazy("properties:list"))
         )
 
+
 class MyPropertiesListView(LoginRequiredMixin, ListView):
-    """View for listing all properties created by the user."""
     model = Property
     template_name = "properties/myprops.html"
     context_object_name = "properties"
@@ -96,8 +94,8 @@ class MyPropertiesListView(LoginRequiredMixin, ListView):
     def get_queryset(self):
         return Property.objects.filter(user=self.request.user)
 
+
 class FavoritesListView(LoginRequiredMixin, ListView):
-    """Simplified but optimized version of the favorites list view."""
     model = Property
     template_name = "properties/favorites.html"
     context_object_name = "properties"
@@ -110,50 +108,33 @@ class FavoritesListView(LoginRequiredMixin, ListView):
             .distinct()
         )
 
-class PropertyView(LoginRequiredMixin, View):
-    """
-    Unified view to handle:
-    - GET: create form / download
-    - POST: create or update property
-    """
-    def get_object(self, pk):
-        return get_object_or_404(Property, pk=pk)
 
+class PropertyView(LoginRequiredMixin, PropertyFormHandlerMixin, View):
     def get(self, request, *args, **kwargs):
         pk = kwargs.get("pk")
         action = kwargs.get("action")
 
         if pk and action == "download":
             return handle_document_download(request, self.get_object(pk))
-        
+
         if not pk:
             return render_property_template(request, "new.html", form=PropertyForm())
-        
-        return HttpResponseForbidden("Invalid request")
+
+        raise PermissionDenied("Invalid request")
 
     @transaction.atomic
     def post(self, request, *args, **kwargs):
         pk = kwargs.get("pk")
-        if pk:
-            prop = self.get_object(pk)
-            if prop.user != request.user:
-                return HttpResponseForbidden("Not allowed")
-            form = PropertyForm(request.POST, request.FILES, instance=prop)
-        else:
-            form = PropertyForm(request.POST, request.FILES)
+        form = PropertyForm(
+            request.POST, request.FILES, instance=self.get_object(pk) if pk else None
+        )
 
-        if form.is_valid():
-            form.instance.user = request.user
-            prop = form.save()
-            handle_document_removal(request, prop, form)
-            handle_image_deletion(request, prop)
-            handle_image_upload(request, prop)
-            messages.success(request, f"Property {'updated' if pk else 'created'} successfully.")
-            return redirect("properties:detail", pk=prop.pk)
-        
-        messages.error(request, "Please correct the form errors.")
+        response = self.process_property_form(
+            request, form, instance=self.get_object(pk) if pk else None
+        )
+        if response:
+            return response
+
         return render_property_template(
-            request,
-            "edit.html" if pk else "new.html",
-            form=form
+            request, "edit.html" if pk else "new.html", form=form
         )
