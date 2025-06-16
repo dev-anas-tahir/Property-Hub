@@ -118,7 +118,7 @@ class PropertyView(LoginRequiredMixin, PropertyFormHandlerMixin, View):
             return handle_document_download(request, self.get_object(pk))
 
         if not pk:
-            return render_property_template(request, "new.html", form=PropertyForm())
+            return render_property_template(request, "create.html", form=PropertyForm())
 
         raise PermissionDenied("Invalid request")
 
@@ -136,5 +136,5 @@ class PropertyView(LoginRequiredMixin, PropertyFormHandlerMixin, View):
             return response
 
         return render_property_template(
-            request, "edit.html" if pk else "new.html", form=form
+            request, "edit.html" if pk else "create.html", form=form
         )

@@ -12,7 +12,7 @@ from apps.properties.views import (
 app_name = "properties"
 
 urlpatterns = [
-    path("new/", PropertyView.as_view(), name="new"),
+    path("create/", PropertyView.as_view(), name="create"),
     path("", PropertiesListView.as_view(), name="list"),
     path("<int:pk>/", PropertyDetailView.as_view(), name="detail"),
     path("<int:pk>/", PropertyDetailView.as_view(), name="delete"),
