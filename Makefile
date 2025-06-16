@@ -1,4 +1,4 @@
-.PHONY: build migrate run
+.PHONY: build migrate runserver rungunicorn test shell
 
 build:
 	pip install pipenv
@@ -9,8 +9,11 @@ migrate:
 	pipenv run python manage.py migrate
 	pipenv run python manage.py collectstatic --noinput
 
-run:
+runserver:
 	pipenv run python manage.py runserver
+
+rungunicorn:
+	pipenv run gunicorn config.wsgi:application --bind 0.0.0.0:8000 --workers=1 --timeout=120
 
 test:
 	pipenv run pytest
