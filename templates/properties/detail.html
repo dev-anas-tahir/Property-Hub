@@ -107,7 +107,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <form method="POST" id="delete-form" action="{% url 'properties:detail' property.pk %}" style="display:inline;">
+                <form method="POST" id="delete-form" action="{% url 'properties:delete' property.pk %}" style="display:inline;">
                     {% csrf_token %}
                     <input type="hidden" name="_method" value="DELETE">
                     <button type="submit" class="btn btn-danger">Yes, Delete</button>

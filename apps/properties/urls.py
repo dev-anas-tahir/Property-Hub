@@ -12,6 +12,7 @@ urlpatterns = [
     path("", PropertiesListView.as_view(), name="list"),
     path("<int:pk>/", PropertyDetailView.as_view(), name="detail"),
     path("<int:pk>/edit/", EditPropertyView.as_view(), name="edit"),
+    path("delete/<int:pk>/", PropertyView.as_view(), {"action": "delete"}, name="delete"),
     path("<int:pk>/download/", PropertyView.as_view(), {"action": "download"}, name="download_document"),
     path("myprops/", MyPropertiesListView.as_view(), name="myprops"),
     path("favorites/", FavoritesListView.as_view(), name="favorites"),
