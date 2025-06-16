@@ -4,16 +4,16 @@ listing properties, viewing property details, creating new properties, editing e
 and deleting properties within the Property Hub application.
 """
 
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views import View
-from django.db import transaction
-from django.contrib import messages
+from django.views.generic import ListView, DetailView, UpdateView
+from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.http import HttpResponseForbidden
-from apps.properties.forms import PropertyForm
+from django.db import transaction
+from django.contrib import messages
 from apps.properties.models import Property, Favorite
-from django.shortcuts import get_object_or_404, redirect
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic import ListView, DetailView, UpdateView
+from apps.properties.forms import PropertyForm
 from apps.properties.utils import (
     get_properties_with_favorites,
     handle_document_download,
@@ -21,6 +21,7 @@ from apps.properties.utils import (
     handle_image_deletion,
     handle_image_upload,
     render_property_template,
+    delete_property_and_assets,
 )
 
 class PropertiesListView(ListView):
@@ -41,6 +42,19 @@ class PropertyDetailView(DetailView):
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
         return render_property_template(request, "detail.html", property_obj=self.object)
+    
+    def post(self, request, *args, **kwargs):
+        if request.POST.get("_method") == "DELETE":
+            return self.delete(request, *args, **kwargs)
+        return super().post(request, *args, **kwargs)
+    
+    @transaction.atomic
+    def delete(self, request, *args, **kwargs):
+        prop = self.get_object()
+        if prop.user != request.user:
+            return HttpResponseForbidden("Not allowed")
+        delete_property_and_assets(request, prop)
+        return redirect("properties:list")
 
 class EditPropertyView(LoginRequiredMixin, UpdateView):
     """View for editing a property."""
@@ -101,7 +115,6 @@ class PropertyView(LoginRequiredMixin, View):
     Unified view to handle:
     - GET: create form / download
     - POST: create or update property
-    - DELETE: delete a property
     """
     def get_object(self, pk):
         return get_object_or_404(Property, pk=pk)
@@ -120,9 +133,6 @@ class PropertyView(LoginRequiredMixin, View):
 
     @transaction.atomic
     def post(self, request, *args, **kwargs):
-        if request.POST.get("_method") == "DELETE":
-            return self.delete(request, *args, **kwargs)
-
         pk = kwargs.get("pk")
         if pk:
             prop = self.get_object(pk)
@@ -147,20 +157,3 @@ class PropertyView(LoginRequiredMixin, View):
             "edit.html" if pk else "new.html",
             form=form
         )
-
-    @transaction.atomic
-    def delete(self, request, *args, **kwargs):
-        prop = self.get_object(kwargs.get("pk"))
-        if prop.user != request.user:
-            return HttpResponseForbidden("Not allowed")
-        
-        for img in prop.images.all():
-            img.image.delete(save=False)
-            img.delete()
-        
-        if prop.documents:
-            prop.documents.delete(save=False)
-        
-        prop.delete()
-        messages.success(request, "Property deleted successfully.")
-        return redirect("properties:list")
