@@ -3,13 +3,13 @@ This module contains utility functions for property-related operations.
 """
 
 import os
-from typing import Optional
+from typing import Optional, List
 from django.contrib import messages
 from django.shortcuts import render
 from django.contrib.auth.models import User
-from django.http import HttpResponseForbidden, FileResponse
-from apps.properties.models import Property, PropertyImage
 from apps.properties.forms import PropertyForm
+from apps.properties.models import Property, PropertyImage
+from django.http import HttpResponseForbidden, FileResponse
 from django.db.models import QuerySet, BooleanField, Value, Case, When
 
 
@@ -73,43 +73,41 @@ def handle_image_deletion(request, property_obj: Property):
             continue
 
 
-def handle_image_upload(request, property_obj: Property):
+def handle_image_upload(request, property_obj: Property) -> List[str]:
     """
-    Handle multiple image uploads for a property with validation and messaging.
+    Handle multiple image uploads for a property with validation.
+
+    Args:
+        request: The HTTP request object.
+        property_obj: The Property instance to associate images with.
+
+    Returns:
+        List of error messages for invalid images, or empty list if all valid.
     """
     images = request.FILES.getlist("images")
     if not images:
-        return
+        return []
 
     allowed_extensions = [".jpg", ".jpeg", ".png", ".gif", ".webp"]
     max_size = 5 * 1024 * 1024  # 5MB
     max_files = 10
+    errors = []
 
     if len(images) > max_files:
-        messages.warning(
-            request,
-            f"Maximum {max_files} images allowed. Only first {max_files} processed.",
-        )
+        errors.append(f"Maximum {max_files} images allowed. Only first {max_files} processed.")
         images = images[:max_files]
 
     valid_images = []
     for img in images:
         if not img or img.size == 0:
-            messages.warning(
-                request, f"Image {img.name} is invalid or empty. Skipping."
-            )
+            errors.append(f"Image {img.name} is invalid or empty.")
             continue
         if img.size > max_size:
-            messages.warning(
-                request, f"Image {img.name} is too large (max 5MB). Skipping."
-            )
+            errors.append(f"Image {img.name} is too large (max 5MB).")
             continue
         ext = os.path.splitext(img.name.lower())[1]
         if ext not in allowed_extensions:
-            messages.warning(
-                request,
-                f"Image {img.name} has invalid format. Allowed: JPG, PNG, GIF, WebP. Skipping.",
-            )
+            errors.append(f"Image {img.name} has invalid format. Allowed: JPG, PNG, GIF, WebP.")
             continue
         valid_images.append(PropertyImage(property=property_obj, image=img))
 
@@ -120,7 +118,9 @@ def handle_image_upload(request, property_obj: Property):
             if first_img:
                 first_img.is_primary = True
                 first_img.save()
+            messages.success(request, f"{len(valid_images)} images uploaded successfully.")
 
+    return errors
 
 def delete_property_and_assets(request, property_obj: Property):
     """

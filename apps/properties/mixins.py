@@ -15,26 +15,37 @@ from apps.properties.utils import (
     delete_property_and_assets,
 )
 
-class DeletePropertyMixin:
-    """Handles property deletion logic."""
-    @transaction.atomic
-    def delete(self, request, *args, **kwargs):
-        prop = self.get_object()
-        if prop.user != request.user:
-            return HttpResponseForbidden("Not allowed")
-        delete_property_and_assets(request, prop)
-        return redirect("properties:list")
 
 class PropertyAccessMixin:
     """Provides get_object with ownership enforcement."""
+
     def get_object(self, pk=None):
         obj = get_object_or_404(Property, pk=pk or self.kwargs.get("pk"))
         if obj.user != self.request.user:
             raise HttpResponseForbidden("Not allowed")
         return obj
 
+
+class DeletePropertyMixin:
+    """Handles property deletion logic, only for owner."""
+
+    def post(self, request, *args, **kwargs):
+        if request.POST.get("_method") == "DELETE":
+            return self.delete(request, *args, **kwargs)
+        return super().post(request, *args, **kwargs)
+
+    @transaction.atomic
+    def delete(self, request, *args, **kwargs):
+        prop = get_object_or_404(Property, pk=self.kwargs.get("pk"))
+        if not request.user.is_authenticated or prop.user != request.user:
+            return HttpResponseForbidden("Not allowed")
+        delete_property_and_assets(request, prop)
+        return redirect("properties:list")
+
+
 class PropertyFormHandlerMixin:
     """Handles media cleanup/upload and messaging around property forms."""
+
     def process_property_form(self, request, form, instance=None):
         """
         Process a property form for creation or update.
@@ -45,7 +56,7 @@ class PropertyFormHandlerMixin:
             instance: The Property instance for updates, or None for creation.
 
         Returns:
-            HttpResponse (redirect on success, or None on failure).
+            HttpResponse (redirect on success, or form on failure).
         """
         if form.is_valid():
             prop = form.save(commit=False)
@@ -55,7 +66,11 @@ class PropertyFormHandlerMixin:
             prop.save()
             handle_document_removal(request, prop, form)
             handle_image_deletion(request, prop)
-            handle_image_upload(request, prop)
+            image_errors = handle_image_upload(request, prop)
+            if image_errors:
+                for error in image_errors:
+                    form.add_error(None, error)
+                return None
             action = "updated" if instance else "created"
             messages.success(request, f"Property {action} successfully.")
             return redirect("properties:detail", pk=prop.pk)

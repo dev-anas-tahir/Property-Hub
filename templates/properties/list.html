@@ -42,12 +42,13 @@
                 </div>
             </div>
         {% endfor %}
+        {% include 'page.html' %}
     {% else %}
         <div class="col-12">
             <div class="alert alert-info" role="alert">
                 No properties available.
             </div>
         </div>
-    {% endif %}
+        {% endif %}
 </div>
 {% endblock %}

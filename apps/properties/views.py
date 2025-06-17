@@ -30,12 +30,13 @@ class PropertiesListView(ListView):
     model = Property
     template_name = "properties/list.html"
     context_object_name = "properties"
+    paginate_by = 9
 
     def get_queryset(self):
         return get_properties_with_favorites(self.request.user)
 
 
-class PropertyDetailView(LoginRequiredMixin, DetailView, DeletePropertyMixin):
+class PropertyDetailView(DetailView, DeletePropertyMixin):
     model = Property
     template_name = "properties/detail.html"
     context_object_name = "property"
@@ -45,12 +46,6 @@ class PropertyDetailView(LoginRequiredMixin, DetailView, DeletePropertyMixin):
         return render_property_template(
             request, "detail.html", property_obj=self.object
         )
-
-    def post(self, request, *args, **kwargs):
-        if request.POST.get("_method") == "DELETE":
-            return self.delete(request, *args, **kwargs)
-        return super().post(request, *args, **kwargs)
-
 
 class EditPropertyView(
     LoginRequiredMixin, PropertyAccessMixin, PropertyFormHandlerMixin, UpdateView
@@ -90,6 +85,7 @@ class MyPropertiesListView(LoginRequiredMixin, ListView):
     model = Property
     template_name = "properties/myprops.html"
     context_object_name = "properties"
+    paginate_by = 9
 
     def get_queryset(self):
         return Property.objects.filter(user=self.request.user)
@@ -99,6 +95,7 @@ class FavoritesListView(LoginRequiredMixin, ListView):
     model = Property
     template_name = "properties/favorites.html"
     context_object_name = "properties"
+    paginate_by = 9
 
     def get_queryset(self):
         return (
@@ -134,6 +131,8 @@ class PropertyView(LoginRequiredMixin, PropertyFormHandlerMixin, View):
         )
         if response:
             return response
+        
+        messages.error(request, "Please correct the form errors.")
 
         return render_property_template(
             request, "edit.html" if pk else "create.html", form=form
