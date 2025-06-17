@@ -46,10 +46,10 @@
                         <div class="text-danger">{{ form.price.errors }}</div>
                     </div>
                     {% if property.images.all %}
-                    <label class="mt-4">Current Images:</label>
+                    <label class="mt-1">Current Images:</label>
                         <div class="row">
                             {% for image in property.images.all %}
-                                <div class="col-md-4 mb-3">
+                                <div class="col-md-4 mb-4">
                                     <div class="card h-100 shadow-sm">
                                         <img src="{{ image.image.url }}" class="card-img-top" alt="Property Image" style="height: 150px; object-fit: cover;">
                                         <div class="card-body d-flex align-items-center">
@@ -65,14 +65,14 @@
                     {% else %}
                         <div class="alert alert-info">No images uploaded.</div>
                     {% endif %}
-                    <label class="mt-4">Upload New Images:</label>
                     <div class="mb-3">
+                        <label>Upload New Images:</label>
                         <input type="file" name="images" multiple class="form-control" accept="image/jpeg,image/png">
                         <div class="text-danger">{{ form.non_field_errors }}</div>
                     </div>
                     {% if property.documents %}
-                    <label class="mt-4">Current Document:</label>
-                    <div class="mb-3">
+                    <div class="mb-1">
+                        <label>Current Document:</label>
                         {% if property.documents %}
                             <p><a href="{% url 'properties:download_document' property.pk %}" target="_blank">{{ property.documents.name|cut:'documents/' }}</a></p>
                             <div class="form-check">
@@ -84,8 +84,8 @@
                         {% endif %}
                     </div>
                     {% else %}
-                        <label class="mt-4">Upload New Document:</label>
-                        <div class="mb-3">
+                    <div class="mb-1">
+                            <label>Upload New Document:</label>
                             {{ form.documents }}
                             <div class="text-danger">{{ form.documents.errors }}</div>
                         </div>

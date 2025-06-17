@@ -12,6 +12,7 @@ whitenoise = "*"
 django-storages = "*"
 boto3 = "*"
 django-extensions = "*"
+django-axes = "*"
 
 [dev-packages]
 pytest = "*"
