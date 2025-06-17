@@ -45,7 +45,6 @@ class DeletePropertyMixin:
 
 class PropertyFormHandlerMixin:
     """Handles media cleanup/upload and messaging around property forms."""
-
     def process_property_form(self, request, form, instance=None):
         """
         Process a property form for creation or update.
@@ -56,22 +55,31 @@ class PropertyFormHandlerMixin:
             instance: The Property instance for updates, or None for creation.
 
         Returns:
-            HttpResponse (redirect on success, or form on failure).
+            HttpResponse (redirect on success) or None (on failure).
         """
-        if form.is_valid():
+        if not form.is_valid():
+            return None
+
+        # Check for image errors before saving
+        image_errors = handle_image_upload(request, instance)
+        if image_errors:
+            for error in image_errors:
+                form.add_error(None, error)
+            return None
+
+        with transaction.atomic():
             prop = form.save(commit=False)
             if instance:
                 prop.id = instance.id  # Preserve ID for updates
             prop.user = request.user
             prop.save()
+            form.save_m2m()  # Save many-to-many fields if any
+
+            # Handle document and image operations
             handle_document_removal(request, prop, form)
             handle_image_deletion(request, prop)
-            image_errors = handle_image_upload(request, prop)
-            if image_errors:
-                for error in image_errors:
-                    form.add_error(None, error)
-                return None
+            handle_image_upload(request, prop)  # Re-run to save valid images
+            
             action = "updated" if instance else "created"
             messages.success(request, f"Property {action} successfully.")
             return redirect("properties:detail", pk=prop.pk)
-        return None

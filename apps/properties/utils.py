@@ -8,28 +8,28 @@ from django.contrib import messages
 from django.shortcuts import render
 from django.contrib.auth.models import User
 from apps.properties.forms import PropertyForm
-from apps.properties.models import Property, PropertyImage
+from apps.properties.models import Property, PropertyImage, Favorite
 from django.http import HttpResponseForbidden, FileResponse
-from django.db.models import QuerySet, BooleanField, Value, Case, When
+from django.db.models import QuerySet, Value, Exists, OuterRef
 
 
 def get_properties_with_favorites(user: Optional[User] = None) -> QuerySet:
     """
     Retrieve properties with favorite status annotation for a user.
     """
-    queryset = Property.objects.select_related("user").prefetch_related("images")
+    queryset = Property.objects.select_related('user').prefetch_related('images')
     if user and user.is_authenticated:
         queryset = queryset.annotate(
-            is_favorited=Case(
-                When(favorited_by__user=user, then=Value(True)),
-                default=Value(False),
-                output_field=BooleanField(),
+            is_favorited=Exists(
+                Favorite.objects.filter(
+                    user=user,
+                    property_id=OuterRef('pk')
+                )
             )
-        ).distinct()
+        )
     else:
         queryset = queryset.annotate(is_favorited=Value(False))
     return queryset
-
 
 def handle_document_download(request, property_obj: Property) -> FileResponse:
     """
@@ -101,13 +101,16 @@ def handle_image_upload(request, property_obj: Property) -> List[str]:
     for img in images:
         if not img or img.size == 0:
             errors.append(f"Image {img.name} is invalid or empty.")
+            messages.warning(request, f"Image {img.name} is invalid or empty.")
             continue
         if img.size > max_size:
             errors.append(f"Image {img.name} is too large (max 5MB).")
+            messages.warning(request, f"Image {img.name} is too large (max 5MB).")
             continue
         ext = os.path.splitext(img.name.lower())[1]
         if ext not in allowed_extensions:
             errors.append(f"Image {img.name} has invalid format. Allowed: JPG, PNG, GIF, WebP.")
+            messages.warning(request, f"Image {img.name} has invalid format. Allowed: JPG, PNG, GIF, WebP.")
             continue
         valid_images.append(PropertyImage(property=property_obj, image=img))
 
