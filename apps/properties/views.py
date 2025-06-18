@@ -47,6 +47,7 @@ class PropertyDetailView(DetailView, DeletePropertyMixin):
             request, "detail.html", property_obj=self.object
         )
 
+
 class EditPropertyView(
     LoginRequiredMixin, PropertyAccessMixin, PropertyFormHandlerMixin, UpdateView
 ):
@@ -76,6 +77,11 @@ class ToggleFavoriteView(LoginRequiredMixin, View):
         fav, created = Favorite.objects.get_or_create(user=request.user, property=prop)
         if not created:
             fav.delete()
+            messages.success(
+                request, f"Property {prop.name} removed from your favorites."
+            )
+        else:
+            messages.success(request, f"Property {prop.name} added to your favorites.")
         return redirect(
             request.META.get("HTTP_REFERER", reverse_lazy("properties:list"))
         )
@@ -131,7 +137,7 @@ class PropertyView(LoginRequiredMixin, PropertyFormHandlerMixin, View):
         )
         if response:
             return response
-        
+
         messages.error(request, "Please correct the form errors.")
 
         return render_property_template(
