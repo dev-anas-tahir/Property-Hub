@@ -8,6 +8,11 @@ pillow = "*"
 django-environ = "*"
 django = "*"
 gunicorn = "*"
+whitenoise = "*"
+django-storages = "*"
+boto3 = "*"
+django-extensions = "*"
+django-axes = "*"
 
 [dev-packages]
 pytest = "*"

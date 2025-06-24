@@ -1,11 +1,11 @@
 {% extends 'base.html' %}
 
-{% block title %}Favorite Properties{% endblock %}
+{% block title %}My Properties{% endblock %}
 
 {% block content %}
 <div class="row">
     <div class="col-12 mb-4">
-        <h1>Favorite Properties</h1>
+        <h1>My Properties</h1>
     </div>
     {% if properties %}
         {% for property in properties %}
@@ -26,14 +26,7 @@
                     </div>
                     <div class="card-footer bg-transparent d-flex gap-2">
                         <a href="{% url 'properties:detail' property.pk %}" class="btn btn-primary flex-grow-1">View Details</a>
-                        <form method="post" action="{% url 'properties:toggle_favorite' property.pk %}">
-                            {% csrf_token %}
-                            <button type="submit" class="btn btn-outline-primary">
-                                {% if property %}
-                                    💔 Unfavorite
-                                {% endif %}
-                            </button>
-                        </form>
+                        <a href="{% url 'properties:edit' property.pk %}" class="btn btn-warning flex-grow-1">Edit</a>
                     </div>
                 </div>
             </div>
@@ -42,7 +35,7 @@
     {% else %}
         <div class="col-12">
             <div class="alert alert-info" role="alert">
-                You have no favorite properties.
+                No properties available.
             </div>
         </div>
     {% endif %}

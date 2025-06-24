@@ -10,16 +10,17 @@ from django.core.validators import MinValueValidator
 class Property(models.Model):
     """Model representing a property."""
 
-    class PropertyType(models.TextChoices):
-        HOUSE = "House"
-        PLOT = "Plot"
+    PROPERTY_TYPE = (
+        ("House", "House"),
+        ("Plot", "Plot"),
+    )
 
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="properties")
     name = models.CharField(max_length=255)
     full_address = models.CharField(max_length=255)
-    phone_number = models.CharField(max_length=15)
+    phone_number = models.CharField(max_length=14)
     cnic = models.CharField(max_length=15)
-    property_type = models.CharField(max_length=10, choices=PropertyType.choices)
+    property_type = models.CharField(max_length=10, choices=PROPERTY_TYPE)
     description = models.TextField()
     price = models.DecimalField(
         max_digits=10, decimal_places=0, validators=[MinValueValidator(0)]
@@ -83,7 +84,7 @@ class Favorite(models.Model):
     favorited_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        unique_together = ("user", "property")  # prevents duplicates
+        unique_together = ("user", "property")
         ordering = ["-favorited_at"]
 
     def __str__(self):

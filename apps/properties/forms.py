@@ -1,29 +1,9 @@
-"""
-This module contains forms for property-related operations.
-"""
-
-import re
 from django import forms
 from apps.properties.models import Property
-from django.core.exceptions import ValidationError
-
-
-def validate_cnic(value):
-    pattern = r'^\d{5}-\d{7}-\d{1}$'
-    if not re.match(pattern, value):
-        raise ValidationError('CNIC must be in the format 00000-0000000-0')
-
-
-def validate_phone(value):
-    pattern = r'^\+\d{2}-\d{10}$'
-    if not re.match(pattern, value):
-        raise ValidationError('Phone number must be in the format +00-0000000000')
+from apps.properties.validations import validate_cnic, validate_phone
 
 
 class PropertyForm(forms.ModelForm):
-    price = forms.DecimalField(
-        widget=forms.NumberInput(attrs={"class": "form-control"})
-    )
     remove_document = forms.BooleanField(
         required=False,
         widget=forms.CheckboxInput(attrs={"class": "form-check-input"}),
@@ -33,15 +13,8 @@ class PropertyForm(forms.ModelForm):
     class Meta:
         model = Property
         fields = [
-            "name",
-            "description",
-            "full_address",
-            "phone_number",
-            "cnic",
-            "property_type",
-            "price",
-            "documents",
-            "is_published",
+            "name", "description", "full_address", "phone_number",
+            "cnic", "property_type", "price", "documents", "is_published"
         ]
         labels = {
             "name": "Property Name",
@@ -62,30 +35,25 @@ class PropertyForm(forms.ModelForm):
             "cnic": forms.TextInput(attrs={"class": "form-control", "placeholder": "12345-1234567-1"}),
             "property_type": forms.Select(attrs={"class": "form-control"}),
             "price": forms.NumberInput(attrs={"class": "form-control"}),
-            "documents": forms.FileInput(
-                attrs={
-                    "class": "form-control",
-                    "accept": ".pdf,application/pdf",
-                }
-            ),
+            "documents": forms.FileInput(attrs={"class": "form-control", "accept": ".pdf,application/pdf"}),
             "is_published": forms.CheckboxInput(attrs={"class": "form-check-input"}),
         }
-        validators = {
-            "phone_number": [validate_phone],
-            "cnic": [validate_cnic],
-        }
+
+    def clean_phone_number(self):
+        phone = self.cleaned_data.get("phone_number")
+        validate_phone(phone)
+        return phone
+
+    def clean_cnic(self):
+        cnic = self.cleaned_data.get("cnic")
+        validate_cnic(cnic)
+        return cnic
 
     def clean_documents(self):
         documents = self.cleaned_data.get("documents")
-        if documents:  # Only validate if a new file was uploaded
+        if documents:
             if not documents.name.lower().endswith(".pdf"):
                 raise forms.ValidationError("Only PDF files are allowed.")
-            # For newly uploaded files, we can check the content type
-            if (
-                hasattr(documents, "content_type")
-                and documents.content_type != "application/pdf"
-            ):
-                raise forms.ValidationError(
-                    "File type is not supported. Please upload a PDF file."
-                )
+            if hasattr(documents, "content_type") and documents.content_type != "application/pdf":
+                raise forms.ValidationError("File type is not supported. Please upload a PDF file.")
         return documents
