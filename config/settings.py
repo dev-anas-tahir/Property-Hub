@@ -9,10 +9,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 env = environ.Env(DEBUG=(bool, False))
 
-if Path(BASE_DIR / ".env.prod").exists():
+if Path(BASE_DIR / ".env.dev").exists():
+    environ.Env.read_env(BASE_DIR / ".env.dev")
+elif Path(BASE_DIR / ".env.prod").exists():
     environ.Env.read_env(BASE_DIR / ".env.prod")
-if Path(BASE_DIR / ".env").exists():
-    environ.Env.read_env(BASE_DIR / ".env")
 
 DEBUG = env("DEBUG")
 print("DEBUG", DEBUG)
@@ -35,21 +35,29 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "axes",
-    "apps.users",
-    "apps.properties",
+    "django_components",
+    "django_unicorn",
+    "django_htmx",
+    # Custom Apps
+    "apps.users.apps.UsersConfig",
+    "apps.properties.apps.PropertiesConfig",
 ]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
-    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
+    "django_htmx.middleware.HtmxMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "axes.middleware.AxesMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
+
+# Add WhiteNoise only in production
+if not DEBUG:
+    MIDDLEWARE.insert(1, "whitenoise.middleware.WhiteNoiseMiddleware")
 
 ROOT_URLCONF = "config.urls"
 
@@ -82,7 +90,7 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 AUTHENTICATION_BACKENDS = [
-    "django.contrib.auth.backends.ModelBackend",
+    "axes.backends.AxesBackend",
 ]
 
 LANGUAGE_CODE = "en-us"
@@ -92,7 +100,6 @@ USE_TZ = True
 
 STATIC_ROOT = BASE_DIR / "staticfiles"
 STATIC_URL = "/static/"
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 MEDIA_URL = "/media/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
@@ -101,12 +108,19 @@ LOGIN_URL = "users:login"
 AXES_ENABLED = True
 AXES_FAILURE_LIMIT = 2
 AXES_COOLOFF_TIME = timedelta(minutes=1)
-AXES_ONLY_USER_FAILURES = True
 AXES_LOCK_OUT_AT_FAILURE = True
 AXES_RESET_ON_SUCCESS = True
-AXES_LOCK_OUT_BY_COMBINATION_USER_AND_IP = False
 AXES_DISABLE_ACCESS_LOG = False
 
+# Django Componenents settings
+COMPONENTS = {
+    "dirs": [BASE_DIR / "propertyhub" / "components"],
+}
+
+# Django Unicorn settings
+UNICORN = {
+    "SCRIPT_LOCATION": "after",
+}
 
 if DEBUG:
     MEDIA_ROOT = BASE_DIR / "media"

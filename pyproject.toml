@@ -14,6 +14,10 @@ dependencies = [
     "django-extensions>=4.1",
     "django-axes>=8.0.0",
     "psycopg[binary]>=3.2.10",
+    "django-tailwind>=4.2.0",
+    "django-components>=0.141.6",
+    "django-unicorn>=0.62.0",
+    "django-htmx>=1.26.0",
 ]
 
 [dependency-groups]
@@ -23,6 +27,7 @@ dev = [
     "django-debug-toolbar>=5.2.0",
     "factory-boy>=3.3.3",
     "pytest-factoryboy>=2.7.0",
+    "django-tailwind[reload]>=4.2.0",
 ]
 
 [build-system]

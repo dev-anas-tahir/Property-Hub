@@ -1,20 +1,17 @@
 up:
-	docker compose -f docker-compose.dev.yml up --build -d
+	docker compose -f docker-compose.dev.yml up -d
 
 down:
 	docker compose -f docker-compose.dev.yml down -v
 
-logs:
-	docker compose -f docker-compose.dev.yml logs -f web
+runserver:
+	uv run python manage.py runserver
 
 makemigrations:
-	docker compose -f docker-compose.dev.yml exec web uv run python manage.py makemigrations
+	uv run python manage.py makemigrations
 
 migrate:
-	docker compose -f docker-compose.dev.yml exec web uv run python manage.py migrate
-
-shell:
-	docker compose -f docker-compose.dev.yml exec web uv run python manage.py shell
+	uv run python manage.py migrate
 
 prod-up:
 	docker compose -f docker-compose.prod.yml up --build -d

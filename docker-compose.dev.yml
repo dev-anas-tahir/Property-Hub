@@ -1,22 +1,7 @@
 services:
-  web:
-    build:
-      context: .
-      dockerfile: Dockerfile.dev
-    container_name: propertyhub-web-dev
-    volumes:
-      - .:/app
-    ports:
-      - "8000:8000"
-    env_file:
-      - .env.dev
-    depends_on:
-      - db
-      - localstack
-
   db:
     image: postgres:17
-    container_name: propertyhub-db
+    container_name: propertyhub-db-dev
     restart: always
     environment:
       POSTGRES_USER: propertyhub
@@ -25,11 +10,18 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
     ports:
-      - "5432:5432"
+      - "5433:5432"
+
+  redis:
+    image: redis:7
+    container_name: propertyhub-redis-dev
+    restart: always
+    ports:
+      - "6379:6379"
 
   localstack:
     image: localstack/localstack:latest
-    container_name: propertyhub-localstack
+    container_name: propertyhub-localstack-dev
     ports:
       - "4566:4566"
     environment:
@@ -38,9 +30,9 @@ services:
       - AWS_ACCESS_KEY_ID=test
       - AWS_SECRET_ACCESS_KEY=test
 
-  # Optional dev tools
   pgadmin:
     image: dpage/pgadmin4
+    container_name: propertyhub-pgadmin
     environment:
       PGADMIN_DEFAULT_EMAIL: admin@propertyhub.dev
       PGADMIN_DEFAULT_PASSWORD: admin
@@ -51,6 +43,7 @@ services:
 
   mailhog:
     image: mailhog/mailhog
+    container_name: propertyhub-mailhog
     ports:
       - "8025:8025"
 
