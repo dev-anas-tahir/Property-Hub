@@ -1,7 +1,8 @@
 from django_unicorn.components import UnicornView
 from django.contrib.auth.models import User
 from django.contrib.auth import login
-from django.shortcuts import redirect
+from django.http import HttpResponseRedirect
+from django.urls import reverse
 from apps.users.forms import validate_password_strength
 from django.core.exceptions import ValidationError
 
@@ -93,8 +94,8 @@ class SignupFormView(UnicornView):
             )
 
             # Auto-login user
-            login(self.request, user)
-            return redirect('properties:list')
+            login(self.request, user, backend='django.contrib.auth.backends.ModelBackend')
+            return HttpResponseRedirect(reverse('properties:list'))
 
         except Exception as e:
             self.errors['non_field'] = f"An error occurred during signup: {str(e)}"

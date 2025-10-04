@@ -1,6 +1,7 @@
 from django_unicorn.components import UnicornView
 from django.contrib.auth import authenticate, login
-from django.shortcuts import redirect
+from django.http import HttpResponseRedirect
+from django.urls import reverse
 
 
 class LoginFormView(UnicornView):
@@ -32,8 +33,8 @@ class LoginFormView(UnicornView):
         )
 
         if user is not None:
-            login(self.request, user)
-            return redirect('properties:list')
+            login(self.request, user, backend='django.contrib.auth.backends.ModelBackend')
+            return HttpResponseRedirect(reverse('properties:list'))
         else:
             self.errors['non_field'] = "Invalid username or password."
             self.is_loading = False

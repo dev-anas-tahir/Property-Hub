@@ -3,7 +3,8 @@ Property detail component for displaying comprehensive property information.
 """
 
 from django_unicorn.components import UnicornView
-from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import get_object_or_404
+from django.urls import reverse
 from django.db import transaction
 from apps.properties.models import Property, Favorite
 from apps.properties.utils import delete_property_and_assets
@@ -88,7 +89,7 @@ class PropertyDetailView(UnicornView):
         try:
             delete_property_and_assets(self.request, self.property)
             # Redirect to properties list after deletion
-            return redirect('properties:list')
+            return self.redirect(reverse('properties:list'))
         except Exception as e:
             # Log error and hide modal
             self.show_delete_modal = False

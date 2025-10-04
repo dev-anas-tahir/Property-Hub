@@ -9,13 +9,8 @@
         <!-- Username -->
         <div class="mb-3">
             <label for="username" class="form-label">Username</label>
-            <input 
-                type="text" 
-                class="form-control {% if errors.username %}is-invalid{% endif %}" 
-                id="username" 
-                unicorn:model.defer="username"
-                {% if is_loading %}disabled{% endif %}
-            >
+            <input type="text" class="form-control {% if errors.username %}is-invalid{% endif %}" id="username"
+                unicorn:model.defer="username" {% if is_loading %}disabled{% endif %}>
             {% if errors.username %}
             <div class="invalid-feedback">
                 {{ errors.username }}
@@ -26,13 +21,8 @@
         <!-- Password -->
         <div class="mb-3">
             <label for="password" class="form-label">Password</label>
-            <input 
-                type="password" 
-                class="form-control {% if errors.password %}is-invalid{% endif %}" 
-                id="password" 
-                unicorn:model.defer="password"
-                {% if is_loading %}disabled{% endif %}
-            >
+            <input type="password" class="form-control {% if errors.password %}is-invalid{% endif %}" id="password"
+                unicorn:model.defer="password" {% if is_loading %}disabled{% endif %}>
             {% if errors.password %}
             <div class="invalid-feedback">
                 {{ errors.password }}
@@ -41,11 +31,7 @@
         </div>
 
         <div class="d-grid gap-2">
-            <button 
-                type="submit" 
-                class="btn btn-primary"
-                {% if is_loading %}disabled{% endif %}
-            >
+            <button type="submit" class="btn btn-primary" {% if is_loading %}disabled{% endif %}>
                 <span unicorn:loading.remove>Login</span>
                 <span unicorn:loading>
                     <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
