@@ -35,10 +35,9 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "axes",
-    "django_components",
     "django_unicorn",
-    "django_htmx",
     # Custom Apps
+    "apps.shared.apps.SharedConfig",
     "apps.users.apps.UsersConfig",
     "apps.properties.apps.PropertiesConfig",
 ]
@@ -47,7 +46,6 @@ MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
-    "django_htmx.middleware.HtmxMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "axes.middleware.AxesMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -111,11 +109,6 @@ AXES_COOLOFF_TIME = timedelta(minutes=1)
 AXES_LOCK_OUT_AT_FAILURE = True
 AXES_RESET_ON_SUCCESS = True
 AXES_DISABLE_ACCESS_LOG = False
-
-# Django Componenents settings
-COMPONENTS = {
-    "dirs": [BASE_DIR / "propertyhub" / "components"],
-}
 
 # Django Unicorn settings
 UNICORN = {

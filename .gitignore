@@ -1,9 +1,10 @@
 # Git Ignore for Django
 
-# Python cache files
+# Python / pytest cache files
 __pycache__/
 *.py[cod]
 *$py.class
+.pytest_cache/
 
 # Virtual environment
 env/

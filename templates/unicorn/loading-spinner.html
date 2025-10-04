@@ -1,0 +1,18 @@
+{% if show %}
+<div class="{{ container_class }}" style="{% if style == 'overlay' %}z-index: 9998;{% endif %}">
+    {% if style == 'button' %}
+        <span class="{{ spinner_class }}" role="status" aria-hidden="true"></span>
+    {% else %}
+        <div class="text-center">
+            <div class="{{ spinner_class }}" role="status">
+                <span class="visually-hidden">{{ text }}</span>
+            </div>
+            {% if text and style != 'button' %}
+                <div class="mt-2 {% if style == 'overlay' %}text-white{% endif %}">
+                    {{ text }}
+                </div>
+            {% endif %}
+        </div>
+    {% endif %}
+</div>
+{% endif %}

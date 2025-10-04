@@ -1,24 +1,22 @@
 from django.urls import path
 from apps.properties.views import (
-    PropertyView,
-    PropertyDetailView,
-    PropertiesListView,
-    FavoritesListView,
-    ToggleFavoriteView,
-    EditPropertyView,
-    MyPropertiesListView,
+    property_detail_view,
+    properties_list_view,
+    favorites_list_view,
+    my_properties_list_view,
+    property_create_view,
+    property_edit_view,
+    property_download_document_view,
 )
 
 app_name = "properties"
 
 urlpatterns = [
-    path("create/", PropertyView.as_view(), name="create"),
-    path("", PropertiesListView.as_view(), name="list"),
-    path("<int:pk>/", PropertyDetailView.as_view(), name="detail"),
-    path("<int:pk>/", PropertyDetailView.as_view(), name="delete"),
-    path("<int:pk>/edit/", EditPropertyView.as_view(), name="edit"),
-    path("<int:pk>/download/", PropertyView.as_view(), {"action": "download"}, name="download_document"),
-    path("myprops/", MyPropertiesListView.as_view(), name="myprops"),
-    path("favorites/", FavoritesListView.as_view(), name="favorites"),
-    path("<int:pk>/toggle_favorite/", ToggleFavoriteView.as_view(), name="toggle_favorite"),
+    path("create/", property_create_view, name="create"),
+    path("", properties_list_view, name="list"),
+    path("<int:pk>/", property_detail_view, name="detail"),
+    path("<int:pk>/edit/", property_edit_view, name="edit"),
+    path("<int:pk>/download/", property_download_document_view, name="download_document"),
+    path("myprops/", my_properties_list_view, name="myprops"),
+    path("favorites/", favorites_list_view, name="favorites"),
 ]

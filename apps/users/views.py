@@ -1,73 +1,36 @@
 """
-This module contains class-based views for user-related operations such as
+This module contains views for user-related operations such as
 signing up, logging in, and profile management within the Property Hub application.
 """
 
-from django.views.generic import CreateView, UpdateView
-from django.contrib.auth.views import LoginView, LogoutView
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.urls import reverse_lazy
-from django.contrib.auth.models import User
-from django.shortcuts import redirect
-from django.contrib.auth import login, logout
-from django.contrib.auth.views import PasswordChangeView
-from apps.users.forms import SignUpForm, UpdateProfileForm, CustomPasswordChangeForm
+from django.shortcuts import render, redirect
+from django.contrib.auth import logout
+from django.contrib.auth.decorators import login_required
 
 
-class SignUpView(CreateView):
-    """View for handling user sign-up."""
-
-    form_class = SignUpForm
-    template_name = "users/signup.html"
-
-    def form_valid(self, form):
-        """Override form_valid to save the user and redirect to log in."""
-        user = form.save()
-        login(self.request, user)
-        return redirect("properties:list")
+def signup_view(request):
+    """Simple view for rendering signup page with Unicorn component."""
+    return render(request, "users/signup.html")
 
 
-class CustomLoginView(LoginView):
-    """View for handling user login and on success redirection to home"""
-
-    template_name = "users/login.html"
-
-    def get_success_url(self):
-        """Override get_success_url to redirect to home."""
-        return reverse_lazy("properties:list")
+def login_view(request):
+    """Simple view for rendering login page with Unicorn component."""
+    return render(request, "users/login.html")
 
 
-class UpdateProfileView(LoginRequiredMixin, UpdateView):
-    """View for updating user profile."""
-
-    model = User
-    form_class = UpdateProfileForm
-    template_name = "users/profile.html"
-
-    def get_object(self, queryset=None):
-        """Override get_object to return the current user."""
-        return self.request.user
-
-    def get_success_url(self):
-        """Override get_success_url to redirect to profile."""
-        return reverse_lazy("properties:list")
+@login_required
+def profile_view(request):
+    """Simple view for rendering profile page with Unicorn component."""
+    return render(request, "users/profile.html")
 
 
-class CustomLogoutView(LogoutView):
+@login_required
+def password_change_view(request):
+    """Simple view for rendering password change page with Unicorn component."""
+    return render(request, "users/password_change.html")
+
+
+def logout_view(request):
     """Custom logout view that redirects home after logout."""
-
-    @staticmethod
-    def dispatch(request, *args, **kwargs):
-        logout(request)
-        return redirect("properties:list")
-
-
-class CustomPasswordChangeView(LoginRequiredMixin, PasswordChangeView):
-    """Custom password change view that redirects home after password change."""
-
-    template_name = "users/password_change.html"
-    form_class = CustomPasswordChangeForm
-
-    def get_success_url(self):
-        """Override get_success_url to redirect to home."""
-        return reverse_lazy("properties:list")
+    logout(request)
+    return redirect("properties:list")

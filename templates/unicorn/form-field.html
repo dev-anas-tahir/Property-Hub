@@ -1,0 +1,92 @@
+<div class="mb-3 {% if field_type == 'checkbox' %}form-check{% endif %}">
+    {% if field_type != 'checkbox' and label %}
+        <label for="{{ input_id }}" class="form-label">
+            {{ label }}
+            {% if required %}<span class="text-danger">*</span>{% endif %}
+        </label>
+    {% endif %}
+    
+    {% if field_type == 'text' or field_type == 'email' or field_type == 'tel' or field_type == 'number' %}
+        <input 
+            type="{{ field_type }}"
+            class="{{ field_class }}"
+            id="{{ input_id }}"
+            name="{{ field_name }}"
+            unicorn:model="value"
+            placeholder="{{ placeholder }}"
+            {% if required %}required{% endif %}
+            {% if disabled %}disabled{% endif %}
+            {% if readonly %}readonly{% endif %}
+            {% if min_value %}min="{{ min_value }}"{% endif %}
+            {% if max_value %}max="{{ max_value }}"{% endif %}
+            {% if pattern %}pattern="{{ pattern }}"{% endif %}
+        >
+    
+    {% elif field_type == 'textarea' %}
+        <textarea 
+            class="{{ field_class }}"
+            id="{{ input_id }}"
+            name="{{ field_name }}"
+            unicorn:model="value"
+            placeholder="{{ placeholder }}"
+            rows="{{ rows }}"
+            {% if required %}required{% endif %}
+            {% if disabled %}disabled{% endif %}
+            {% if readonly %}readonly{% endif %}
+        >{{ value }}</textarea>
+    
+    {% elif field_type == 'select' %}
+        <select 
+            class="{{ field_class }}"
+            id="{{ input_id }}"
+            name="{{ field_name }}"
+            unicorn:model="value"
+            {% if required %}required{% endif %}
+            {% if disabled %}disabled{% endif %}
+        >
+            <option value="">{{ placeholder|default:"Select an option" }}</option>
+            {% for option in options %}
+                <option value="{{ option.value }}" {% if option.value == value %}selected{% endif %}>
+                    {{ option.label }}
+                </option>
+            {% endfor %}
+        </select>
+    
+    {% elif field_type == 'checkbox' %}
+        <input 
+            type="checkbox"
+            class="{{ field_class }}"
+            id="{{ input_id }}"
+            name="{{ field_name }}"
+            unicorn:model="value"
+            {% if disabled %}disabled{% endif %}
+        >
+        {% if label %}
+            <label class="form-check-label" for="{{ input_id }}">
+                {{ label }}
+                {% if required %}<span class="text-danger">*</span>{% endif %}
+            </label>
+        {% endif %}
+    
+    {% elif field_type == 'file' %}
+        <input 
+            type="file"
+            class="{{ field_class }}"
+            id="{{ input_id }}"
+            name="{{ field_name }}"
+            {% if accept %}accept="{{ accept }}"{% endif %}
+            {% if required %}required{% endif %}
+            {% if disabled %}disabled{% endif %}
+        >
+    {% endif %}
+    
+    {% if help_text %}
+        <div class="form-text">{{ help_text }}</div>
+    {% endif %}
+    
+    {% if has_error %}
+        <div class="invalid-feedback d-block">
+            {{ error }}
+        </div>
+    {% endif %}
+</div>

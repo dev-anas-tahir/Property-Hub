@@ -1,0 +1,20 @@
+<div>
+    {% if user.is_authenticated %}
+        <button 
+            type="button"
+            class="btn btn-sm {% if is_favorited %}btn-danger{% else %}btn-outline-danger{% endif %}"
+            unicorn:click="toggle"
+            {% if is_loading %}disabled{% endif %}
+            title="{% if is_favorited %}Remove from favorites{% else %}Add to favorites{% endif %}"
+        >
+            <span unicorn:loading.remove>
+                <i class="bi {% if is_favorited %}bi-heart-fill{% else %}bi-heart{% endif %}"></i>
+                {% if is_favorited %}Favorited{% else %}Favorite{% endif %}
+            </span>
+            <span unicorn:loading class="d-none">
+                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                Loading...
+            </span>
+        </button>
+    {% endif %}
+</div>
