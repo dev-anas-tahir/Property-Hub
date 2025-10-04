@@ -1,22 +1,23 @@
-.PHONY: build migrate runserver rungunicorn test shell
+up:
+	docker compose -f docker-compose.dev.yml up --build -d
 
-build:
-	pip install uv
-	uv sync
+down:
+	docker compose -f docker-compose.dev.yml down -v
+
+logs:
+	docker compose -f docker-compose.dev.yml logs -f web
+
+makemigrations:
+	docker compose -f docker-compose.dev.yml exec web uv run python manage.py makemigrations
 
 migrate:
-	uv run python manage.py makemigrations
-	uv run python manage.py migrate
-	uv run python manage.py collectstatic --noinput
-
-runserver:
-	uv run python manage.py runserver
-
-rungunicorn:
-	uv run gunicorn config.wsgi:application --bind 0.0.0.0:8000 --workers=1 --timeout=120
-
-test:
-	uv run pytest
+	docker compose -f docker-compose.dev.yml exec web uv run python manage.py migrate
 
 shell:
-	uv run python manage.py shell
+	docker compose -f docker-compose.dev.yml exec web uv run python manage.py shell
+
+prod-up:
+	docker compose -f docker-compose.prod.yml up --build -d
+
+prod-down:
+	docker compose -f docker-compose.prod.yml down -v

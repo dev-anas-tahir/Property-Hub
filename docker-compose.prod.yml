@@ -1,3 +1,4 @@
+version: "3.9"
 services:
   web:
     build:
@@ -9,6 +10,7 @@ services:
     env_file:
       - .env.prod
     depends_on:
+      - db
       - localstack
     entrypoint: >
       sh -c "
@@ -16,14 +18,26 @@ services:
         uv run gunicorn config.wsgi:application --bind 0.0.0.0:8000 --workers=3 --timeout=120
       "
 
+  db:
+    image: postgres:17
+    container_name: propertyhub-db
+    restart: always
+    environment:
+      POSTGRES_USER: propertyhub
+      POSTGRES_PASSWORD: propertyhub
+      POSTGRES_DB: propertyhub
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
   localstack:
-    image: localstack/localstack
-    container_name: localstack
+    image: localstack/localstack:latest
+    container_name: propertyhub-localstack
     ports:
       - "4566:4566"
     environment:
       - SERVICES=s3
-      - DEBUG=1
-      - DATA_DIR=/tmp/localstack/data
-      - AWS_ACCESS_KEY_ID=test
-      - AWS_SECRET_ACCESS_KEY=test
+      - AWS_ACCESS_KEY_ID=prod
+      - AWS_SECRET_ACCESS_KEY=prod
+
+volumes:
+  pgdata:

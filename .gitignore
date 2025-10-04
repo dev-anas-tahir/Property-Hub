@@ -19,11 +19,8 @@ venv/
 *.db
 *.sqlite3
 
-# Django migrations
-**/migrations/
-
 # Environment variables
-.env
+.env.dev
 .env.prod
 
 # IDE specific
