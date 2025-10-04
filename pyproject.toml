@@ -1,0 +1,25 @@
+[project]
+name = "property-hub"
+version = "0.1.0"
+description = "Django Property Management System"
+requires-python = ">=3.12"
+dependencies = [
+    "django>=5.2.3",
+    "pillow>=11.2.1",
+    "django-environ>=0.12.0",
+    "gunicorn>=23.0.0",
+    "whitenoise>=6.9.0",
+    "django-storages>=1.14.6",
+    "boto3>=1.38.35",
+    "django-extensions>=4.1",
+    "django-axes>=8.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.4.0",
+    "pytest-django>=4.11.1",
+    "django-debug-toolbar>=5.2.0",
+    "factory-boy>=3.3.3",
+    "pytest-factoryboy>=2.7.0",
+]

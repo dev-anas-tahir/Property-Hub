@@ -11,7 +11,7 @@ A Django test project by Devsinc for listing, searching, and managing real-estat
 - User authentication & profile management
 - Django Admin for staff management
 - REST-friendly URL structure & clean templates
-- Docker-based production setup + Pipenv for local development
+- Docker-based production setup + UV for local development
 - Tests with `pytest`
 
 ---
@@ -42,7 +42,7 @@ Property-Hub/
 ├── Dockerfile            # Production image definition
 ├── docker-compose.yml    # Local development stack (Django + DB + nginx)
 ├── Makefile              # Handy shortcuts (build / migrate / run / test …)
-├── Pipfile & Pipfile.lock
+├── pyproject.toml & uv.lock
 ├── .env
 └── README.md
 ```
@@ -66,9 +66,9 @@ Property-Hub/
    AWS_SECRET_ACCESS_KEY=changeme
    AWS_STORAGE_BUCKET_NAME=changeme
    ```
-3. **Install Python dependencies** via Pipenv:
+3. **Install Python dependencies** via UV:
    ```bash
-   make build       # installs pipenv & all packages
+   make build       # installs UV & all packages
    ```
 4. **Apply migrations & collect static:**
    ```bash
@@ -113,7 +113,7 @@ Access the app at `http://localhost:8000`.
 
 | Command         | Action                               |
 |-----------------|--------------------------------------|
-| `make build`    | Install dependencies with Pipenv     |
+| `make build`    | Install dependencies with UV          |
 | `make migrate`  | Run migrations & collectstatic       |
 | `make run`      | Start Django development server      |
 | `make test`     | Run the test-suite with pytest       |

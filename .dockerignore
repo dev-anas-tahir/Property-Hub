@@ -35,3 +35,7 @@ conftest.py
 .vscode
 docker-compose.yml
 docker-compose.dev.yml
+
+# UV cache directories
+.uv-cache/
+.uv/

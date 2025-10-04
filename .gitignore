@@ -8,6 +8,7 @@ __pycache__/
 # Virtual environment
 env/
 venv/
+.venv/
 
 # Django specific
 *.log
@@ -29,6 +30,7 @@ venv/
 .vscode/
 .idea/
 .windsurf/
+.kiro/
 
 # Byte-compiled / optimized / DLL files
 *.py[cod]
@@ -74,6 +76,9 @@ nosetests.xml
 coverage.xml
 *.cover
 .hypothesis/
+
+# UV cache directories
+.uv-cache/
 
 # media files
 media/
