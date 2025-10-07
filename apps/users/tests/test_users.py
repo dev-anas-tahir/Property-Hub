@@ -31,9 +31,9 @@ def test_property_str(user):
         is_published=True,
         description="Test description",
         full_address="Test address",
-        phone_number="+92-3001234567",
+        phone_number="+923001234567",
         cnic="12345-1234567-1",
-        property_type=Property.PropertyType.HOUSE,
+        property_type="House",
     )
     assert str(prop) == "Test House"
 

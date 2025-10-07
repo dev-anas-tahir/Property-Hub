@@ -46,12 +46,8 @@ class PropertyFormView(UnicornView):
     is_loading: bool = False
     is_edit_mode: bool = False
     
-    # Property type choices
-    property_type_choices = [
-        ("", "Select Property Type"),
-        ("House", "House"),
-        ("Plot", "Plot"),
-    ]
+    # Property type choices - derive from model to keep in sync
+    property_type_choices = [("", "Select Property Type")] + list(Property.PROPERTY_TYPE)
     
     def mount(self):
         """Initialize component and load existing property data for edit mode."""
@@ -62,6 +58,7 @@ class PropertyFormView(UnicornView):
     def load_property(self):
         """Load existing property data for editing."""
         try:
+            # Load the property (do not use select_for_update here — mount is not wrapped in a transaction)
             property_obj = get_object_or_404(
                 Property.objects.select_related('user').prefetch_related('images'),
                 id=self.property_id
@@ -78,7 +75,8 @@ class PropertyFormView(UnicornView):
             self.phone_number = property_obj.phone_number
             self.cnic = property_obj.cnic
             self.property_type = property_obj.property_type
-            self.price = str(property_obj.price)
+            # Keep price as string for the form, formatted with 2 decimal places
+            self.price = format(property_obj.price, 'f')
             self.is_published = property_obj.is_published
             
             # Load existing images
@@ -124,11 +122,13 @@ class PropertyFormView(UnicornView):
         """Real-time validation for price."""
         if value:
             try:
+                # Use Decimal and ensure two decimal places consistency
                 price_decimal = Decimal(value)
                 if price_decimal < 0:
                     self.errors['price'] = "Price must be a positive number"
-                elif 'price' in self.errors:
-                    del self.errors['price']
+                else:
+                    # remove previous price error if any
+                    self.errors.pop('price', None)
             except (ValueError, TypeError):
                 self.errors['price'] = "Please enter a valid number"
     
@@ -212,7 +212,16 @@ class PropertyFormView(UnicornView):
             property_obj.phone_number = self.phone_number.strip()
             property_obj.cnic = self.cnic.strip()
             property_obj.property_type = self.property_type
-            property_obj.price = Decimal(self.price)
+            # Normalize price to Decimal with 2 decimal places to match model
+            try:
+                price_decimal = Decimal(self.price)
+                # quantize to 2 decimal places without changing the value semantics
+                price_decimal = price_decimal.quantize(Decimal('0.01'))
+                property_obj.price = price_decimal
+            except Exception:
+                self.errors['price'] = "Please enter a valid number"
+                self.is_loading = False
+                return
             property_obj.is_published = self.is_published
             
             # Handle document removal
@@ -233,12 +242,12 @@ class PropertyFormView(UnicornView):
                         continue
             
             # Handle image uploads from request.FILES
-            images = self.request.FILES.getlist('images')
+            images = self.request.FILES.getlist('images') if hasattr(self.request.FILES, 'getlist') else []
             if images:
                 self._handle_image_upload(property_obj, images)
             
             # Handle document upload from request.FILES
-            document = self.request.FILES.get('documents')
+            document = self.request.FILES.get('documents') if hasattr(self.request.FILES, 'get') else None
             if document:
                 # Validate PDF
                 if not document.name.lower().endswith('.pdf'):
@@ -255,6 +264,7 @@ class PropertyFormView(UnicornView):
             return HttpResponseRedirect(redirect_url)
         
         except Exception as e:
+            # Generic catch - ensure loading state is reset
             self.errors['non_field'] = f"An error occurred while saving: {str(e)}"
             self.is_loading = False
     
