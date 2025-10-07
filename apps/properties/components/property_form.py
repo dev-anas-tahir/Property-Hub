@@ -5,6 +5,7 @@ Property form component for creating and editing properties.
 import os
 from decimal import Decimal
 from django_unicorn.components import UnicornView
+from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.db import transaction
@@ -249,9 +250,9 @@ class PropertyFormView(UnicornView):
                 property_obj.save(update_fields=['documents'])
             
             self.is_loading = False
-            
-            # Redirect to detail view
-            return self.redirect(reverse('properties:detail', kwargs={'pk': property_obj.pk}))
+
+            redirect_url = reverse('properties:detail', kwargs={'pk': property_obj.pk})
+            return HttpResponseRedirect(redirect_url)
         
         except Exception as e:
             self.errors['non_field'] = f"An error occurred while saving: {str(e)}"
