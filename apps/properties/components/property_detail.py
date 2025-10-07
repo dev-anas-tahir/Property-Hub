@@ -89,6 +89,13 @@ class PropertyDetailView(UnicornView):
 
         try:
             delete_property_and_assets(self.request, self.property)
+            # Clear local state so template rendering after the action
+            # does not attempt to access the deleted property's attributes
+            # (which can lead to NoReverseMatch when templates call {% url ... property.id %}).
+            self.property = None
+            self.is_owner = False
+            self.show_delete_modal = False
+
             # Redirect to properties list after deletion
             return HttpResponseRedirect(reverse('properties:list'))
         except Exception as e:

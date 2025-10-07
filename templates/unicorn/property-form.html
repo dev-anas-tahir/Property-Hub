@@ -27,7 +27,8 @@
                         </div>
                     {% endif %}
                     
-                    <form unicorn:submit.prevent="save" enctype="multipart/form-data">
+                    <form unicorn:submit.prevent="save" unicorn:multipart="true" enctype="multipart/form-data">
+                        {% csrf_token %}
                         <!-- Property Name -->
                         <div class="mb-3">
                             <label for="name" class="form-label">Property Name</label>
@@ -191,6 +192,7 @@
                                 name="images"
                                 multiple 
                                 accept="image/jpeg,image/png,image/gif,image/webp"
+                                unicorn:file="images_to_upload"
                             >
                             <small class="form-text text-muted">
                                 Allowed formats: JPG, PNG, GIF, WebP. Max size: 5MB per image. Max 10 images.
@@ -231,6 +233,7 @@
                                 id="documents" 
                                 name="documents"
                                 accept=".pdf,application/pdf"
+                                unicorn:file="document_file"
                             >
                             {% if errors.documents %}
                                 <div class="invalid-feedback">{{ errors.documents }}</div>
