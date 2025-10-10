@@ -78,20 +78,19 @@
                     {% if user.is_authenticated %}
                         <button 
                             type="button" 
-                            class="btn btn-outline-primary"
+                            class="btn btn-outline-primary d-flex align-items-center justify-content-center"
                             unicorn:click="toggle_favorite"
                             {% if is_loading %}disabled{% endif %}
+                            aria-pressed="{{ is_favorited|yesno:'true,false' }}"
                         >
-                            <span unicorn:loading>
-                                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                            </span>
-                            <span unicorn:loading.remove>
-                                {% if is_favorited %}
-                                    💔 Remove from Favorites
-                                {% else %}
-                                    ❤️ Add to Favorites
-                                {% endif %}
-                            </span>
+                            <span class="me-2">{% if is_favorited %}💔{% else %}❤️{% endif %}</span>
+                            <span>{% if is_favorited %}Remove from Favorites{% else %}Add to Favorites{% endif %}</span>
+                            {% if is_loading %}
+                                <span class="ms-2">
+                                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                    Loading...
+                                </span>
+                            {% endif %}
                         </button>
                     {% endif %}
                     

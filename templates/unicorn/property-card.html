@@ -38,7 +38,7 @@
         
         {% if user.is_authenticated %}
             <div class="d-grid">
-                {% unicorn 'favorite-button' property_id=property_data.id %}
+                {% unicorn 'favorite-button' property_id=property_data.id key=property_data.id %}
             </div>
         {% endif %}
     </div>

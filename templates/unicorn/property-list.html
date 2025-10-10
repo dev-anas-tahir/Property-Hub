@@ -18,7 +18,7 @@
         <div class="row">
             {% for property_id in properties %}
                 <div class="col-md-4 mb-4">
-                    {% unicorn 'property-card' property_id=property_id %}
+                        {% unicorn 'property-card' property_id=property_id key=property_id %}
                 </div>
             {% endfor %}
         </div>

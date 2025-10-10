@@ -47,7 +47,7 @@ class FavoriteButtonView(UnicornView):
                 self.is_favorited = True
             
             # Emit event to parent components to refresh their data
-            self.call('property_favorited', property_id=self.property_id, is_favorited=self.is_favorited)
+            self.call('property_favorited', self.property_id, self.is_favorited)
             
         finally:
             self.is_loading = False
