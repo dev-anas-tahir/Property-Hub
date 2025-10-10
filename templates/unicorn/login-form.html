@@ -21,14 +21,20 @@
         <!-- Password -->
         <div class="mb-3">
             <label for="password" class="form-label">Password</label>
-            <input type="password" class="form-control {% if errors.password %}is-invalid{% endif %}" id="password"
-                unicorn:model.defer="password" {% if is_loading %}disabled{% endif %}>
+            <div class="input-group">
+                <input type="password" class="form-control {% if errors.password %}is-invalid{% endif %}" id="password"
+                    unicorn:model.defer="password" {% if is_loading %}disabled{% endif %}>
+                <button class="btn btn-outline-secondary" type="button" tabindex="-1" onclick="window.togglePassword('password', this)">
+                    <i class="bi bi-eye"></i>
+                </button>
+            </div>
             {% if errors.password %}
             <div class="invalid-feedback">
                 {{ errors.password }}
             </div>
             {% endif %}
         </div>
+        {% block password_toggle_script %}{% endblock %}
 
         <div class="d-grid gap-2">
             <button type="submit" class="btn btn-primary" {% if is_loading %}disabled{% endif %}>
