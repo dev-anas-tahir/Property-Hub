@@ -1,13 +1,15 @@
 """
-Test cases for property-related Unicorn components.
+Test cases for property-related components.
+Note: These tests are for legacy Unicorn components and may need updating.
 """
 
 import pytest
 from django.test import RequestFactory
 from django.contrib.auth.models import User, AnonymousUser
 from apps.properties.models import Property, PropertyImage, Favorite
-from apps.properties.components.property_list import PropertyListView
-from apps.properties.components.property_card import PropertyCardView
+# Legacy component imports - these files have been removed
+# from apps.properties.components.property_list import PropertyListView
+# from apps.properties.components.property_card import PropertyCardView
 from apps.properties.components.favorite_button import FavoriteButtonView
 from apps.properties.components.property_detail import PropertyDetailView
 from apps.properties.components.property_form import PropertyFormView

@@ -1,5 +1,4 @@
 {% extends 'base.html' %}
-{% load unicorn %}
 
 {% block title %}Login{% endblock %}
 
@@ -10,8 +9,7 @@
             <div class="card shadow-sm">
                 <div class="card-body">
                     <h2 class="card-title text-center mb-4">Login</h2>
-                    {% csrf_token %}
-                    {% unicorn 'login-form' %}
+                    {% include 'partials/users/login_form.html' %}
                 </div>
             </div>
         </div>

@@ -1,9 +1,20 @@
 {% extends 'base.html' %}
-{% load unicorn %}
 
 {% block title %}Create New Property{% endblock %}
 
 {% block content %}
-{% csrf_token %}
-{% unicorn 'property-form' %}
+<div class="row">
+    <div class="col-lg-8 mx-auto">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0">
+                    <i class="bi bi-plus-circle"></i> Create New Property
+                </h4>
+            </div>
+            <div class="card-body">
+                {% include 'partials/properties/property_form.html' with is_edit_mode=False %}
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

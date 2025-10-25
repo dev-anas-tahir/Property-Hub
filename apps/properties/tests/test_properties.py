@@ -32,9 +32,8 @@ def test_property_add_form(user, client):
     """Test adding a new property using the form."""
 
     client.force_login(user)
-    # Views in this app render Unicorn components and don't accept POST in
-    # the traditional Django form way. Assert the create page renders and
-    # then create a Property via the ORM to simulate a saved record.
+    # Views in this app now use HTMX for form handling.
+    # Assert the create page renders and then create a Property via the ORM to simulate a saved record.
     response = client.get(reverse("properties:create"))
     assert response.status_code == 200
 
@@ -70,8 +69,8 @@ def test_property_edit_form(user, client):
         price=100000,
         is_published=True,
     )
-    # The edit view renders a Unicorn component. Confirm the page renders
-    # and then simulate an edit through the ORM (the frontend handles POSTs).
+    # The edit view now uses HTMX for form handling. Confirm the page renders
+    # and then simulate an edit through the ORM.
     response = client.get(reverse("properties:edit", args=[prop.id]))
     assert response.status_code == 200
 

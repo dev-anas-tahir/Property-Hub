@@ -1,5 +1,4 @@
 {% extends 'base.html' %}
-{% load unicorn %}
 
 {% block title %}Sign Up{% endblock %}
 
@@ -9,8 +8,8 @@
         <div class="col-lg-6">
             <div class="card shadow-sm">
                 <div class="card-body">
-                    <h2 class="card-title text-center mb-4">Sign Up</h2>
-                    {% unicorn 'signup-form' %}
+                    <h2 class="card-title text-center mb-4">Create Your Account</h2>
+                    {% include 'partials/users/signup_form.html' %}
                 </div>
             </div>
         </div>

@@ -35,7 +35,6 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "axes",
-    "django_unicorn",
     # Custom Apps
     "apps.shared.apps.SharedConfig",
     "apps.users.apps.UsersConfig",
@@ -105,16 +104,14 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 LOGIN_URL = "users:login"
 
 AXES_ENABLED = True
-AXES_FAILURE_LIMIT = 2
-AXES_COOLOFF_TIME = timedelta(minutes=1)
+AXES_FAILURE_LIMIT = 10
+AXES_COOLOFF_TIME = timedelta(seconds=10)
 AXES_LOCK_OUT_AT_FAILURE = True
 AXES_RESET_ON_SUCCESS = True
 AXES_DISABLE_ACCESS_LOG = False
-
-# Django Unicorn settings
-UNICORN = {
-    "SCRIPT_LOCATION": "after",
-}
+AXES_LOCKOUT_TEMPLATE = None
+AXES_LOCKOUT_URL = None
+AXES_VERBOSE = True
 
 if DEBUG:
     MEDIA_ROOT = BASE_DIR / "media"
