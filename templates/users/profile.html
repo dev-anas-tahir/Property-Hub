@@ -1,5 +1,4 @@
 {% extends 'base.html' %}
-{% load unicorn %}
 
 {% block title %}Profile{% endblock %}
 
@@ -10,7 +9,16 @@
             <div class="card shadow-sm">
                 <div class="card-body">
                     <h1 class="card-title text-center mb-4">Update Profile</h1>
-                    {% unicorn 'profile-form' %}
+                    
+                    <!-- Display current user information -->
+                    <div class="mb-4 p-3 bg-light rounded">
+                        <h5 class="mb-3">Current Profile Information</h5>
+                        <p class="mb-1"><strong>Username:</strong> {{ user.username }}</p>
+                        <p class="mb-1"><strong>Name:</strong> {{ user.first_name }} {{ user.last_name }}</p>
+                        <p class="mb-0"><strong>Email:</strong> {{ user.email }}</p>
+                    </div>
+                    
+                    {% include 'partials/users/profile_form.html' %}
                 </div>
             </div>
         </div>

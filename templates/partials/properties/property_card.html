@@ -1,0 +1,42 @@
+<div class="card h-100">
+    {% if property.primary_image %}
+    <img src="{{ property.primary_image.image.url }}" class="card-img-top" alt="{{ property.name }}" style="height: 200px; object-fit: cover;">
+    {% else %}
+    <div class="card-img-top bg-secondary d-flex align-items-center justify-content-center" style="height: 200px;">
+        <span class="text-white">No Image</span>
+    </div>
+    {% endif %}
+    
+    <div class="card-body">
+        <h5 class="card-title">{{ property.name }}</h5>
+        <p class="card-text text-muted mb-2">
+            <small><i class="bi bi-geo-alt"></i> {{ property.full_address }}</small>
+        </p>
+        <p class="card-text">
+            <span class="badge bg-info text-dark">{{ property.property_type }}</span>
+        </p>
+        <p class="card-text">
+            <strong class="text-success fs-5">${{ property.price|floatformat:2 }}</strong>
+        </p>
+    </div>
+    
+    <div class="card-footer bg-transparent">
+        <div class="d-flex justify-content-between align-items-center gap-2">
+            <a href="{% url 'properties:detail' property.pk %}" class="btn btn-sm btn-primary">View Details</a>
+            
+            {% if user.is_authenticated %}
+                {% if property.user == user %}
+                    {# Owner actions #}
+                    <div class="btn-group" role="group">
+                        <a href="{% url 'properties:edit' property.pk %}" class="btn btn-sm btn-outline-secondary" title="Edit">
+                            <i class="bi bi-pencil"></i>
+                        </a>
+                    </div>
+                {% else %}
+                    {# Favorite button for non-owners #}
+                    {% include 'partials/properties/favorite_button.html' with property=property is_favorited=property.is_favorited %}
+                {% endif %}
+            {% endif %}
+        </div>
+    </div>
+</div>

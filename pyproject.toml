@@ -14,7 +14,6 @@ dependencies = [
     "django-extensions>=4.1",
     "django-axes>=8.0.0",
     "psycopg[binary]>=3.2.10",
-    "django-unicorn>=0.62.0",
     "werkzeug>=3.1.3",
 ]
 
