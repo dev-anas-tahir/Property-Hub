@@ -1,0 +1,160 @@
+{% load unicorn %}
+
+<div>
+    {% if property %}
+        <div class="row">
+            <div class="col-12">
+                <h1 class="mb-4">{{ property.name }}</h1>
+
+                <!-- Image Carousel Component -->
+                {% if property.images.all %}
+                    {% unicorn 'image-carousel' property_id=property.id %}
+                {% else %}
+                    <div class="alert alert-info mb-4" role="alert">
+                        No images available for this property.
+                    </div>
+                {% endif %}
+
+                <!-- Property Details Card -->
+                <div class="card mb-4 shadow-sm">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">Property Details</h5>
+                    </div>
+                    <div class="card-body">
+                        <dl class="row mb-0">
+                            <dt class="col-sm-3">Description</dt>
+                            <dd class="col-sm-9">{{ property.description|default:"No description provided" }}</dd>
+                            
+                            <dt class="col-sm-3">Address</dt>
+                            <dd class="col-sm-9">{{ property.full_address }}</dd>
+                            
+                            <dt class="col-sm-3">Phone Number</dt>
+                            <dd class="col-sm-9">{{ property.phone_number }}</dd>
+                            
+                            <dt class="col-sm-3">CNIC</dt>
+                            <dd class="col-sm-9">{{ property.cnic }}</dd>
+                            
+                            <dt class="col-sm-3">Property Type</dt>
+                            <dd class="col-sm-9">{{ property.property_type }}</dd>
+                            
+                            <dt class="col-sm-3">Price</dt>
+                            <dd class="col-sm-9">${{ property.price }}</dd>
+                            
+                            <dt class="col-sm-3">Published</dt>
+                            <dd class="col-sm-9">
+                                {% if property.is_published %}
+                                    <span class="badge bg-success">Yes</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">No</span>
+                                {% endif %}
+                            </dd>
+                            
+                            <dt class="col-sm-3">Created</dt>
+                            <dd class="col-sm-9">{{ property.created_at|date:"F j, Y" }}</dd>
+                            
+                            <dt class="col-sm-3">Owner</dt>
+                            <dd class="col-sm-9">{{ property.user.username }}</dd>
+                            
+                            <dt class="col-sm-3">Document</dt>
+                            <dd class="col-sm-9">
+                                {% if property.documents %}
+                                    {% if user.is_authenticated %}
+                                        <a href="{% url 'properties:download_document' property.id %}" class="btn btn-primary btn-sm">
+                                            <i class="bi bi-download"></i> Download Document
+                                        </a>
+                                    {% else %}
+                                        <span class="text-muted">Log in to download the document.</span>
+                                    {% endif %}
+                                {% else %}
+                                    <span class="text-muted">No document uploaded.</span>
+                                {% endif %}
+                            </dd>
+                        </dl>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="d-flex gap-2 mb-4 flex-wrap">
+                    {% if user.is_authenticated %}
+                        <button 
+                            type="button" 
+                            class="btn btn-outline-primary d-flex align-items-center justify-content-center"
+                            unicorn:click="toggle_favorite"
+                            {% if is_loading %}disabled{% endif %}
+                            aria-pressed="{{ is_favorited|yesno:'true,false' }}"
+                        >
+                            <span class="me-2">{% if is_favorited %}💔{% else %}❤️{% endif %}</span>
+                            <span>{% if is_favorited %}Remove from Favorites{% else %}Add to Favorites{% endif %}</span>
+                            {% if is_loading %}
+                                <span class="ms-2">
+                                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                    Loading...
+                                </span>
+                            {% endif %}
+                        </button>
+                    {% endif %}
+                    
+                    {% if is_owner %}
+                        <a href="{% url 'properties:edit' property.id %}" class="btn btn-warning">
+                            <i class="bi bi-pencil"></i> Edit Property
+                        </a>
+                        <button 
+                            type="button" 
+                            class="btn btn-danger"
+                            unicorn:click="show_delete_confirmation"
+                        >
+                            <i class="bi bi-trash"></i> Delete Property
+                        </button>
+                    {% endif %}
+                    
+                    <a href="{% url 'properties:list' %}" class="btn btn-secondary">
+                        <i class="bi bi-arrow-left"></i> Back to Properties
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Delete Confirmation Modal -->
+        {% if show_delete_modal %}
+            <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Confirm Property Deletion</h5>
+                            <button 
+                                type="button" 
+                                class="btn-close" 
+                                unicorn:click="cancel_delete"
+                                aria-label="Close"
+                            ></button>
+                        </div>
+                        <div class="modal-body">
+                            <p>Are you sure you want to delete <strong>"{{ property.name }}"</strong>?</p>
+                            <p class="text-danger mb-0">This action cannot be undone.</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button 
+                                type="button" 
+                                class="btn btn-secondary" 
+                                unicorn:click="cancel_delete"
+                            >
+                                Cancel
+                            </button>
+                            <button 
+                                type="button" 
+                                class="btn btn-danger"
+                                unicorn:click="delete_property"
+                            >
+                                Yes, Delete
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    {% else %}
+        <div class="alert alert-warning" role="alert">
+            Property not found.
+        </div>
+    {% endif %}
+</div>

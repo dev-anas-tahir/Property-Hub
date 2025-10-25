@@ -1,0 +1,45 @@
+{% load unicorn %}
+
+<div class="card h-100 shadow-sm">
+    {% if property_data.image_url %}
+        <img src="{{ property_data.image_url }}" class="card-img-top" alt="{{ property_data.name }}" style="height: 200px; object-fit: cover;">
+    {% else %}
+        <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+            <span class="text-muted">No Image</span>
+        </div>
+    {% endif %}
+    
+    <div class="card-body">
+        <h5 class="card-title">{{ property_data.name }}</h5>
+        <p class="card-text text-muted">
+            <i class="bi bi-geo-alt"></i> {{ property_data.full_address|truncatewords:10 }}
+        </p>
+        <p class="card-text">{{ property_data.description }}</p>
+        <p class="card-text">
+            <strong>Price:</strong> ${{ property_data.price|floatformat:0 }}
+        </p>
+        <p class="card-text">
+            <strong>Type:</strong> <span class="badge bg-secondary">{{ property_data.property_type }}</span>
+        </p>
+    </div>
+    
+    <div class="card-footer bg-transparent">
+        <div class="d-flex gap-2 mb-2">
+            <a href="{% url 'properties:detail' property_data.id %}" class="btn btn-primary btn-sm flex-grow-1">
+                <i class="bi bi-eye"></i> View Details
+            </a>
+            
+            {% if show_actions and is_owner %}
+                <a href="{% url 'properties:edit' property_data.id %}" class="btn btn-warning btn-sm" title="Edit">
+                    <i class="bi bi-pencil"></i>
+                </a>
+            {% endif %}
+        </div>
+        
+        {% if user.is_authenticated %}
+            <div class="d-grid">
+                {% unicorn 'favorite-button' property_id=property_data.id key=property_data.id %}
+            </div>
+        {% endif %}
+    </div>
+</div>

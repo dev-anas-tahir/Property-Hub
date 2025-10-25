@@ -1,0 +1,97 @@
+<div>
+    <!-- Modal Backdrop -->
+    {% if show %}
+        <div class="modal-backdrop fade show" 
+             style="z-index: 1040;"
+             unicorn:click="cancel"></div>
+    {% endif %}
+
+    <!-- Modal -->
+    <div class="modal {% if show %}show d-block{% endif %}" 
+         tabindex="-1" 
+         role="dialog"
+         style="z-index: 1050;"
+         aria-labelledby="deleteModalLabel"
+         aria-hidden="{% if not show %}true{% else %}false{% endif %}">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <!-- Modal Header -->
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title" id="deleteModalLabel">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                        Confirm Deletion
+                    </h5>
+                    <button type="button" 
+                            class="btn-close btn-close-white" 
+                            unicorn:click="cancel"
+                            aria-label="Close"></button>
+                </div>
+
+                <!-- Modal Body -->
+                <div class="modal-body">
+                    <p class="mb-3">
+                        Are you sure you want to delete 
+                        {% if item_name %}
+                            <strong>"{{ item_name }}"</strong>
+                        {% else %}
+                            this {{ item_type }}
+                        {% endif %}?
+                    </p>
+                    <div class="alert alert-warning d-flex align-items-center" role="alert">
+                        <i class="bi bi-exclamation-circle-fill me-2"></i>
+                        <div>
+                            This action cannot be undone. All associated data will be permanently removed.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modal Footer -->
+                <div class="modal-footer">
+                    <button type="button" 
+                            class="btn btn-secondary" 
+                            unicorn:click="cancel">
+                        <i class="bi bi-x-circle me-1"></i>
+                        Cancel
+                    </button>
+                    <button type="button" 
+                            class="btn btn-danger" 
+                            unicorn:click="confirm">
+                        <i class="bi bi-trash-fill me-1"></i>
+                        Delete
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .modal-backdrop {
+        background-color: rgba(0, 0, 0, 0.5);
+    }
+
+    .modal.show {
+        display: block;
+    }
+
+    .modal-dialog {
+        max-width: 500px;
+    }
+
+    .modal-content {
+        border: none;
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    }
+
+    .modal-header {
+        border-bottom: none;
+    }
+
+    .modal-footer {
+        border-top: 1px solid #dee2e6;
+    }
+
+    .btn-close-white {
+        filter: brightness(0) invert(1);
+    }
+</style>

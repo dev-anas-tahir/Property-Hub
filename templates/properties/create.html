@@ -1,72 +1,9 @@
 {% extends 'base.html' %}
-{% load form_filters_properties %}
+{% load unicorn %}
 
 {% block title %}Create New Property{% endblock %}
 
 {% block content %}
-<div class="row">
-    <div class="col-md-8 mx-auto">
-        <h1 class="mb-4">Create a New Property</h1>
-        <div class="card shadow-sm">
-            <div class="card-body">
-                <form method="post" enctype="multipart/form-data">
-                    {% csrf_token %}
-                    <div class="mb-3">
-                        {{ form.name.label_tag }}
-                        {{ form.name|add_class:"form-control" }}
-                        <div class="text-danger">{{ form.name.errors }}</div>
-                    </div>
-                    <div class="mb-3">
-                        {{ form.description.label_tag }}
-                        {{ form.description|add_class:"form-control" }}
-                        <div class="text-danger">{{ form.description.errors }}</div>
-                    </div>
-                    <div class="mb-3">
-                        {{ form.full_address.label_tag }}
-                        {{ form.full_address|add_class:"form-control" }}
-                        <div class="text-danger">{{ form.full_address.errors }}</div>
-                    </div>
-                    <div class="mb-3">
-                        {{ form.phone_number.label_tag }}
-                        {{ form.phone_number|add_class:"form-control" }}
-                        <div class="text-danger">{{ form.phone_number.errors }}</div>
-                    </div>
-                    <div class="mb-3">
-                        {{ form.cnic.label_tag }}
-                        {{ form.cnic|add_class:"form-control" }}
-                        <div class="text-danger">{{ form.cnic.errors }}</div>
-                    </div>
-                    <div class="mb-3">
-                        {{ form.property_type.label_tag }}
-                        {{ form.property_type|add_class:"form-control" }}
-                        <div class="text-danger">{{ form.property_type.errors }}</div>
-                    </div>
-                    <div class="mb-3">
-                        {{ form.price.label_tag }}
-                        {{ form.price|add_class:"form-control" }}
-                        <div class="text-danger">{{ form.price.errors }}</div>
-                    </div>
-                    <div class="mb-3">
-                        {{ form.documents.label_tag }}
-                        {{ form.documents|add_class:"form-control" }}
-                        <div class="text-danger">{{ form.documents.errors }}</div>
-                    </div>
-                    <div class="mb-3">
-                        <label for="images">Upload Images:</label>
-                        <input type="file" name="images" multiple class="form-control" accept="image/jpeg,image/png">
-                    </div>
-                    <div class="mb-3">
-                        {{ form.is_published.label_tag }}
-                        {{ form.is_published|add_class:"form-check-input" }}
-                        <div class="text-danger">{{ form.is_published.errors }}</div>
-                    </div>
-                    <div class="d-flex gap-2">
-                        <button type="submit" class="btn btn-primary">Create Property</button>
-                        <a href="{% url 'properties:list' %}" class="btn btn-secondary">Cancel</a>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
+{% csrf_token %}
+{% unicorn 'property-form' %}
 {% endblock %}

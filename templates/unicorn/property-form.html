@@ -1,0 +1,283 @@
+<div>
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <h1 class="mb-4">
+                {% if is_edit_mode %}
+                    Edit Property: {{ name }}
+                {% else %}
+                    Create a New Property
+                {% endif %}
+            </h1>
+            
+            <div class="card shadow-sm">
+                <div class="card-body position-relative">
+                    <!-- Loading overlay -->
+                    <div unicorn:show="is_loading" class="position-absolute top-0 start-0 w-100 h-100 bg-white bg-opacity-75" style="z-index: 1000; display: none;">
+                        <div class="d-flex w-100 h-100 align-items-center justify-content-center">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Non-field errors -->
+                    {% if errors.non_field %}
+                        <div class="alert alert-danger" role="alert">
+                            {{ errors.non_field }}
+                        </div>
+                    {% endif %}
+                    
+                    <form unicorn:submit.prevent="save" unicorn:multipart="true" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <!-- Property Name -->
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Property Name</label>
+                            <input 
+                                type="text" 
+                                class="form-control {% if errors.name %}is-invalid{% endif %}" 
+                                id="name" 
+                                unicorn:model.defer="name"
+                                placeholder="Enter property name"
+                            >
+                            {% if errors.name %}
+                                <div class="invalid-feedback">{{ errors.name }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Description -->
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description</label>
+                            <textarea 
+                                class="form-control {% if errors.description %}is-invalid{% endif %}" 
+                                id="description" 
+                                unicorn:model.defer="description"
+                                rows="4"
+                                placeholder="Enter property description"
+                            ></textarea>
+                            {% if errors.description %}
+                                <div class="invalid-feedback">{{ errors.description }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Full Address -->
+                        <div class="mb-3">
+                            <label for="full_address" class="form-label">Full Address</label>
+                            <input 
+                                type="text" 
+                                class="form-control {% if errors.full_address %}is-invalid{% endif %}" 
+                                id="full_address" 
+                                unicorn:model.defer="full_address"
+                                placeholder="Enter full address"
+                            >
+                            {% if errors.full_address %}
+                                <div class="invalid-feedback">{{ errors.full_address }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Phone Number -->
+                        <div class="mb-3">
+                            <label for="phone_number" class="form-label">Phone Number</label>
+                            <input 
+                                type="text" 
+                                class="form-control {% if errors.phone_number %}is-invalid{% endif %}" 
+                                id="phone_number" 
+                                unicorn:model.lazy="phone_number"
+                                placeholder="+92-3001234567"
+                            >
+                            {% if errors.phone_number %}
+                                <div class="invalid-feedback">{{ errors.phone_number }}</div>
+                            {% endif %}
+                            <small class="form-text text-muted">Format: +00-0000000000</small>
+                        </div>
+                        
+                        <!-- CNIC -->
+                        <div class="mb-3">
+                            <label for="cnic" class="form-label">CNIC</label>
+                            <input 
+                                type="text" 
+                                class="form-control {% if errors.cnic %}is-invalid{% endif %}" 
+                                id="cnic" 
+                                unicorn:model.lazy="cnic"
+                                placeholder="12345-1234567-1"
+                            >
+                            {% if errors.cnic %}
+                                <div class="invalid-feedback">{{ errors.cnic }}</div>
+                            {% endif %}
+                            <small class="form-text text-muted">Format: 00000-0000000-0</small>
+                        </div>
+                        
+                        <!-- Property Type -->
+                        <div class="mb-3">
+                            <label for="property_type" class="form-label">Property Type</label>
+                            <select 
+                                class="form-control {% if errors.property_type %}is-invalid{% endif %}" 
+                                id="property_type" 
+                                unicorn:model.defer="property_type"
+                            >
+                                {% for value, label in property_type_choices %}
+                                    <option value="{{ value }}" {% if property_type == value %}selected{% endif %}>
+                                        {{ label }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                            {% if errors.property_type %}
+                                <div class="invalid-feedback">{{ errors.property_type }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Price -->
+                        <div class="mb-3">
+                            <label for="price" class="form-label">Price</label>
+                            <input 
+                                type="number" 
+                                class="form-control {% if errors.price %}is-invalid{% endif %}" 
+                                id="price" 
+                                unicorn:model.lazy="price"
+                                placeholder="Enter price"
+                                step="1"
+                                min="0"
+                            >
+                            {% if errors.price %}
+                                <div class="invalid-feedback">{{ errors.price }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Existing Images (Edit Mode) -->
+                        {% if is_edit_mode and existing_images %}
+                            <div class="mb-3">
+                                <label class="form-label">Current Images</label>
+                                <div class="row">
+                                    {% for image in existing_images %}
+                                        <div class="col-md-4 mb-3">
+                                            <div class="card h-100 shadow-sm">
+                                                <img 
+                                                    src="{{ image.url }}" 
+                                                    class="card-img-top" 
+                                                    alt="Property Image" 
+                                                    style="height: 150px; object-fit: cover;"
+                                                >
+                                                <div class="card-body d-flex align-items-center">
+                                                    <div class="form-check">
+                                                        <input 
+                                                            type="checkbox" 
+                                                            class="form-check-input" 
+                                                            id="delete_image_{{ image.id }}"
+                                                            unicorn:click="toggle_image_delete({{ image.id }})"
+                                                            {% if image.id in images_to_delete %}checked{% endif %}
+                                                        >
+                                                        <label class="form-check-label" for="delete_image_{{ image.id }}">
+                                                            Delete
+                                                        </label>
+                                                    </div>
+                                                    {% if image.is_primary %}
+                                                        <span class="badge bg-primary ms-2">Primary</span>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        {% endif %}
+                        
+                        <!-- Upload New Images -->
+                        <div class="mb-3">
+                            <label for="images" class="form-label">
+                                {% if is_edit_mode %}Upload New Images{% else %}Upload Images{% endif %}
+                            </label>
+                            <input 
+                                type="file" 
+                                class="form-control" 
+                                id="images" 
+                                name="images"
+                                multiple 
+                                accept="image/jpeg,image/png,image/gif,image/webp"
+                                unicorn:file="images_to_upload"
+                            >
+                            <small class="form-text text-muted">
+                                Allowed formats: JPG, PNG, GIF, WebP. Max size: 5MB per image. Max 10 images.
+                            </small>
+                        </div>
+                        
+                        <!-- Current Document (Edit Mode) -->
+                        {% if is_edit_mode and current_document_name %}
+                            <div class="mb-3">
+                                <label class="form-label">Current Document</label>
+                                <p>
+                                    <a href="{% url 'properties:download_document' property_id %}" target="_blank">
+                                        {{ current_document_name }}
+                                    </a>
+                                </p>
+                                <div class="form-check">
+                                    <input 
+                                        type="checkbox" 
+                                        class="form-check-input" 
+                                        id="remove_document"
+                                        unicorn:model="remove_document"
+                                    >
+                                    <label class="form-check-label" for="remove_document">
+                                        Remove current document
+                                    </label>
+                                </div>
+                            </div>
+                        {% endif %}
+                        
+                        <!-- Upload Document -->
+                        <div class="mb-3">
+                            <label for="documents" class="form-label">
+                                {% if is_edit_mode and current_document_name %}Upload New Document{% else %}Document (PDF only){% endif %}
+                            </label>
+                            <input 
+                                type="file" 
+                                class="form-control {% if errors.documents %}is-invalid{% endif %}" 
+                                id="documents" 
+                                name="documents"
+                                accept=".pdf,application/pdf"
+                                unicorn:file="document_file"
+                            >
+                            {% if errors.documents %}
+                                <div class="invalid-feedback">{{ errors.documents }}</div>
+                            {% endif %}
+                            <small class="form-text text-muted">Only PDF files are allowed.</small>
+                        </div>
+                        
+                        <!-- Published Checkbox -->
+                        <div class="mb-3 form-check">
+                            <input 
+                                type="checkbox" 
+                                class="form-check-input" 
+                                id="is_published"
+                                unicorn:model="is_published"
+                            >
+                            <label class="form-check-label" for="is_published">
+                                Published
+                            </label>
+                        </div>
+                        
+                        <!-- Action Buttons -->
+                        <div class="d-flex gap-2">
+                            <button 
+                                type="submit" 
+                                class="btn btn-primary"
+                                {% if is_loading %}disabled{% endif %}
+                            >
+                                {% if is_loading %}
+                                    <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                    Saving...
+                                {% else %}
+                                    {% if is_edit_mode %}Save Changes{% else %}Create Property{% endif %}
+                                {% endif %}
+                            </button>
+                            <a 
+                                href="{% if is_edit_mode %}{% url 'properties:detail' property_id %}{% else %}{% url 'properties:list' %}{% endif %}" 
+                                class="btn btn-secondary"
+                            >
+                                Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

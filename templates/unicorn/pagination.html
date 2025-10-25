@@ -1,0 +1,66 @@
+<div class="d-flex justify-content-center align-items-center mt-4">
+    <nav aria-label="Page navigation">
+        <ul class="pagination mb-0">
+            <!-- Previous button -->
+            <li class="page-item {% if not has_previous %}disabled{% endif %}">
+                <button class="page-link" unicorn:click="previous_page" {% if not has_previous or is_loading
+                    %}disabled{% endif %} aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </button>
+            </li>
+
+            <!-- First page if not in range -->
+            {% if page_range.0 > 1 %}
+            <li class="page-item">
+                <button class="page-link" unicorn:click="go_to_page(1)" {% if is_loading %}disabled{% endif %}>
+                    1
+                </button>
+            </li>
+            {% if page_range.0 > 2 %}
+            <li class="page-item disabled">
+                <span class="page-link">...</span>
+            </li>
+            {% endif %}
+            {% endif %}
+
+            <!-- Page numbers -->
+            {% for page_num in page_range %}
+            <li class="page-item {% if page_num == current_page %}active{% endif %}">
+                <button class="page-link" unicorn:click="go_to_page({{ page_num }})" {% if is_loading %}disabled{% endif
+                    %}>
+                    {{ page_num }}
+                </button>
+            </li>
+            {% endfor %}
+
+            <!-- Last page if not in range -->
+            {% if page_range|last < total_pages %} {% if page_range|last < total_pages|add:"-1" %} <li
+                class="page-item disabled">
+                <span class="page-link">...</span>
+                </li>
+                {% endif %}
+                <li class="page-item">
+                    <button class="page-link" unicorn:click="go_to_page({{ total_pages }})" {% if is_loading
+                        %}disabled{% endif %}>
+                        {{ total_pages }}
+                    </button>
+                </li>
+                {% endif %}
+
+                <!-- Next button -->
+                <li class="page-item {% if not has_next %}disabled{% endif %}">
+                    <button class="page-link" unicorn:click="next_page" {% if not has_next or is_loading %}disabled{%
+                        endif %} aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </button>
+                </li>
+        </ul>
+    </nav>
+
+    <!-- Loading indicator -->
+    <div unicorn:loading class="ms-3">
+        <div class="spinner-border spinner-border-sm text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+</div>

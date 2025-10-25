@@ -1,0 +1,131 @@
+<div>
+    <form unicorn:submit.prevent="submit">
+        {% if errors.non_field %}
+        <div class="alert alert-danger">
+            {{ errors.non_field }}
+        </div>
+        {% endif %}
+
+        <!-- Username -->
+        <div class="mb-3">
+            <label for="username" class="form-label">Username</label>
+            <input 
+                type="text" 
+                class="form-control {% if errors.username %}is-invalid{% endif %}" 
+                id="username" 
+                unicorn:model.lazy="username"
+                {% if is_loading %}disabled{% endif %}
+            >
+            {% if errors.username %}
+            <div class="invalid-feedback">
+                {{ errors.username }}
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Email -->
+        <div class="mb-3">
+            <label for="email" class="form-label">Email</label>
+            <input 
+                type="email" 
+                class="form-control {% if errors.email %}is-invalid{% endif %}" 
+                id="email" 
+                unicorn:model.lazy="email"
+                {% if is_loading %}disabled{% endif %}
+            >
+            {% if errors.email %}
+            <div class="invalid-feedback">
+                {{ errors.email }}
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- First Name -->
+        <div class="mb-3">
+            <label for="first_name" class="form-label">First Name (Optional)</label>
+            <input 
+                type="text" 
+                class="form-control" 
+                id="first_name" 
+                unicorn:model.defer="first_name"
+                {% if is_loading %}disabled{% endif %}
+            >
+        </div>
+
+        <!-- Last Name -->
+        <div class="mb-3">
+            <label for="last_name" class="form-label">Last Name (Optional)</label>
+            <input 
+                type="text" 
+                class="form-control" 
+                id="last_name" 
+                unicorn:model.defer="last_name"
+                {% if is_loading %}disabled{% endif %}
+            >
+        </div>
+
+        <!-- Password 1 -->
+        <div class="mb-3">
+            <label for="password1" class="form-label">Password</label>
+            <div class="input-group">
+                <input 
+                    type="password" 
+                    class="form-control {% if errors.password1 %}is-invalid{% endif %}" 
+                    id="password1" 
+                    unicorn:model.lazy="password1"
+                    {% if is_loading %}disabled{% endif %}
+                >
+                <button class="btn btn-outline-secondary" type="button" tabindex="-1" onclick="togglePassword('password1', this)">
+                    <i class="bi bi-eye"></i>
+                </button>
+            </div>
+            {% if errors.password1 %}
+            <div class="invalid-feedback">
+                {{ errors.password1 }}
+            </div>
+            {% else %}
+            <div class="form-text">
+                Password must be at least 8 characters long and contain at least one digit, one uppercase letter, and one special character.
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Password 2 -->
+        <div class="mb-3">
+            <label for="password2" class="form-label">Confirm Password</label>
+            <div class="input-group">
+                <input 
+                    type="password" 
+                    class="form-control {% if errors.password2 %}is-invalid{% endif %}" 
+                    id="password2" 
+                    unicorn:model.defer="password2"
+                    {% if is_loading %}disabled{% endif %}
+                >
+                <button class="btn btn-outline-secondary" type="button" tabindex="-1" onclick="window.togglePassword('password2', this)">
+                    <i class="bi bi-eye"></i>
+                </button>
+            </div>
+            {% if errors.password2 %}
+            <div class="invalid-feedback">
+                {{ errors.password2 }}
+            </div>
+            {% endif %}
+        </div>
+        {% block password_toggle_script %}{% endblock %}
+
+        <div class="d-grid gap-2">
+            <button 
+                type="submit" 
+                class="btn btn-primary"
+                {% if is_loading %}disabled{% endif %}
+            >
+                <span unicorn:loading.remove>Sign Up</span>
+                <span unicorn:loading>
+                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                    Creating account...
+                </span>
+            </button>
+            <a href="{% url 'users:login' %}" class="btn btn-outline-secondary">Already have an account? Login</a>
+        </div>
+    </form>
+</div>
