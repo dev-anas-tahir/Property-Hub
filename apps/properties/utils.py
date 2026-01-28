@@ -7,6 +7,7 @@ from django.contrib import messages
 from apps.properties.models import Property
 from django.http import HttpResponseForbidden, FileResponse
 
+
 def handle_document_download(request, property_obj: Property) -> FileResponse:
     """
     Handle document download with permission checks and file response.
@@ -22,8 +23,6 @@ def handle_document_download(request, property_obj: Property) -> FileResponse:
         as_attachment=True,
         filename=os.path.basename(property_obj.documents.name),
     )
-
-
 
 
 def delete_property_and_assets(request, property_obj: Property):
