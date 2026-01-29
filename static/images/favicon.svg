@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#6366f1;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#8b5cf6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#d946ef;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background circle -->
+  <circle cx="50" cy="50" r="48" fill="url(#gradient)"/>
+  
+  <!-- House icon -->
+  <g fill="white">
+    <!-- Roof -->
+    <path d="M 50 25 L 75 45 L 70 45 L 70 70 L 30 70 L 30 45 L 25 45 Z"/>
+    
+    <!-- Door -->
+    <rect x="42" y="55" width="16" height="15" fill="#6366f1" rx="1"/>
+    
+    <!-- Window -->
+    <rect x="38" y="48" width="8" height="6" fill="#6366f1" rx="1"/>
+    <rect x="54" y="48" width="8" height="6" fill="#6366f1" rx="1"/>
+  </g>
+</svg>
