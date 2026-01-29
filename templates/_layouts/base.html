@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en" data-theme="propertyhub">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}PropertyHub{% endblock %}</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="{% static 'images/favicon.svg' %}">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS with DaisyUI -->
+    <link href="{% static 'dist/output.css' %}" rel="stylesheet">
+    
+    <!-- HTMX -->
+    <script src="https://unpkg.com/htmx.org@1.9.10" defer></script>
+    
+    <!-- Alpine.js -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.3/dist/cdn.min.js"></script>
+    
+    <!-- Custom Styles -->
+    <style>
+        /* Alpine.js x-cloak: Prevent flash of unstyled content */
+        [x-cloak] { 
+            display: none !important; 
+        }
+        
+        /* HTMX loading indicators */
+        .htmx-indicator {
+            display: none;
+        }
+        
+        .htmx-request .htmx-indicator {
+            display: inline-block;
+        }
+        
+        .htmx-request.htmx-indicator {
+            display: inline-block;
+        }
+        
+        /* Custom gradient backgrounds */
+        .bg-gradient-airbnb {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #d946ef 100%);
+        }
+        
+        .bg-gradient-card {
+            background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+        }
+        
+        /* Custom animations */
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        .animate-slide-in-right {
+            animation: slideInRight 0.3s ease-out;
+        }
+        
+        /* Navigation active state */
+        .nav-link-active {
+            @apply bg-white/20 text-white;
+        }
+        
+        /* Property card hover effects */
+        .property-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .property-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+    
+    {% block extra_head %}{% endblock %}
+</head>
+
+<body class="min-h-screen bg-base-200">
+    <!-- Navigation -->
+    {% include '_components/navigation/navbar.html' %}
+    
+    <!-- Messages -->
+    {% if messages %}
+        {% include '_components/ui/messages.html' %}
+    {% endif %}
+    
+    <!-- Main Content -->
+    <main class="{% block main_class %}container mx-auto px-4 py-8{% endblock %}">
+        {% block content %}{% endblock %}
+    </main>
+    
+    <!-- Footer -->
+    {% include '_components/navigation/footer.html' %}
+    
+    <!-- HTMX Configuration -->
+    <script>
+        // Configure HTMX to automatically include CSRF token in all requests
+        document.body.addEventListener('htmx:configRequest', (event) => {
+            event.detail.headers['X-CSRFToken'] = '{{ csrf_token }}';
+        });
+        
+        // Global loading state management
+        document.body.addEventListener('htmx:beforeRequest', (event) => {
+            document.body.classList.add('htmx-loading');
+        });
+        
+        document.body.addEventListener('htmx:afterRequest', (event) => {
+            document.body.classList.remove('htmx-loading');
+        });
+    </script>
+    
+    {% block extra_scripts %}{% endblock %}
+</body>
+
+</html>

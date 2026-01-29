@@ -1,0 +1,159 @@
+{% load static %}
+
+<form method="post" enctype="multipart/form-data" class="space-y-6">
+    {% csrf_token %}
+    
+    <!-- Form Errors -->
+    {% if form.non_field_errors %}
+        <div class="alert alert-error">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <div>
+                {% for error in form.non_field_errors %}
+                    <div>{{ error }}</div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+    
+    <!-- Basic Information -->
+    <div class="card bg-base-100 shadow-soft">
+        <div class="card-body">
+            <h2 class="card-title text-xl mb-6">Basic Information</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Property Title -->
+                <div class="md:col-span-2">
+                    {% include '_components/forms/input.html' with field=form.name label="Property Title" placeholder="e.g., Beautiful 3BR House in Downtown" required=True %}
+                </div>
+                
+                <!-- Property Type -->
+                <div>
+                    {% include '_components/forms/select.html' with field=form.property_type label="Property Type" required=True %}
+                </div>
+                
+                <!-- Price -->
+                <div>
+                    {% include '_components/forms/input.html' with field=form.price label="Price" placeholder="Enter price" required=True icon='<svg class="w-5 h-5 text-base-content/40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path></svg>' %}
+                </div>
+                
+                <!-- Address -->
+                <div class="md:col-span-2">
+                    {% include '_components/forms/input.html' with field=form.full_address label="Address" placeholder="Enter full address" required=True icon='<svg class="w-5 h-5 text-base-content/40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>' %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Property Details -->
+    <div class="card bg-base-100 shadow-soft">
+        <div class="card-body">
+            <h2 class="card-title text-xl mb-6">Property Details</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Phone Number -->
+                <div>
+                    {% include '_components/forms/input.html' with field=form.phone_number label="Phone Number" placeholder="+92-3001234567" required=True %}
+                </div>
+                
+                <!-- CNIC -->
+                <div>
+                    {% include '_components/forms/input.html' with field=form.cnic label="CNIC" placeholder="12345-1234567-1" required=True %}
+                </div>
+            </div>
+            
+            <!-- Description -->
+            <div class="mt-6">
+                {% include '_components/forms/textarea.html' with field=form.description label="Description" placeholder="Describe your property, its features, and what makes it special..." rows=6 %}
+            </div>
+            
+            <!-- Published Status -->
+            <div class="mt-6">
+                <div class="form-control">
+                    <label class="label cursor-pointer justify-start">
+                        <input type="checkbox" name="is_published" class="checkbox checkbox-primary mr-3" {% if form.is_published.value %}checked{% endif %}>
+                        <span class="label-text">
+                            <strong>Publish Property</strong>
+                            <br>
+                            <small class="text-base-content/60">Make this property visible to other users</small>
+                        </span>
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Images -->
+    {% if not is_edit_mode or property.images.count == 0 %}
+        <div class="card bg-base-100 shadow-soft">
+            <div class="card-body">
+                <h2 class="card-title text-xl mb-6">Property Images</h2>
+                
+                <!-- Image Upload Area -->
+                <div class="border-2 border-dashed border-base-300 rounded-2xl p-8 text-center hover:border-primary-300 transition-colors">
+                    <svg class="w-12 h-12 text-base-content/40 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                    </svg>
+                    <h3 class="text-lg font-semibold text-base-content mb-2">Upload Property Images</h3>
+                    <p class="text-base-content/60 mb-4">Drag and drop images here, or click to browse</p>
+                    <input type="file" name="images" multiple accept="image/*" class="file-input file-input-bordered file-input-primary w-full max-w-xs">
+                    <p class="text-xs text-base-content/50 mt-2">Supported formats: JPG, PNG, WebP. Max 10 images.</p>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+    
+    <!-- Existing Images (Edit Mode) -->
+    {% if is_edit_mode and property.images.count > 0 %}
+        <div class="card bg-base-100 shadow-soft">
+            <div class="card-body">
+                <h2 class="card-title text-xl mb-6">Current Images</h2>
+                
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-6">
+                    {% for image in property.images.all %}
+                        <div class="relative group">
+                            <img src="{{ image.image.url }}" alt="Property image" class="w-full h-32 object-cover rounded-lg">
+                            <div class="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center">
+                                <label class="cursor-pointer">
+                                    <input type="checkbox" name="delete_image_ids" value="{{ image.id }}" class="checkbox checkbox-error">
+                                    <span class="text-white text-sm ml-2">Delete</span>
+                                </label>
+                            </div>
+                            {% if image.is_primary %}
+                                <div class="absolute top-2 left-2">
+                                    <span class="badge badge-primary badge-sm">Primary</span>
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+                
+                <!-- Add More Images -->
+                <div class="border-2 border-dashed border-base-300 rounded-xl p-6 text-center">
+                    <h3 class="text-lg font-semibold text-base-content mb-2">Add More Images</h3>
+                    <input type="file" name="images" multiple accept="image/*" class="file-input file-input-bordered file-input-primary w-full max-w-xs">
+                </div>
+            </div>
+        </div>
+    {% endif %}
+    
+    <!-- Submit Button -->
+    <div class="flex justify-end space-x-4">
+        <a href="{% if is_edit_mode %}{% url 'properties:detail' property.pk %}{% else %}{% url 'properties:list' %}{% endif %}" 
+           class="btn btn-outline">Cancel</a>
+        <button type="submit" class="btn btn-primary">
+            {% if is_edit_mode %}
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+                Update Property
+            {% else %}
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                </svg>
+                Create Property
+            {% endif %}
+        </button>
+    </div>
+</form>

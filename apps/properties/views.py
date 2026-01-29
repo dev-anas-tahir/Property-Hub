@@ -4,7 +4,7 @@ All interactive functionality is handled by HTMX and Alpine.js.
 """
 
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, render, redirect
 from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator
 from apps.properties.models import Property, PropertyImage
@@ -83,7 +83,7 @@ def properties_list_view(request):
 
     # Return partial template for HTMX requests, full page for standard requests
     if is_htmx:
-        return render(request, "partials/properties/property_list.html", context)
+        return render(request, "_components/properties/property_grid.html", context)
     else:
         return render(request, "properties/list.html", context)
 
@@ -136,7 +136,7 @@ def property_detail_view(request, pk):
 
     # Return partial template for HTMX requests, full page for standard requests
     if is_htmx:
-        return render(request, "partials/properties/property_detail.html", context)
+        return render(request, "_components/properties/property_detail.html", context)
     else:
         return render(request, "properties/detail.html", context)
 
@@ -250,7 +250,7 @@ def property_edit_view(request, pk):
 
         # Return partial template for HTMX, full page for standard requests
         if is_htmx:
-            return render(request, "partials/properties/property_form.html", context)
+            return render(request, "_components/properties/property_form.html", context)
         else:
             return render(request, "properties/edit.html", context)
 
@@ -264,7 +264,7 @@ def property_edit_view(request, pk):
 
     # Return partial template for HTMX, full page for standard requests
     if is_htmx:
-        return render(request, "partials/properties/property_form.html", context)
+        return render(request, "_components/properties/property_form.html", context)
     else:
         return render(request, "properties/edit.html", context)
 
@@ -364,7 +364,7 @@ def property_create_view(request):
 
         # Return partial template for HTMX, full page for standard requests
         if is_htmx:
-            return render(request, "partials/properties/property_form.html", context)
+            return render(request, "_components/properties/property_form.html", context)
         else:
             return render(request, "properties/create.html", context)
 
@@ -377,7 +377,7 @@ def property_create_view(request):
 
     # Return partial template for HTMX, full page for standard requests
     if is_htmx:
-        return render(request, "partials/properties/property_form.html", context)
+        return render(request, "_components/properties/property_form.html", context)
     else:
         return render(request, "properties/create.html", context)
 
@@ -428,7 +428,7 @@ def property_favorite_toggle_view(request, pk):
             "property": property_obj,
             "is_favorited": is_favorited,
         }
-        return render(request, "partials/properties/favorite_button.html", context)
+        return render(request, "_components/properties/favorite_button.html", context)
 
     # For non-HTMX requests, return a simple response
     return HttpResponse("OK", status=200)

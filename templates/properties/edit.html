@@ -1,20 +1,28 @@
-{% extends 'base.html' %}
+{% extends '_layouts/base.html' %}
+{% load static %}
 
-{% block title %}Edit Property{% endblock %}
+{% block title %}Edit {{ property.name }} - PropertyHub{% endblock %}
 
 {% block content %}
-<div class="row">
-    <div class="col-lg-8 mx-auto">
-        <div class="card">
-            <div class="card-header">
-                <h4 class="mb-0">
-                    <i class="bi bi-pencil"></i> Edit Property
-                </h4>
-            </div>
-            <div class="card-body">
-                {% include 'partials/properties/property_form.html' with is_edit_mode=True %}
-            </div>
+<div class="max-w-4xl mx-auto">
+    <!-- Page Header -->
+    <div class="flex items-center justify-between mb-8">
+        <div>
+            <h1 class="text-3xl font-display font-bold text-base-content mb-2">Edit Property</h1>
+            <p class="text-base-content/60">Update your property information and images</p>
+        </div>
+        <div class="flex items-center space-x-3">
+            <a href="{% url 'properties:detail' property.pk %}" class="btn btn-outline">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                </svg>
+                View Property
+            </a>
         </div>
     </div>
+    
+    <!-- Property Form -->
+    {% include '_components/properties/property_form.html' with form=form property=property is_edit_mode=True %}
 </div>
 {% endblock %}

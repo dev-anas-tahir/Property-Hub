@@ -1,21 +1,192 @@
-{% extends 'base.html' %}
-{% load unicorn %}
+{% extends '_layouts/dashboard.html' %}
+{% load static %}
 
-{% block title %}My Properties{% endblock %}
+{% block title %}My Properties - PropertyHub{% endblock %}
 
-{% block content %}
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-12 mb-4 d-flex justify-content-between align-items-center">
-            <div>
-                <h1>My Properties</h1>
-                <p class="text-muted">Manage your property listings</p>
+{% block page_title %}My Properties{% endblock %}
+
+{% block page_actions %}
+<a href="{% url 'properties:create' %}" class="btn btn-primary">
+    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+    </svg>
+    Add Property
+</a>
+{% endblock %}
+
+{% block dashboard_content %}
+<!-- Stats Overview -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+    <div class="stat bg-base-100 shadow-soft rounded-2xl">
+        <div class="stat-figure text-primary">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+            </svg>
+        </div>
+        <div class="stat-title">Total Properties</div>
+        <div class="stat-value text-primary">{{ properties|length }}</div>
+        <div class="stat-desc">Properties listed</div>
+    </div>
+    
+    <div class="stat bg-base-100 shadow-soft rounded-2xl">
+        <div class="stat-figure text-success">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+            </svg>
+        </div>
+        <div class="stat-title">Total Views</div>
+        <div class="stat-value text-success">{{ total_views|default:0 }}</div>
+        <div class="stat-desc">Across all properties</div>
+    </div>
+    
+    <div class="stat bg-base-100 shadow-soft rounded-2xl">
+        <div class="stat-figure text-warning">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+            </svg>
+        </div>
+        <div class="stat-title">Total Favorites</div>
+        <div class="stat-value text-warning">{{ total_favorites|default:0 }}</div>
+        <div class="stat-desc">From all users</div>
+    </div>
+</div>
+
+<!-- Properties Management -->
+{% if properties %}
+    <!-- Filter and Sort -->
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+        <div class="flex items-center space-x-3">
+            <div class="dropdown">
+                <div tabindex="0" role="button" class="btn btn-outline btn-sm">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path>
+                    </svg>
+                    Filter
+                </div>
+                <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow-large bg-base-100 rounded-box w-52">
+                    <li><a>All Properties</a></li>
+                    <li><a>For Sale</a></li>
+                    <li><a>For Rent</a></li>
+                    <li><a>Recently Added</a></li>
+                </ul>
             </div>
-            <a href="{% url 'properties:create' %}" class="btn btn-primary">
-                <i class="bi bi-plus-circle"></i> Create New Property
-            </a>
+            
+            <div class="dropdown">
+                <div tabindex="0" role="button" class="btn btn-outline btn-sm">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"></path>
+                    </svg>
+                    Sort
+                </div>
+                <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow-large bg-base-100 rounded-box w-52">
+                    <li><a>Newest First</a></li>
+                    <li><a>Oldest First</a></li>
+                    <li><a>Price: High to Low</a></li>
+                    <li><a>Price: Low to High</a></li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="text-sm text-base-content/60">
+            {{ properties|length }} propert{{ properties|length|pluralize:"y,ies" }}
         </div>
     </div>
-    {% unicorn 'property-list' show_my_properties=True %}
-</div>
+    
+    <!-- Properties Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+        {% for property in properties %}
+            <div class="card bg-base-100 shadow-soft hover:shadow-large transition-all duration-300">
+                <!-- Property Image -->
+                <figure class="relative h-48">
+                    {% if property.images.first %}
+                        <img src="{{ property.images.first.image.url }}" 
+                             alt="{{ property.name }}"
+                             class="w-full h-full object-cover">
+                    {% else %}
+                        <div class="w-full h-full bg-gradient-to-br from-primary-100 to-secondary-100 flex items-center justify-center">
+                            <svg class="w-12 h-12 text-primary-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                            </svg>
+                        </div>
+                    {% endif %}
+                    
+                    <!-- Status Badge -->
+                    <div class="absolute top-3 left-3">
+                        <span class="badge badge-primary badge-sm">{{ property.get_property_type_display }}</span>
+                    </div>
+                    
+                    <!-- Actions Menu -->
+                    <div class="absolute top-3 right-3">
+                        <div class="dropdown dropdown-end">
+                            <div tabindex="0" role="button" class="btn btn-circle btn-sm bg-white/90 border-0">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"></path>
+                                </svg>
+                            </div>
+                            <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow-large bg-base-100 rounded-box w-40">
+                                <li><a href="{% url 'properties:detail' property.pk %}">View</a></li>
+                                <li><a href="{% url 'properties:edit' property.pk %}">Edit</a></li>
+                                <li><a class="text-error">Delete</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </figure>
+                
+                <!-- Property Details -->
+                <div class="card-body p-4">
+                    <h3 class="card-title text-lg line-clamp-1">{{ property.name }}</h3>
+                    <p class="text-base-content/60 text-sm line-clamp-2 mb-3">{{ property.full_address }}</p>
+                    
+                    <!-- Property Stats -->
+                    <div class="flex items-center justify-between text-sm text-base-content/70 mb-4">
+                        <div class="flex items-center space-x-3">
+                            <span>{{ property.property_type }}</span>
+                        </div>
+                        <span class="font-bold text-accent">${{ property.price|floatformat:0 }}</span>
+                    </div>
+                    
+                    <!-- Property Metrics -->
+                    <div class="flex items-center justify-between text-xs text-base-content/60 mb-4">
+                        <span>{{ property.view_count|default:0 }} views</span>
+                        <span>{{ property.created_at|timesince }} ago</span>
+                    </div>
+                    
+                    <!-- Action Buttons -->
+                    <div class="card-actions justify-end">
+                        <a href="{% url 'properties:edit' property.pk %}" class="btn btn-outline btn-sm">Edit</a>
+                        <a href="{% url 'properties:detail' property.pk %}" class="btn btn-primary btn-sm">View</a>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+    
+    <!-- Pagination -->
+    {% if page_obj %}
+        <div class="mt-8">
+            {% include '_components/ui/pagination.html' with page_obj=page_obj %}
+        </div>
+    {% endif %}
+    
+{% else %}
+    <!-- Empty State -->
+    <div class="text-center py-16">
+        <div class="w-32 h-32 bg-base-200 rounded-full flex items-center justify-center mx-auto mb-6">
+            <svg class="w-16 h-16 text-base-content/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+            </svg>
+        </div>
+        <h3 class="text-2xl font-semibold text-base-content mb-2">No properties yet</h3>
+        <p class="text-base-content/60 mb-8 max-w-md mx-auto">
+            Start building your property portfolio by adding your first listing.
+        </p>
+        <a href="{% url 'properties:create' %}" class="btn btn-primary btn-lg">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+            </svg>
+            Add Your First Property
+        </a>
+    </div>
+{% endif %}
 {% endblock %}

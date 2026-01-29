@@ -1,0 +1,50 @@
+{% load static %}
+
+<div class="form-control w-full">
+    {% if label %}
+        <label class="label" for="{{ field.id_for_label }}">
+            <span class="label-text font-medium text-base-content">
+                {{ label }}
+                {% if required %}
+                    <span class="text-error">*</span>
+                {% endif %}
+            </span>
+        </label>
+    {% endif %}
+    
+    <select id="{{ field.id_for_label }}"
+            name="{{ field.name }}"
+            class="select select-bordered w-full {% if field.errors %}select-error{% endif %}"
+            {% if required %}required{% endif %}
+            {% for attr, value in field.field.widget.attrs.items %}
+                {{ attr }}="{{ value }}"
+            {% endfor %}>
+        
+        {% if not required and placeholder %}
+            <option value="">{{ placeholder }}</option>
+        {% endif %}
+        
+        {% for choice_value, choice_label in field.field.choices %}
+            <option value="{{ choice_value }}" 
+                    {% if choice_value == field.value %}selected{% endif %}>
+                {{ choice_label }}
+            </option>
+        {% endfor %}
+    </select>
+    
+    {% if field.errors %}
+        <label class="label">
+            <span class="label-text-alt text-error">
+                {{ field.errors.0 }}
+            </span>
+        </label>
+    {% endif %}
+    
+    {% if help_text %}
+        <label class="label">
+            <span class="label-text-alt text-base-content/60">
+                {{ help_text }}
+            </span>
+        </label>
+    {% endif %}
+</div>

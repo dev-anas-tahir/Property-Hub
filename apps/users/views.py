@@ -59,13 +59,13 @@ def signup_view(request):
 
         # Return form with errors
         context = {"form": form}
-        template = "partials/users/signup_form.html" if is_htmx else "users/signup.html"
+        template = "_components/forms/signup_form.html" if is_htmx else "users/signup.html"
         return render(request, template, context)
 
     # GET request
     form = SignupForm()
     context = {"form": form}
-    template = "partials/users/signup_form.html" if is_htmx else "users/signup.html"
+    template = "_components/forms/signup_form.html" if is_htmx else "users/signup.html"
     return render(request, template, context)
 
 
@@ -99,7 +99,7 @@ def login_view(request):
             form.add_error(None, error_msg)
             context = {"form": form}
             template = (
-                "partials/users/login_form.html" if is_htmx else "users/login.html"
+                "_components/forms/login_form.html" if is_htmx else "users/login.html"
             )
             return render(request, template, context)
 
@@ -151,13 +151,13 @@ def login_view(request):
 
         # Return form with errors
         context = {"form": form}
-        template = "partials/users/login_form.html" if is_htmx else "users/login.html"
+        template = "_components/forms/login_form.html" if is_htmx else "users/login.html"
         return render(request, template, context)
 
     # GET request
     form = LoginForm()
     context = {"form": form}
-    template = "partials/users/login_form.html" if is_htmx else "users/login.html"
+    template = "_components/forms/login_form.html" if is_htmx else "users/login.html"
     return render(request, template, context)
 
 
@@ -201,7 +201,7 @@ def profile_edit_view(request):
         # Return form with errors
         context = {"form": form}
         template = (
-            "partials/users/profile_form.html" if is_htmx else "users/profile.html"
+            "_components/forms/profile_form.html" if is_htmx else "users/profile.html"
         )
         return render(request, template, context)
 
@@ -215,7 +215,7 @@ def profile_edit_view(request):
         user=request.user,
     )
     context = {"form": form}
-    template = "partials/users/profile_form.html" if is_htmx else "users/profile.html"
+    template = "_components/forms/profile_form.html" if is_htmx else "users/profile.html"
     return render(request, template, context)
 
 

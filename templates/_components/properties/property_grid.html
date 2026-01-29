@@ -1,0 +1,18 @@
+{% load static %}
+
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+    {% for property in properties %}
+        {% include '_components/properties/property_card.html' with property=property %}
+    {% empty %}
+        <div class="col-span-full">
+            {% include '_components/ui/empty_state.html' with title="No properties found" subtitle="Try adjusting your search criteria or check back later for new listings." %}
+        </div>
+    {% endfor %}
+</div>
+
+<!-- Pagination -->
+{% if page_obj %}
+    <div class="mt-8">
+        {% include '_components/ui/pagination.html' with page_obj=page_obj %}
+    </div>
+{% endif %}

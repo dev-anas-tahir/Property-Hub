@@ -1,20 +1,235 @@
-{% extends 'base.html' %}
+{% extends '_layouts/base.html' %}
+{% load static %}
 
-{% block title %}Create New Property{% endblock %}
+{% block title %}Add Property - PropertyHub{% endblock %}
 
 {% block content %}
-<div class="row">
-    <div class="col-lg-8 mx-auto">
-        <div class="card">
-            <div class="card-header">
-                <h4 class="mb-0">
-                    <i class="bi bi-plus-circle"></i> Create New Property
-                </h4>
-            </div>
+<div class="max-w-4xl mx-auto">
+    <!-- Page Header -->
+    <div class="text-center mb-8">
+        <h1 class="text-3xl font-display font-bold text-base-content mb-2">Add New Property</h1>
+        <p class="text-base-content/60">List your property and reach thousands of potential buyers or renters</p>
+    </div>
+    
+    <!-- Progress Steps -->
+    <div class="mb-8">
+        <ul class="steps steps-horizontal w-full">
+            <li class="step step-primary">Basic Info</li>
+            <li class="step">Details</li>
+            <li class="step">Images</li>
+            <li class="step">Review</li>
+        </ul>
+    </div>
+    
+    <!-- Form -->
+    <form method="post" enctype="multipart/form-data" class="space-y-8" x-data="{ 
+        currentStep: 1,
+        totalSteps: 4,
+        nextStep() {
+            if (this.currentStep < this.totalSteps) this.currentStep++;
+        },
+        prevStep() {
+            if (this.currentStep > 1) this.currentStep--;
+        }
+    }">
+        {% csrf_token %}
+        
+        <!-- Step 1: Basic Information -->
+        <div class="card bg-base-100 shadow-soft" x-show="currentStep === 1" x-transition>
             <div class="card-body">
-                {% include 'partials/properties/property_form.html' with is_edit_mode=False %}
+                <h2 class="card-title text-xl mb-6">Basic Information</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Property Title -->
+                    <div class="md:col-span-2">
+                        {% include '_components/forms/input.html' with field=form.title label="Property Title" placeholder="e.g., Beautiful 3BR House in Downtown" required=True %}
+                    </div>
+                    
+                    <!-- Property Type -->
+                    <div>
+                        {% include '_components/forms/select.html' with field=form.property_type label="Property Type" required=True %}
+                    </div>
+                    
+                    <!-- Price -->
+                    <div>
+                        {% include '_components/forms/input.html' with field=form.price label="Price" placeholder="Enter price" required=True icon='<svg class="w-5 h-5 text-base-content/40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path></svg>' %}
+                    </div>
+                    
+                    <!-- Address -->
+                    <div class="md:col-span-2">
+                        {% include '_components/forms/input.html' with field=form.address label="Address" placeholder="Enter full address" required=True icon='<svg class="w-5 h-5 text-base-content/40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>' %}
+                    </div>
+                </div>
+                
+                <div class="card-actions justify-end mt-6">
+                    <button type="button" @click="nextStep()" class="btn btn-primary">
+                        Next Step
+                        <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                        </svg>
+                    </button>
+                </div>
             </div>
         </div>
-    </div>
+        
+        <!-- Step 2: Property Details -->
+        <div class="card bg-base-100 shadow-soft" x-show="currentStep === 2" x-transition>
+            <div class="card-body">
+                <h2 class="card-title text-xl mb-6">Property Details</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Bedrooms -->
+                    <div>
+                        {% include '_components/forms/input.html' with field=form.bedrooms label="Bedrooms" placeholder="Number of bedrooms" %}
+                    </div>
+                    
+                    <!-- Bathrooms -->
+                    <div>
+                        {% include '_components/forms/input.html' with field=form.bathrooms label="Bathrooms" placeholder="Number of bathrooms" %}
+                    </div>
+                    
+                    <!-- Area -->
+                    <div>
+                        {% include '_components/forms/input.html' with field=form.area label="Area (sq ft)" placeholder="Property area" %}
+                    </div>
+                </div>
+                
+                <!-- Description -->
+                <div class="mt-6">
+                    {% include '_components/forms/textarea.html' with field=form.description label="Description" placeholder="Describe your property, its features, and what makes it special..." rows=6 %}
+                </div>
+                
+                <div class="card-actions justify-between mt-6">
+                    <button type="button" @click="prevStep()" class="btn btn-outline">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                        </svg>
+                        Previous
+                    </button>
+                    <button type="button" @click="nextStep()" class="btn btn-primary">
+                        Next Step
+                        <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Step 3: Images -->
+        <div class="card bg-base-100 shadow-soft" x-show="currentStep === 3" x-transition>
+            <div class="card-body">
+                <h2 class="card-title text-xl mb-6">Property Images</h2>
+                
+                <!-- Image Upload Area -->
+                <div class="border-2 border-dashed border-base-300 rounded-2xl p-8 text-center hover:border-primary-300 transition-colors">
+                    <svg class="w-12 h-12 text-base-content/40 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                    </svg>
+                    <h3 class="text-lg font-semibold text-base-content mb-2">Upload Property Images</h3>
+                    <p class="text-base-content/60 mb-4">Drag and drop images here, or click to browse</p>
+                    <input type="file" name="images" multiple accept="image/*" class="file-input file-input-bordered file-input-primary w-full max-w-xs">
+                    <p class="text-xs text-base-content/50 mt-2">Supported formats: JPG, PNG, WebP. Max 10 images.</p>
+                </div>
+                
+                <!-- Image Preview Area -->
+                <div class="mt-6" id="image-preview">
+                    <!-- Images will be previewed here -->
+                </div>
+                
+                <div class="card-actions justify-between mt-6">
+                    <button type="button" @click="prevStep()" class="btn btn-outline">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                        </svg>
+                        Previous
+                    </button>
+                    <button type="button" @click="nextStep()" class="btn btn-primary">
+                        Review & Submit
+                        <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Step 4: Review & Submit -->
+        <div class="card bg-base-100 shadow-soft" x-show="currentStep === 4" x-transition>
+            <div class="card-body">
+                <h2 class="card-title text-xl mb-6">Review Your Listing</h2>
+                
+                <div class="alert alert-info mb-6">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <div>
+                        <h3 class="font-bold">Almost there!</h3>
+                        <div class="text-xs">Please review your property details before submitting.</div>
+                    </div>
+                </div>
+                
+                <!-- Property Summary -->
+                <div class="bg-base-200 rounded-2xl p-6 mb-6">
+                    <h3 class="font-semibold text-lg mb-4">Property Summary</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                        <div><strong>Title:</strong> <span id="review-title">-</span></div>
+                        <div><strong>Type:</strong> <span id="review-type">-</span></div>
+                        <div><strong>Price:</strong> <span id="review-price">-</span></div>
+                        <div><strong>Address:</strong> <span id="review-address">-</span></div>
+                        <div><strong>Bedrooms:</strong> <span id="review-bedrooms">-</span></div>
+                        <div><strong>Bathrooms:</strong> <span id="review-bathrooms">-</span></div>
+                    </div>
+                </div>
+                
+                <!-- Terms and Conditions -->
+                <div class="form-control mb-6">
+                    <label class="label cursor-pointer justify-start">
+                        <input type="checkbox" name="terms" class="checkbox checkbox-primary mr-3" required>
+                        <span class="label-text">
+                            I agree to the 
+                            <a href="#" class="link link-primary">Terms of Service</a> 
+                            and confirm that all information provided is accurate.
+                        </span>
+                    </label>
+                </div>
+                
+                <div class="card-actions justify-between">
+                    <button type="button" @click="prevStep()" class="btn btn-outline">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                        </svg>
+                        Previous
+                    </button>
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        Publish Property
+                    </button>
+                </div>
+            </div>
+        </div>
+    </form>
 </div>
+
+<script>
+// Update review section when form values change
+document.addEventListener('DOMContentLoaded', function() {
+    const updateReview = () => {
+        document.getElementById('review-title').textContent = document.querySelector('[name="title"]').value || '-';
+        document.getElementById('review-type').textContent = document.querySelector('[name="property_type"] option:checked').textContent || '-';
+        document.getElementById('review-price').textContent = document.querySelector('[name="price"]').value ? '$' + document.querySelector('[name="price"]').value : '-';
+        document.getElementById('review-address').textContent = document.querySelector('[name="address"]').value || '-';
+        document.getElementById('review-bedrooms').textContent = document.querySelector('[name="bedrooms"]').value || '-';
+        document.getElementById('review-bathrooms').textContent = document.querySelector('[name="bathrooms"]').value || '-';
+    };
+    
+    // Update review when inputs change
+    document.querySelectorAll('input, select, textarea').forEach(input => {
+        input.addEventListener('input', updateReview);
+        input.addEventListener('change', updateReview);
+    });
+});
+</script>
 {% endblock %}
