@@ -11,10 +11,12 @@
     {% endif %}
 {% endblock %}
 
+{% block main_class %}p-0 m-0{% endblock %}
+
 {% block content %}
-<!-- Hero Section -->
-<div class="bg-gradient-airbnb text-white py-16 mb-8 -mx-4 px-4">
-    <div class="container mx-auto text-center">
+<!-- Hero Section - Full Width -->
+<div class="bg-gradient-airbnb text-white mb-8 ">
+    <div class="container mx-auto py-20 px-4 text-center ">
         <h1 class="text-4xl md:text-5xl font-display font-bold mb-4">
             {% if show_my_properties %}
                 My Properties
@@ -53,79 +55,82 @@
     </div>
 </div>
 
-<!-- Filters and Actions -->
-<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
-    <div class="flex items-center space-x-4">
-        <!-- Filter Buttons -->
-        <div class="dropdown">
-            <div tabindex="0" role="button" class="btn btn-outline">
-                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path>
-                </svg>
-                Filters
+<!-- Main Content Container -->
+<div class="container mx-auto px-4 pb-8">
+    <!-- Filters and Actions -->
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+        <div class="flex items-center space-x-4">
+            <!-- Filter Buttons -->
+            <div class="dropdown">
+                <div tabindex="0" role="button" class="btn btn-outline">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path>
+                    </svg>
+                    Filters
+                </div>
+                <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow-large bg-base-100 rounded-box w-52">
+                    <li><a>Property Type</a></li>
+                    <li><a>Price Range</a></li>
+                    <li><a>Bedrooms</a></li>
+                    <li><a>Bathrooms</a></li>
+                </ul>
             </div>
-            <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow-large bg-base-100 rounded-box w-52">
-                <li><a>Property Type</a></li>
-                <li><a>Price Range</a></li>
-                <li><a>Bedrooms</a></li>
-                <li><a>Bathrooms</a></li>
-            </ul>
+            
+            <!-- Sort Dropdown -->
+            <div class="dropdown">
+                <div tabindex="0" role="button" class="btn btn-outline">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"></path>
+                    </svg>
+                    Sort By
+                </div>
+                <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow-large bg-base-100 rounded-box w-52">
+                    <li><a>Price: Low to High</a></li>
+                    <li><a>Price: High to Low</a></li>
+                    <li><a>Newest First</a></li>
+                    <li><a>Oldest First</a></li>
+                </ul>
+            </div>
         </div>
         
-        <!-- Sort Dropdown -->
-        <div class="dropdown">
-            <div tabindex="0" role="button" class="btn btn-outline">
-                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"></path>
-                </svg>
-                Sort By
+        <!-- Action Buttons -->
+        <div class="flex items-center space-x-3">
+            {% if user.is_authenticated and not show_favorites %}
+                <a href="{% url 'properties:create' %}" class="btn btn-primary">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                    </svg>
+                    Add Property
+                </a>
+            {% endif %}
+            
+            <!-- View Toggle -->
+            <div class="join">
+                <button class="btn btn-outline join-item btn-active">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path>
+                    </svg>
+                </button>
+                <button class="btn btn-outline join-item">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>
+                    </svg>
+                </button>
             </div>
-            <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow-large bg-base-100 rounded-box w-52">
-                <li><a>Price: Low to High</a></li>
-                <li><a>Price: High to Low</a></li>
-                <li><a>Newest First</a></li>
-                <li><a>Oldest First</a></li>
-            </ul>
         </div>
     </div>
-    
-    <!-- Action Buttons -->
-    <div class="flex items-center space-x-3">
-        {% if user.is_authenticated and not show_favorites %}
-            <a href="{% url 'properties:create' %}" class="btn btn-primary">
-                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-                </svg>
-                Add Property
-            </a>
-        {% endif %}
-        
-        <!-- View Toggle -->
-        <div class="join">
-            <button class="btn btn-outline join-item btn-active">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path>
-                </svg>
-            </button>
-            <button class="btn btn-outline join-item">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>
-                </svg>
-            </button>
+
+    <!-- Results Count -->
+    {% if page_obj %}
+        <div class="mb-6">
+            <p class="text-base-content/70">
+                Showing {{ page_obj.start_index }}-{{ page_obj.end_index }} of {{ page_obj.paginator.count }} properties
+            </p>
         </div>
-    </div>
+    {% endif %}
+
+    <!-- Properties Grid -->
+    {% include '_components/properties/property_grid.html' with properties=properties page_obj=page_obj %}
 </div>
-
-<!-- Results Count -->
-{% if page_obj %}
-    <div class="mb-6">
-        <p class="text-base-content/70">
-            Showing {{ page_obj.start_index }}-{{ page_obj.end_index }} of {{ page_obj.paginator.count }} properties
-        </p>
-    </div>
-{% endif %}
-
-<!-- Properties Grid -->
-{% include '_components/properties/property_grid.html' with properties=properties page_obj=page_obj %}
 
 {% endblock %}
