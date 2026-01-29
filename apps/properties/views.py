@@ -277,8 +277,39 @@ def my_properties_list_view(request):
 
 @login_required
 def favorites_list_view(request):
-    """Simple view to render the favorites list page with HTMX."""
-    return render(request, "properties/favorites.html")
+    """Display user's favorite properties with pagination.
+    
+    All properties in this view are favorited by definition,
+    so we set is_favorited=True for each property.
+    """
+    from apps.properties.models import Favorite
+    
+    # Get favorited properties with related data for optimization
+    favorite_properties = (
+        Property.objects.filter(favorited_by__user=request.user)
+        .distinct()
+        .select_related("user")
+        .prefetch_related("images")
+    )
+    
+    # Get page number from query parameters
+    page_number = request.GET.get("page", 1)
+    
+    # Create paginator (10 items per page)
+    from django.core.paginator import Paginator
+    paginator = Paginator(favorite_properties, 10)
+    page_obj = paginator.get_page(page_number)
+    
+    # Set is_favorited=True for all properties (they're all favorites)
+    for prop in page_obj.object_list:
+        prop.is_favorited = True
+    
+    context = {
+        "properties": page_obj.object_list,
+        "page_obj": page_obj,
+    }
+    
+    return render(request, "properties/favorites.html", context)
 
 
 @login_required
@@ -394,17 +425,14 @@ def property_favorite_toggle_view(request, pk):
     """Toggle favorite status for a property.
 
     Handles POST requests to add/remove a property from user's favorites.
-    Returns updated button HTML partial for HTMX requests.
+    Returns JSON response with updated favorite status.
     """
     from apps.properties.models import Favorite
-    from django.http import HttpResponse
+    from django.http import JsonResponse
 
     # Only allow POST requests
     if request.method != "POST":
-        return HttpResponse("Method not allowed", status=405)
-
-    # Check if this is an HTMX request
-    is_htmx = request.headers.get("HX-Request") == "true"
+        return JsonResponse({"error": "Method not allowed"}, status=405)
 
     # Get the property
     property_obj = get_object_or_404(Property, pk=pk)
@@ -422,16 +450,8 @@ def property_favorite_toggle_view(request, pk):
         # Favorite was just created
         is_favorited = True
 
-    # For HTMX requests, return the updated button partial
-    if is_htmx:
-        context = {
-            "property": property_obj,
-            "is_favorited": is_favorited,
-        }
-        return render(request, "_components/properties/favorite_button.html", context)
-
-    # For non-HTMX requests, return a simple response
-    return HttpResponse("OK", status=200)
+    # Return JSON response
+    return JsonResponse({"is_favorited": is_favorited})
 
 
 @login_required

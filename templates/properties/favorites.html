@@ -4,31 +4,41 @@
 {% block title %}My Favorites - PropertyHub{% endblock %}
 
 {% block content %}
-<!-- Page Header -->
-<div class="flex items-center justify-between mb-8">
-    <div>
-        <h1 class="text-3xl font-display font-bold text-base-content mb-2">
-            <svg class="w-8 h-8 inline-block mr-3 text-error" fill="currentColor" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
-            </svg>
-            My Favorites
-        </h1>
-        <p class="text-base-content/60">Properties you've saved for later</p>
-    </div>
+<div x-data="{ 
+    favoriteCount: {{ properties|length }},
+    updateCount() {
+        // Use setTimeout to ensure DOM has updated after element removal
+        setTimeout(() => {
+            this.favoriteCount = document.querySelectorAll('[data-property-card]').length;
+        }, 50);
+    }
+}" 
+@favorite-toggled.window="updateCount()">
     
-    <div class="flex items-center space-x-3">
-        <a href="{% url 'properties:list' %}" class="btn btn-outline">
-            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-            </svg>
-            Browse More
-        </a>
+    <!-- Page Header -->
+    <div class="flex items-center justify-between mb-8">
+        <div>
+            <h1 class="text-3xl font-display font-bold text-base-content mb-2">
+                <svg class="w-8 h-8 inline-block mr-3 text-error" fill="currentColor" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                </svg>
+                My Favorites
+            </h1>
+            <p class="text-base-content/60">Properties you've saved for later</p>
+        </div>
+        
+        <div class="flex items-center space-x-3">
+            <a href="{% url 'properties:list' %}" class="btn btn-outline">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                </svg>
+                Browse More
+            </a>
+        </div>
     </div>
-</div>
 
-<!-- Favorites Count -->
-{% if properties %}
-    <div class="mb-6">
+    <!-- Favorites Count -->
+    <div x-show="favoriteCount > 0" class="mb-6">
         <div class="stats shadow-soft">
             <div class="stat">
                 <div class="stat-figure text-error">
@@ -37,19 +47,21 @@
                     </svg>
                 </div>
                 <div class="stat-title">Favorite Properties</div>
-                <div class="stat-value text-error">{{ properties|length }}</div>
+                <div class="stat-value text-error" x-text="favoriteCount"></div>
                 <div class="stat-desc">Properties you've saved</div>
             </div>
         </div>
     </div>
-{% endif %}
 
-<!-- Properties Grid -->
-{% if properties %}
-    {% include '_components/properties/property_grid.html' with properties=properties page_obj=page_obj %}
-{% else %}
+    <!-- Properties Grid -->
+    <div x-show="favoriteCount > 0">
+        {% if properties %}
+            {% include '_components/properties/property_grid.html' with properties=properties page_obj=page_obj %}
+        {% endif %}
+    </div>
+    
     <!-- Empty State -->
-    <div class="text-center py-16">
+    <div x-show="favoriteCount === 0" class="text-center py-16">
         <div class="w-32 h-32 bg-base-200 rounded-full flex items-center justify-center mx-auto mb-6">
             <svg class="w-16 h-16 text-base-content/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
@@ -66,25 +78,25 @@
             Browse Properties
         </a>
     </div>
-{% endif %}
 
-<!-- Tips Card -->
-<div class="mt-12">
-    <div class="card bg-gradient-to-br from-primary-50 to-secondary-50 border border-primary-100">
-        <div class="card-body">
-            <div class="flex items-start space-x-4">
-                <div class="flex-shrink-0">
-                    <div class="w-12 h-12 bg-primary-100 rounded-full flex items-center justify-center">
-                        <svg class="w-6 h-6 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
-                        </svg>
+    <!-- Tips Card -->
+    <div class="mt-12">
+        <div class="card bg-gradient-to-br from-primary-50 to-secondary-50 border border-primary-100">
+            <div class="card-body">
+                <div class="flex items-start space-x-4">
+                    <div class="flex-shrink-0">
+                        <div class="w-12 h-12 bg-primary-100 rounded-full flex items-center justify-center">
+                            <svg class="w-6 h-6 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                            </svg>
+                        </div>
                     </div>
-                </div>
-                <div>
-                    <h3 class="font-semibold text-base-content mb-2">Pro Tip</h3>
-                    <p class="text-base-content/70 text-sm">
-                        Save properties to your favorites to compare them later, track price changes, and never lose track of properties you're interested in.
-                    </p>
+                    <div>
+                        <h3 class="font-semibold text-base-content mb-2">Pro Tip</h3>
+                        <p class="text-base-content/70 text-sm">
+                            Save properties to your favorites to compare them later, track price changes, and never lose track of properties you're interested in.
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>
