@@ -5,7 +5,7 @@ down:
 	docker compose -f docker-compose.dev.yml down -v
 
 runserver:
-	uv run python manage.py runserver_plus
+	uv run python manage.py runserver_plus localhost:$(filter-out $@,$(MAKECMDGOALS))
 
 makemigrations:
 	uv run python manage.py makemigrations
