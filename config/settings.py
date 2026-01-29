@@ -1,5 +1,7 @@
 """Base settings for the Property-Hub project."""
 
+import dj_database_url
+
 from environs import Env
 from pathlib import Path
 from datetime import timedelta
@@ -80,7 +82,6 @@ TEMPLATES = [
 WSGI_APPLICATION = "config.wsgi.application"
 
 # Database configuration
-import dj_database_url
 DATABASES = {"default": dj_database_url.parse(env.str("DATABASE_URL"))}
 
 AUTH_PASSWORD_VALIDATORS = [
@@ -103,7 +104,7 @@ USE_I18N = True
 USE_TZ = True
 
 STATIC_ROOT = BASE_DIR / "staticfiles"
-STATIC_URL = "/static/"
+STATIC_URL = "static/"
 STATICFILES_DIRS = [
     BASE_DIR / "static",
 ]
