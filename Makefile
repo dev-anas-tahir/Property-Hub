@@ -5,6 +5,7 @@ down:
 	docker compose -f docker-compose.dev.yml down -v
 
 runserver:
+	npm run build-css &
 	uv run python manage.py runserver_plus localhost:$(filter-out $@,$(MAKECMDGOALS))
 
 makemigrations:

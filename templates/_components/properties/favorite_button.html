@@ -1,0 +1,55 @@
+{% load static %}
+
+<div x-data="{ 
+    isFavorited: {{ property.is_favorited|yesno:'true,false' }},
+    isLoading: false,
+    
+    async toggleFavorite() {
+        if (this.isLoading) return;
+        
+        this.isLoading = true;
+        
+        try {
+            const response = await fetch('{% url "properties:favorite_toggle" property.pk %}', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                    'Content-Type': 'application/json',
+                },
+            });
+            
+            if (response.ok) {
+                const data = await response.json();
+                this.isFavorited = data.is_favorited;
+            }
+        } catch (error) {
+            console.error('Error toggling favorite:', error);
+        } finally {
+            this.isLoading = false;
+        }
+    }
+}">
+    <button @click="toggleFavorite()" 
+            :disabled="isLoading"
+            class="btn btn-circle btn-sm bg-white/90 hover:bg-white border-0 shadow-soft transition-all duration-200"
+            :class="{ 'btn-loading': isLoading }">
+        
+        <template x-if="!isLoading">
+            <svg class="w-4 h-4 transition-colors duration-200" 
+                 :class="isFavorited ? 'text-error fill-current' : 'text-base-content/60'"
+                 fill="none" 
+                 stroke="currentColor" 
+                 viewBox="0 0 24 24">
+                <path stroke-linecap="round" 
+                      stroke-linejoin="round" 
+                      stroke-width="2" 
+                      d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z">
+                </path>
+            </svg>
+        </template>
+        
+        <template x-if="isLoading">
+            <span class="loading loading-spinner loading-xs"></span>
+        </template>
+    </button>
+</div>

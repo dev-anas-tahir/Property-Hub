@@ -1,0 +1,107 @@
+{% load static %}
+
+<div class="card property-card bg-base-100 shadow-soft hover:shadow-large transition-all duration-300 overflow-hidden">
+    <!-- Property Image -->
+    <figure class="relative h-48 overflow-hidden">
+        {% if property.images.first %}
+            <img src="{{ property.images.first.image.url }}" 
+                 alt="{{ property.name }}"
+                 class="w-full h-full object-cover transition-transform duration-300 hover:scale-105">
+        {% else %}
+            <div class="w-full h-full bg-gradient-to-br from-primary-100 to-secondary-100 flex items-center justify-center">
+                <svg class="w-16 h-16 text-primary-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                </svg>
+            </div>
+        {% endif %}
+        
+        <!-- Property Type Badge -->
+        <div class="absolute top-3 left-3">
+            <span class="badge badge-primary badge-sm font-medium">
+                {{ property.get_property_type_display }}
+            </span>
+        </div>
+        
+        <!-- Favorite Button -->
+        {% if user.is_authenticated %}
+            <div class="absolute top-3 right-3">
+                {% include '_components/properties/favorite_button.html' with property=property %}
+            </div>
+        {% endif %}
+        
+        <!-- Price Badge -->
+        <div class="absolute bottom-3 left-3">
+            <span class="badge badge-accent badge-lg font-bold text-white">
+                ${{ property.price|floatformat:0 }}
+                {% if property.property_type == 'rent' %}/month{% endif %}
+            </span>
+        </div>
+    </figure>
+    
+    <!-- Property Details -->
+    <div class="card-body p-4">
+        <!-- Title and Location -->
+        <div class="mb-3">
+            <h3 class="card-title text-lg font-semibold text-base-content line-clamp-2 mb-1">
+                {{ property.name }}
+            </h3>
+            <p class="text-base-content/60 text-sm flex items-center">
+                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                </svg>
+                {{ property.full_address|truncatechars:30 }}
+            </p>
+        </div>
+        
+        <!-- Property Features -->
+        <div class="flex items-center space-x-4 text-sm text-base-content/70 mb-4">
+            <div class="flex items-center">
+                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"></path>
+                </svg>
+                {{ property.property_type }}
+            </div>
+            <div class="flex items-center">
+                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                </svg>
+                {{ property.created_at|date:"M Y" }}
+            </div>
+        </div>
+        
+        <!-- Description -->
+        {% if property.description %}
+            <p class="text-base-content/70 text-sm line-clamp-2 mb-4">
+                {{ property.description|truncatechars:100 }}
+            </p>
+        {% endif %}
+        
+        <!-- Owner Info -->
+        <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+                <div class="avatar placeholder">
+                    <div class="bg-primary-100 text-primary-600 rounded-full w-8 h-8">
+                        <span class="text-xs font-semibold">
+                            {{ property.user.first_name|first|default:property.user.username|first|upper }}
+                        </span>
+                    </div>
+                </div>
+                <div>
+                    <p class="text-sm font-medium text-base-content">
+                        {{ property.user.first_name|default:property.user.username }}
+                    </p>
+                    <p class="text-xs text-base-content/60">
+                        {{ property.created_at|timesince }} ago
+                    </p>
+                </div>
+            </div>
+            
+            <!-- View Details Button -->
+            <a href="{% url 'properties:detail' property.pk %}" 
+               class="btn btn-primary btn-sm">
+                View Details
+            </a>
+        </div>
+    </div>
+</div>

@@ -22,7 +22,7 @@ urlpatterns = [
     path("profile/", profile_view, name="profile"),
     path("profile/edit/", profile_edit_view, name="profile_edit"),
     path("logout/", logout_view, name="logout"),
-    path("change_password/", password_change_view, name="change_password"),
+    path("password_change/", password_change_view, name="password_change"),
     # Validation endpoints
     path("validate/username/", validate_username_view, name="validate_username"),
     path("validate/email/", validate_email_view, name="validate_email"),

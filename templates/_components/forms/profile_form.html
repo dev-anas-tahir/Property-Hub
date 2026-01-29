@@ -1,0 +1,39 @@
+{% load static %}
+
+<form method="post" class="space-y-6">
+    {% csrf_token %}
+    
+    <!-- Form Errors -->
+    {% if form.non_field_errors %}
+        <div class="alert alert-error">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <div>
+                {% for error in form.non_field_errors %}
+                    <div>{{ error }}</div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+    
+    <!-- Name Fields -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {% include '_components/forms/input.html' with field=form.first_name label="First Name" placeholder="Enter your first name" required=True %}
+        {% include '_components/forms/input.html' with field=form.last_name label="Last Name" placeholder="Enter your last name" required=True %}
+    </div>
+    
+    <!-- Email Field -->
+    {% include '_components/forms/input.html' with field=form.email label="Email" placeholder="Enter your email" required=True icon='<svg class="w-5 h-5 text-base-content/40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207"></path></svg>' %}
+    
+    <!-- Submit Button -->
+    <div class="flex justify-end space-x-4">
+        <a href="{% url 'users:profile' %}" class="btn btn-outline">Cancel</a>
+        <button type="submit" class="btn btn-primary">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            </svg>
+            Update Profile
+        </button>
+    </div>
+</form>
