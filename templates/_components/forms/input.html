@@ -13,12 +13,19 @@
     {% endif %}
     
     <div class="relative">
+        {% if icon %}
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-10">
+                {{ icon|safe }}
+            </div>
+        {% endif %}
+        
         {% if field.field.widget.input_type == 'password' %}
             <input type="password" 
                    id="{{ field.id_for_label }}"
                    name="{{ field.name }}"
                    value="{{ field.value|default:'' }}"
                    placeholder="{{ placeholder|default:'' }}"
+                   {% if icon %}style="padding-left: 2.5rem;"{% endif %}
                    class="input input-bordered w-full pr-12 {% if field.errors %}input-error{% endif %}"
                    {% if required %}required{% endif %}
                    {% for attr, value in field.field.widget.attrs.items %}
@@ -34,45 +41,45 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
                 </svg>
             </button>
+            
         {% elif field.field.widget.input_type == 'email' %}
             <input type="email" 
                    id="{{ field.id_for_label }}"
                    name="{{ field.name }}"
                    value="{{ field.value|default:'' }}"
                    placeholder="{{ placeholder|default:'' }}"
+                   {% if icon %}style="padding-left: 2.5rem;"{% endif %}
                    class="input input-bordered w-full {% if field.errors %}input-error{% endif %}"
                    {% if required %}required{% endif %}
                    {% for attr, value in field.field.widget.attrs.items %}
                        {{ attr }}="{{ value }}"
                    {% endfor %}>
+                   
         {% elif field.field.widget.input_type == 'number' %}
             <input type="number" 
                    id="{{ field.id_for_label }}"
                    name="{{ field.name }}"
                    value="{{ field.value|default:'' }}"
                    placeholder="{{ placeholder|default:'' }}"
+                   {% if icon %}style="padding-left: 2.5rem;"{% endif %}
                    class="input input-bordered w-full {% if field.errors %}input-error{% endif %}"
                    {% if required %}required{% endif %}
                    {% for attr, value in field.field.widget.attrs.items %}
                        {{ attr }}="{{ value }}"
                    {% endfor %}>
+                   
         {% else %}
             <input type="text" 
                    id="{{ field.id_for_label }}"
                    name="{{ field.name }}"
                    value="{{ field.value|default:'' }}"
                    placeholder="{{ placeholder|default:'' }}"
+                   {% if icon %}style="padding-left: 2.5rem;"{% endif %}
                    class="input input-bordered w-full {% if field.errors %}input-error{% endif %}"
                    {% if required %}required{% endif %}
                    {% for attr, value in field.field.widget.attrs.items %}
                        {{ attr }}="{{ value }}"
                    {% endfor %}>
-        {% endif %}
-        
-        {% if icon %}
-            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                {{ icon|safe }}
-            </div>
         {% endif %}
     </div>
     
