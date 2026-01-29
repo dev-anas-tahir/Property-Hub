@@ -1,312 +1,315 @@
 # Property Hub
 
-A modern Django application for listing, searching, and managing real-estate properties. Built with a component-based architecture using Django Unicorn for reactive, interactive user experiences without full page reloads.
+A modern real-estate property management platform built with Django, featuring a component-based architecture for listing, searching, and managing properties.
 
 ---
 
-## ✨ Key Features
+## 🛠 Tech Stack
 
-- **Component-Based Architecture**: Built with Django Unicorn for reactive, interactive components
-- **Real-Time Interactions**: Favorite properties, paginate, and filter without page reloads
-- **Property Management**: Create, edit, and delete property listings with image galleries
-- **Interactive Forms**: Real-time validation and feedback on all forms
-- **User Authentication**: Complete auth flow with signup, login, profile, and password management
-- **Responsive Design**: Bootstrap 5-based UI that works on all devices
-- **Image Carousel**: Interactive image galleries with keyboard navigation
-- **Favorites System**: Toggle favorites with instant UI updates
-- **Django Admin**: Full admin interface for staff management
-- **Docker Support**: Production-ready Docker setup
-- **Comprehensive Tests**: Test suite with pytest
+### Backend
+- **Django 6.0.1** - Web framework
+- **Python 3.13+** - Programming language
+- **PostgreSQL-17** - Database
+- **UV** - Package manager
+
+### Frontend
+- **Tailwind CSS** - Utility-first CSS framework
+- **DaisyUI** - Component library
+- **HTMX** - Dynamic interactions
+- **Alpine.js** - Lightweight JavaScript framework
+
+### Infrastructure
+- **Docker** - Containerization
+- **AWS S3** - Media storage
+- **Localstack** - Local AWS simulation
 
 ---
 
 ## 🏗 Architecture
 
-This project uses a **component-based architecture** powered by [Django Unicorn](https://www.django-unicorn.com/), enabling reactive, interactive user interfaces without writing JavaScript.
+### Project Structure
 
-### Component-Based Design
-
-All interactive features are built as reusable Unicorn components:
-
-- **Shared Components**: Pagination, alerts, form fields, loading spinners
-- **Property Components**: Property lists, cards, details, forms, image carousels
-- **User Components**: Login, signup, profile, and password change forms
-
-Components handle their own state, validation, and server communication, making the codebase modular and maintainable.
-
-### Benefits
-
-- **No Page Reloads**: All interactions happen seamlessly without full page refreshes
-- **Real-Time Validation**: Forms validate as you type with instant feedback
-- **Reusable Components**: Build once, use everywhere
-- **Server-Side Logic**: All business logic stays in Python (no JavaScript required)
-- **Progressive Enhancement**: Works with JavaScript, degrades gracefully without it
-
-## 🗂 Project Layout
-
-```text
-Property-Hub/
-├── apps/                      # Custom Django apps
-│   ├── properties/            # Property listings domain
-│   │   ├── components/        # Unicorn components
-│   │   │   ├── property_list.py      # Paginated property listing
-│   │   │   ├── property_card.py      # Property card display
-│   │   │   ├── property_detail.py    # Property detail view
-│   │   │   ├── property_form.py      # Create/edit form
-│   │   │   ├── favorite_button.py    # Favorite toggle
-│   │   │   ├── image_carousel.py     # Image gallery
-│   │   │   └── delete_modal.py       # Delete confirmation
-│   │   ├── models.py          # Property, PropertyImage, Favourite
-│   │   ├── views.py           # Simple template views
-│   │   ├── urls.py            # URLConf for the app
-│   │   └── templates/
-│   ├── users/                 # User authentication domain
-│   │   ├── components/        # Unicorn components
-│   │   │   ├── login_form.py         # Login form
-│   │   │   ├── signup_form.py        # Registration form
-│   │   │   ├── profile_form.py       # Profile editor
-│   │   │   ├── password_change_form.py  # Password change
-│   │   │   └── password_input.py     # Password field with toggle
-│   │   ├── models.py          # User model extensions
-│   │   ├── views.py           # Simple template views
-│   │   └── urls.py
-│   └── shared/                # Shared/reusable components
-│       └── components/
-│           ├── pagination.py         # Pagination component
-│           ├── alert_message.py      # Toast/alert messages
-│           ├── form_field.py         # Form field wrapper
-│           └── loading_spinner.py    # Loading indicators
-│
-├── config/                    # Project-level settings & urls
-│   ├── settings.py
-│   ├── urls.py
-│   └── wsgi.py / asgi.py
-│
-├── templates/                 # Global templates & base.html
-│   └── unicorn/               # Component templates
-├── staticfiles/               # Collected static assets
-├── manage.py                  # Django entry point
-├── Dockerfile                 # Production image definition
-├── docker-compose.yml         # Development stack
-├── Makefile                   # Handy shortcuts
-├── pyproject.toml & uv.lock   # Dependencies
-├── COMPONENTS.md              # Component documentation
-└── README.md
 ```
+Property-Hub/
+├── apps/
+│   ├── properties/          # Property management
+│   │   ├── models.py        # Property, PropertyImage models
+│   │   ├── views.py         # View logic
+│   │   ├── forms.py         # Form definitions
+│   │   └── urls.py          # URL routing
+│   ├── users/               # User authentication
+│   │   ├── models.py        # User model
+│   │   ├── views.py         # Auth views
+│   │   └── forms.py         # Auth forms
+│   └── shared/              # Shared utilities
+│
+├── config/                  # Project configuration
+│   ├── settings.py          # Django settings
+│   ├── urls.py              # Root URL config
+│   └── wsgi.py              # WSGI config
+│
+├── templates/               # HTML templates
+│   ├── _layouts/            # Base layouts
+│   ├── _components/         # Reusable components
+│   ├── properties/          # Property templates
+│   └── users/               # User templates
+│
+├── static/                  # Static assets
+│   ├── src/                 # Source CSS
+│   └── dist/                # Compiled CSS
+│
+├── staticfiles/             # Collected static files
+├── media/                   # User uploads
+├── Dockerfile               # Docker image
+├── docker-compose.*.yml     # Docker compose configs
+├── tailwind.config.js       # Tailwind configuration
+├── pyproject.toml           # Python dependencies
+└── Makefile                 # Development commands
+```
+
+### Design Patterns
+
+**Component-Based Templates**
+- Reusable UI components in `templates/_components/`
+- Separation of layouts, components, and pages
+- DRY principle for forms, navigation, and UI elements
+
+**App-Based Organization**
+- Domain-driven design with separate apps
+- Clear separation of concerns
+- Modular and maintainable codebase
+
+**Modern Frontend Stack**
+- Utility-first CSS with Tailwind
+- Progressive enhancement with HTMX
+- Minimal JavaScript with Alpine.js
+- Components from DaisyUI
 
 ---
 
-## ⚙️ Local Development Setup
+## 🚀 Getting Started
 
-1. **Clone the repo**
+### Prerequisites
+
+- Python 3.13+
+- Node.js 18+ (for Tailwind CSS)
+- Docker (optional)
+
+### Local Development
+
+1. **Clone the repository**
    ```bash
-   git clone https://github.com/anasengence/property-hub.git
+   git clone <repository-url>
    cd Property-Hub
    ```
-2. **Create an `.env` file** (copy `.env.sample` if present) and adjust values:
-   ```dotenv
-   DJANGO_SECRET_KEY=changeme
-   DEBUG=True
-   ALLOWED_HOSTS=127.0.0.1,localhost
-   DATABASE_URL=sqlite:///db.sqlite3
-   AWS_ACCESS_KEY_ID=changeme
-   AWS_SECRET_ACCESS_KEY=changeme
-   AWS_STORAGE_BUCKET_NAME=changeme
-   ```
-3. **Install Python dependencies** via UV:
+
+2. **Set up environment variables**
    ```bash
-   make build       # installs UV & all packages
+   cp .env.sample .env.dev
+   # Edit .env with your configuration
    ```
-4. **Apply migrations & collect static:**
+
+3. **Install dependencies**
+   ```bash
+   # Install Python dependencies
+   make build
+   
+   # Install Node dependencies
+   npm install
+   ```
+
+4. **Run database migrations**
    ```bash
    make migrate
    ```
-5. **Run the development server:**
+
+5. **Build Tailwind CSS**
    ```bash
-   make run  # http://127.0.0.1:8000/
+   # Development (watch mode)
+   npm run build-css
+   
+   # Production (minified)
+   npm run build-css-prod
    ```
-6. **Run tests:**
+
+6. **Start development server**
    ```bash
-   make test
+   make runserver
    ```
 
----
+7. **Access the application**
+   ```
+   http://127.0.0.1:8000
+   ```
 
-### 🐳 Docker (local deployment simulation)
-
-Spin up the complete stack (Django, Localstack):
+### Docker Development
 
 ```bash
-docker-compose up --build
-```
-Access the app at `http://localhost:8000`.
+# Start all services
+docker-compose -f docker-compose.dev.yml up --build
 
----
-
-## 🔐 Environment Variables
-
-| Variable            | Description                                   |
-|---------------------|-----------------------------------------------|
-| `DJANGO_SECRET_KEY` | Unique secret key for crypto signing          |
-| `DATABASE_URL`      | Database DSN (SQLite recommended)             |
-| `AWS_ACCESS_KEY_ID` | AWS Access Key ID                             |
-| `AWS_SECRET_ACCESS_KEY` | AWS Secret Access Key                     |
-| `AWS_STORAGE_BUCKET_NAME` | AWS S3 Bucket Name                      |
-| `DEBUG`             | `True` for development, `False` in production |
-
----
-
-## 🧩 Django Unicorn Components
-
-This project leverages Django Unicorn for all interactive features. Components are self-contained Python classes that handle:
-
-- State management
-- User interactions
-- Form validation
-- Database operations
-- Event communication
-
-### Key Components
-
-**Property Components:**
-- `property_list`: Paginated property listing with filtering
-- `property_card`: Individual property display card
-- `property_detail`: Full property details with actions
-- `property_form`: Create/edit property with real-time validation
-- `favorite_button`: Toggle favorite status
-- `image_carousel`: Interactive image gallery
-
-**User Components:**
-- `login_form`: User authentication
-- `signup_form`: User registration with validation
-- `profile_form`: Profile editing
-- `password_change_form`: Password management
-
-**Shared Components:**
-- `pagination`: Reusable pagination
-- `alert_message`: Toast notifications
-- `form_field`: Form field wrapper with errors
-- `loading_spinner`: Loading indicators
-
-For detailed component documentation, see [COMPONENTS.md](COMPONENTS.md).
-
-### Component Usage Example
-
-```html
-<!-- In your template -->
-{% load unicorn %}
-
-<!-- Property list with pagination -->
-{% unicorn 'property_list' %}
-
-<!-- Favorite button -->
-{% unicorn 'favorite_button' property_id=property.id %}
-
-<!-- Alert messages -->
-{% unicorn 'alert_message' %}
-```
-
-```python
-# In your component (apps/properties/components/property_list.py)
-from django_unicorn.components import UnicornView
-
-class PropertyListView(UnicornView):
-    properties: list = []
-    current_page: int = 1
-    
-    def mount(self):
-        self.load_properties()
-    
-    def load_properties(self):
-        # Load and display properties
-        pass
-    
-    def next_page(self):
-        self.current_page += 1
-        self.load_properties()
+# Access at http://localhost:8000
 ```
 
 ---
 
-## 📦 Useful Make Commands
+## 🔧 Development Commands
 
-| Command         | Action                               |
-|-----------------|--------------------------------------|
-| `make build`    | Install dependencies with UV          |
-| `make migrate`  | Run migrations & collectstatic       |
-| `make run`      | Start Django development server      |
-| `make test`     | Run the test-suite with pytest       |
-| `make shell`    | Open a Django shell                  |
+### Make Commands
+
+| Command | Description |
+|---------|-------------|
+| `make build` | Install Python dependencies |
+| `make migrate` | Run migrations and collect static files |
+| `make runserver` | Start Django development server |
+
+### NPM Commands
+
+| Command | Description |
+|---------|-------------|
+| `npm run build-css` | Build Tailwind CSS (watch mode) |
+| `npm run build-css-prod` | Build Tailwind CSS (production) |
+
+---
+
+## 🔐 Environment Configuration
+
+Create a `.env` file with the following variables:
+
+```env
+# Django
+DJANGO_SECRET_KEY=your-secret-key
+DEBUG=True
+ALLOWED_HOSTS=127.0.0.1,localhost
+
+# Database
+DATABASE_URL=sqlite:///db.sqlite3
+
+# AWS S3 (optional)
+AWS_ACCESS_KEY_ID=your-access-key
+AWS_SECRET_ACCESS_KEY=your-secret-key
+AWS_STORAGE_BUCKET_NAME=your-bucket-name
+```
+
+---
+
+## 🎨 Frontend Development
+
+### Tailwind CSS
+
+The project uses Tailwind CSS with DaisyUI for styling. Custom configuration is in `tailwind.config.js`.
+
+**Adding new styles:**
+1. Add Tailwind classes to your templates
+2. Run `npm run build-css` to compile
+3. Run `python manage.py collectstatic` to collect files
+
+**Custom theme:**
+- Primary color: Indigo (#6366f1)
+- Secondary color: Purple (#d946ef)
+- Accent color: Orange (#f97316)
+
+### Component Development
+
+Components are located in `templates/_components/`:
+- `forms/` - Form inputs and controls
+- `navigation/` - Navbar and footer
+- `properties/` - Property-specific components
+- `ui/` - General UI components
 
 ---
 
 ## 🧪 Testing
 
-The project includes comprehensive tests for all components and functionality:
-
-```bash
-# Run all tests
-make test
-
-# Run specific test file
-pytest apps/properties/tests/test_components.py
-
-# Run with coverage
-pytest --cov=apps
-```
-
-Test coverage includes:
-- Component functionality
-- Form validation
-- User authentication flows
-- Property CRUD operations
-- Favorite system
-- Image uploads
-- End-to-end user flows
+In Progress
 
 ---
 
-## 📚 Additional Documentation
+## 📦 Deployment
 
-- **[COMPONENTS.md](COMPONENTS.md)**: Comprehensive component reference with usage examples
-- **[Django Unicorn Docs](https://www.django-unicorn.com/)**: Official Django Unicorn documentation
-- **[Bootstrap 5 Docs](https://getbootstrap.com/docs/5.0/)**: UI framework documentation
-
----
-
-## 🚀 Deployment
-
-The project is production-ready with Docker support:
+### Production Build
 
 ```bash
-# Build production image
+# Build Docker image
 docker build -t property-hub .
 
-# Run with docker-compose
+# Run with production compose
 docker-compose -f docker-compose.prod.yml up
 ```
 
-Environment variables for production:
-- Set `DEBUG=False`
-- Configure `ALLOWED_HOSTS`
-- Use PostgreSQL instead of SQLite
-- Configure AWS S3 for media storage
-- Set secure `DJANGO_SECRET_KEY`
+### Production Checklist
+
+- [ ] Set `DEBUG=False`
+- [ ] Configure `ALLOWED_HOSTS`
+- [ ] Use PostgreSQL database
+- [ ] Configure AWS S3 for media
+- [ ] Set secure `DJANGO_SECRET_KEY`
+- [ ] Enable HTTPS
+- [ ] Configure static file serving
+- [ ] Set up monitoring and logging
 
 ---
 
 ## 🤝 Contributing
 
+### Getting Started
+
 1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+2. Create a feature branch
+   ```bash
+   git checkout -b feature/your-feature-name
+   ```
 3. Make your changes
-4. Run tests (`make test`)
-5. Commit your changes (`git commit -m 'Add amazing feature'`)
-6. Push to the branch (`git push origin feature/amazing-feature`)
-7. Open a Pull Request
+4. Follow the code style guidelines
+5. Write/update tests
+6. Commit your changes
+   ```bash
+   git commit -m "Add: brief description of changes"
+   ```
+7. Push to your fork
+   ```bash
+   git push origin feature/your-feature-name
+   ```
+8. Open a Pull Request
+
+### Code Style
+
+- Follow PEP 8 for Python code
+- Use meaningful variable and function names
+- Add docstrings to functions and classes
+- Keep functions small and focused
+- Write tests for new features
+
+### Commit Message Format
+
+```
+Type: Brief description
+
+Detailed description (optional)
+
+Types: Add, Update, Fix, Remove, Refactor, Docs
+```
+
+### Pull Request Guidelines
+
+- Provide a clear description of changes
+- Reference related issues
+- Ensure all tests pass
+- Update documentation if needed
+- Keep PRs focused and atomic
 
 ---
 
 ## 📝 License
 
 This project is for educational and demonstration purposes.
+
+---
+
+## 📚 Resources
+
+- [Django Documentation](https://docs.djangoproject.com/)
+- [Tailwind CSS Documentation](https://tailwindcss.com/docs)
+- [DaisyUI Documentation](https://daisyui.com/)
+- [HTMX Documentation](https://htmx.org/docs/)
+- [Alpine.js Documentation](https://alpinejs.dev/)
