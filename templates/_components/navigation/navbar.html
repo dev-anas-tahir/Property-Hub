@@ -1,10 +1,11 @@
 {% load static %}
 
 <nav class="navbar bg-gradient-airbnb text-primary-content shadow-large sticky top-0 z-40">
-    <div class="container mx-auto">
-        <div class="navbar-start">
+    <div class="container mx-auto flex justify-between items-center relative">
+        <!-- Left: Logo and Mobile Menu -->
+        <div class="flex items-center">
             <!-- Mobile Menu Button -->
-            <div class="dropdown lg:hidden">
+            <div class="dropdown lg:hidden mr-2">
                 <div tabindex="0" role="button" class="btn btn-ghost">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
@@ -53,16 +54,16 @@
             </a>
         </div>
         
-        <!-- Desktop Menu -->
-        <div class="navbar-center hidden lg:flex">
+        <!-- Center: Desktop Menu - Absolutely Centered -->
+        <div class="hidden lg:flex absolute left-1/2 transform -translate-x-1/2">
             <ul class="menu menu-horizontal px-1 space-x-2">
+                <li>
+                    <a href="{% url 'properties:list' %}" 
+                       class="btn btn-ghost {% if request.resolver_match.url_name == 'list' %}nav-link-active{% endif %}">
+                        All Properties
+                    </a>
+                </li>
                 {% if user.is_authenticated %}
-                    <li>
-                        <a href="{% url 'properties:list' %}" 
-                           class="btn btn-ghost {% if request.resolver_match.url_name == 'list' %}nav-link-active{% endif %}">
-                            All Properties
-                        </a>
-                    </li>
                     <li>
                         <a href="{% url 'properties:create' %}" 
                            class="btn btn-ghost {% if request.resolver_match.url_name == 'create' %}nav-link-active{% endif %}">
@@ -82,8 +83,8 @@
             </ul>
         </div>
         
-        <!-- User Menu -->
-        <div class="navbar-end">
+        <!-- Right: User Menu -->
+        <div class="flex items-center">
             {% if user.is_authenticated %}
                 <div class="dropdown dropdown-end">
                     <div tabindex="0" role="button" class="btn btn-ghost btn-circle avatar">
