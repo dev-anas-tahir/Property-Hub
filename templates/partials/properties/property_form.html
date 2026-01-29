@@ -312,12 +312,12 @@
     </form>
     
     <!-- Loading Overlay -->
-    <div x-show="loading" 
-         x-cloak
-         class="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center"
-         style="background-color: rgba(0,0,0,0.5); z-index: 9999;">
-        <div class="spinner-border text-light" style="width: 3rem; height: 3rem;" role="status">
-            <span class="visually-hidden">Loading...</span>
+    <template x-if="loading">
+        <div class="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center"
+             style="background-color: rgba(0,0,0,0.5); z-index: 9999;">
+            <div class="spinner-border text-light" style="width: 3rem; height: 3rem;" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
         </div>
-    </div>
+    </template>
 </div>

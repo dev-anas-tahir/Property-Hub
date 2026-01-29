@@ -235,8 +235,6 @@ def property_edit_view(request, pk):
                         return response
                     else:
                         # Standard redirect for non-HTMX requests
-                        from django.shortcuts import redirect
-
                         return redirect("properties:detail", pk=property_obj.pk)
 
             except Exception as e:
@@ -297,7 +295,7 @@ def property_create_view(request):
         - Returns full page with form on validation failure
         - Returns standard redirect on success
     """
-    from apps.properties.forms import PropertyForm, PropertyImageFormSet
+    from apps.properties.forms import PropertyForm
     from django.http import HttpResponse
     from django.urls import reverse
     from django.contrib import messages
@@ -352,8 +350,6 @@ def property_create_view(request):
                         return response
                     else:
                         # Standard redirect for non-HTMX requests
-                        from django.shortcuts import redirect
-
                         return redirect("properties:detail", pk=property_obj.pk)
 
             except Exception as e:
@@ -486,7 +482,7 @@ def validate_phone_view(request):
     Returns error message HTML or empty response.
     """
     from django.http import HttpResponse
-    from apps.properties.validations import validate_phone
+    from apps.properties.validations import phone_validator
     from django.core.exceptions import ValidationError
 
     if request.method != "POST":
@@ -498,7 +494,7 @@ def validate_phone_view(request):
         return HttpResponse("", status=200)
 
     try:
-        validate_phone(phone_number)
+        phone_validator(phone_number)
         # Valid phone number - return empty response
         return HttpResponse("", status=200)
     except ValidationError as e:
@@ -514,7 +510,7 @@ def validate_cnic_view(request):
     Returns error message HTML or empty response.
     """
     from django.http import HttpResponse
-    from apps.properties.validations import validate_cnic
+    from apps.properties.validations import cnic_validator
     from django.core.exceptions import ValidationError
 
     if request.method != "POST":
@@ -526,7 +522,7 @@ def validate_cnic_view(request):
         return HttpResponse("", status=200)
 
     try:
-        validate_cnic(cnic)
+        cnic_validator(cnic)
         # Valid CNIC - return empty response
         return HttpResponse("", status=200)
     except ValidationError as e:

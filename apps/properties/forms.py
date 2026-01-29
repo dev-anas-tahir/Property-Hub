@@ -2,13 +2,35 @@
 
 from django import forms
 from django.core.exceptions import ValidationError
-from django.forms import inlineformset_factory
 from apps.properties.models import Property, PropertyImage
-from apps.properties.validations import validate_phone, validate_cnic
+from apps.properties.validations import phone_validator, cnic_validator
 
 
 class PropertyForm(forms.ModelForm):
     """Form for creating and editing properties."""
+    
+    # Override fields to add validators directly
+    phone_number = forms.CharField(
+        max_length=16,
+        validators=[phone_validator],
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': '+92-3001234567',
+        }),
+        help_text='Format: +92-3001234567',
+        label='Phone Number'
+    )
+    
+    cnic = forms.CharField(
+        max_length=15,
+        validators=[cnic_validator],
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': '12345-1234567-1',
+        }),
+        help_text='Format: 12345-1234567-1',
+        label='CNIC'
+    )
     
     class Meta:
         model = Property
@@ -37,14 +59,6 @@ class PropertyForm(forms.ModelForm):
                 'class': 'form-control',
                 'placeholder': 'Enter full address',
             }),
-            'phone_number': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': '+92-3001234567',
-            }),
-            'cnic': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': '12345-1234567-1',
-            }),
             'property_type': forms.Select(attrs={
                 'class': 'form-select',
             }),
@@ -66,17 +80,13 @@ class PropertyForm(forms.ModelForm):
             'name': 'Property Name',
             'description': 'Description',
             'full_address': 'Full Address',
-            'phone_number': 'Phone Number',
-            'cnic': 'CNIC',
             'property_type': 'Property Type',
             'price': 'Price',
             'documents': 'Documents (PDF)',
             'is_published': 'Publish Property',
         }
         help_texts = {
-            'phone_number': 'Format: +92-3001234567',
-            'cnic': 'Format: 12345-1234567-1',
-            'documents': 'Upload property documents (PDF only)',
+            'documents': 'Upload property documents (PDF only, max 10MB)',
             'is_published': 'Make this property visible to other users',
         }
     
@@ -84,29 +94,9 @@ class PropertyForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         # Make documents field not required (it's optional)
         self.fields['documents'].required = False
-        # Make is_published default to False
+        # Make is_published default to False for new properties
         if not self.instance.pk:
             self.fields['is_published'].initial = False
-    
-    def clean_phone_number(self):
-        """Validate phone number using custom validator."""
-        phone = self.cleaned_data.get('phone_number')
-        if phone:
-            try:
-                validate_phone(phone)
-            except ValidationError as e:
-                raise ValidationError(e.message)
-        return phone
-    
-    def clean_cnic(self):
-        """Validate CNIC using custom validator."""
-        cnic = self.cleaned_data.get('cnic')
-        if cnic:
-            try:
-                validate_cnic(cnic)
-            except ValidationError as e:
-                raise ValidationError(e.message)
-        return cnic
     
     def clean_price(self):
         """Validate that price is a positive decimal."""
@@ -127,7 +117,6 @@ class PropertyForm(forms.ModelForm):
                 if document.size > 10 * 1024 * 1024:
                     raise ValidationError('File size must not exceed 10MB.')
         return document
-
 
 
 class PropertyImageForm(forms.ModelForm):
@@ -162,14 +151,3 @@ class PropertyImageForm(forms.ModelForm):
                     raise ValidationError('Image size must not exceed 5MB.')
         return image
 
-
-# Create inline formset for property images
-PropertyImageFormSet = inlineformset_factory(
-    Property,
-    PropertyImage,
-    form=PropertyImageForm,
-    extra=5,  # Number of empty forms to display
-    max_num=10,  # Maximum number of images allowed
-    can_delete=True,  # Allow deletion of existing images
-    validate_max=True,  # Validate max_num constraint
-)
