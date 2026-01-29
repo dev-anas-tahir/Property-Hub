@@ -1,7 +1,7 @@
 {% load static %}
 
 <div x-data="{ 
-    isFavorited: {{ property.is_favorited|yesno:'true,false' }},
+    isFavorited: {% if property.is_favorited %}true{% else %}false{% endif %},
     isLoading: false,
     
     async toggleFavorite() {
@@ -21,6 +21,12 @@
             if (response.ok) {
                 const data = await response.json();
                 this.isFavorited = data.is_favorited;
+                
+                // Dispatch custom event for parent components to listen to
+                this.$dispatch('favorite-toggled', { 
+                    propertyId: {{ property.pk }}, 
+                    isFavorited: data.is_favorited 
+                });
             }
         } catch (error) {
             console.error('Error toggling favorite:', error);

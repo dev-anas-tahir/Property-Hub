@@ -1,6 +1,6 @@
 {% load static %}
 
-<div class="card property-card bg-base-100 shadow-soft hover:shadow-large transition-all duration-300 overflow-hidden">
+<div class="card property-card bg-base-100 shadow-soft hover:shadow-large transition-all duration-300 overflow-hidden" data-property-card>
     <!-- Property Image -->
     <figure class="relative h-48 overflow-hidden">
         {% if property.images.first %}
@@ -24,7 +24,8 @@
         
         <!-- Favorite Button -->
         {% if user.is_authenticated %}
-            <div class="absolute top-3 right-3">
+            <div class="absolute top-3 right-3" 
+                 @favorite-toggled.window="if ($event.detail.propertyId === {{ property.pk }} && !$event.detail.isFavorited && window.location.pathname.includes('favorites')) { $el.closest('[data-property-card]').remove(); }">
                 {% include '_components/properties/favorite_button.html' with property=property %}
             </div>
         {% endif %}
