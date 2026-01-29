@@ -1,23 +1,26 @@
 """Base settings for the Property-Hub project."""
 
-import environ
+from environs import Env
 from pathlib import Path
 from datetime import timedelta
 from django.contrib import messages
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-env = environ.Env(DEBUG=(bool, False))
+# Initialize Env with Django support
+env = Env()
+env.read_env()
 
+# Load environment-specific file
 if Path(BASE_DIR / ".env.dev").exists():
-    environ.Env.read_env(BASE_DIR / ".env.dev")
+    env.read_env(BASE_DIR / ".env.dev", override=True)
 elif Path(BASE_DIR / ".env.prod").exists():
-    environ.Env.read_env(BASE_DIR / ".env.prod")
+    env.read_env(BASE_DIR / ".env.prod", override=True)
 
-DEBUG = env("DEBUG")
+DEBUG = env.bool("DEBUG")
 print("DEBUG", DEBUG)
 
-SECRET_KEY = env("SECRET_KEY")
+SECRET_KEY = env.str("SECRET_KEY")
 ALLOWED_HOSTS = env.list("ALLOWED_HOSTS")
 
 CSRF_TRUSTED_ORIGINS = [
@@ -75,7 +78,10 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "config.wsgi.application"
-DATABASES = {"default": env.db()}
+
+# Database configuration
+import dj_database_url
+DATABASES = {"default": dj_database_url.parse(env.str("DATABASE_URL"))}
 
 AUTH_PASSWORD_VALIDATORS = [
     {
