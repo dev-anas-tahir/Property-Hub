@@ -60,10 +60,16 @@ class Property(models.Model):
     phone_number = models.CharField(max_length=16, validators=[phone_validator])
     cnic = models.CharField(max_length=15, validators=[cnic_validator])
     property_type = models.CharField(max_length=10, choices=PROPERTY_TYPE)
-    description = models.TextField()
+    description = models.TextField(blank=True)
     # Use 2 decimal places for currency precision. Note: changing this requires a migration.
     price = models.DecimalField(
         max_digits=12, decimal_places=2, validators=[MinValueValidator(0)]
+    )
+    bedrooms = models.PositiveIntegerField(blank=True, null=True, help_text="Number of bedrooms")
+    bathrooms = models.PositiveIntegerField(blank=True, null=True, help_text="Number of bathrooms")
+    area = models.DecimalField(
+        max_digits=10, decimal_places=2, blank=True, null=True,
+        validators=[MinValueValidator(0)], help_text="Property area in square feet"
     )
     documents = models.FileField(
         upload_to=documents_upload_path, blank=True, null=True

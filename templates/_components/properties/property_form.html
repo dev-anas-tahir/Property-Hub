@@ -1,159 +1,396 @@
 {% load static %}
 
-<form method="post" enctype="multipart/form-data" class="space-y-6">
-    {% csrf_token %}
-    
-    <!-- Form Errors -->
-    {% if form.non_field_errors %}
-        <div class="alert alert-error">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-            </svg>
-            <div>
-                {% for error in form.non_field_errors %}
-                    <div>{{ error }}</div>
-                {% endfor %}
-            </div>
-        </div>
-    {% endif %}
-    
-    <!-- Basic Information -->
-    <div class="card bg-base-100 shadow-soft">
-        <div class="card-body">
-            <h2 class="card-title text-xl mb-6">Basic Information</h2>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- Property Title -->
-                <div class="md:col-span-2">
-                    {% include '_components/forms/input.html' with field=form.name label="Property Title" placeholder="e.g., Beautiful 3BR House in Downtown" required=True %}
-                </div>
-                
-                <!-- Property Type -->
-                <div>
-                    {% include '_components/forms/select.html' with field=form.property_type label="Property Type" required=True %}
-                </div>
-                
-                <!-- Price -->
-                <div>
-                    {% include '_components/forms/input.html' with field=form.price label="Price" placeholder="Enter price" required=True icon='<svg class="w-5 h-5 text-base-content/40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path></svg>' %}
-                </div>
-                
-                <!-- Address -->
-                <div class="md:col-span-2">
-                    {% include '_components/forms/input.html' with field=form.full_address label="Address" placeholder="Enter full address" required=True icon='<svg class="w-5 h-5 text-base-content/40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>' %}
-                </div>
-            </div>
-        </div>
+<div x-data="propertyForm()">
+    <!-- Progress Bar -->
+    <div class="mb-12">
+        <ul class="steps w-full">
+            <li class="step" :class="currentStep >= 1 ? 'step-primary' : ''">Basic Info</li>
+            <li class="step" :class="currentStep >= 2 ? 'step-primary' : ''">Details</li>
+            <li class="step" :class="currentStep >= 3 ? 'step-primary' : ''">Images</li>
+            <li class="step" :class="currentStep >= 4 ? 'step-primary' : ''">Review</li>
+        </ul>
     </div>
-    
-    <!-- Property Details -->
-    <div class="card bg-base-100 shadow-soft">
-        <div class="card-body">
-            <h2 class="card-title text-xl mb-6">Property Details</h2>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- Phone Number -->
+
+    <form method="post" enctype="multipart/form-data" class="space-y-6">
+        {% csrf_token %}
+        
+        {% if form.non_field_errors %}
+            <div class="alert alert-error">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
                 <div>
-                    {% include '_components/forms/input.html' with field=form.phone_number label="Phone Number" placeholder="+92-3001234567" required=True %}
-                </div>
-                
-                <!-- CNIC -->
-                <div>
-                    {% include '_components/forms/input.html' with field=form.cnic label="CNIC" placeholder="12345-1234567-1" required=True %}
-                </div>
-            </div>
-            
-            <!-- Description -->
-            <div class="mt-6">
-                {% include '_components/forms/textarea.html' with field=form.description label="Description" placeholder="Describe your property, its features, and what makes it special..." rows=6 %}
-            </div>
-            
-            <!-- Published Status -->
-            <div class="mt-6">
-                <div class="form-control">
-                    <label class="label cursor-pointer justify-start">
-                        <input type="checkbox" name="is_published" class="checkbox checkbox-primary mr-3" {% if form.is_published.value %}checked{% endif %}>
-                        <span class="label-text">
-                            <strong>Publish Property</strong>
-                            <br>
-                            <small class="text-base-content/60">Make this property visible to other users</small>
-                        </span>
-                    </label>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Images -->
-    {% if not is_edit_mode or property.images.count == 0 %}
-        <div class="card bg-base-100 shadow-soft">
-            <div class="card-body">
-                <h2 class="card-title text-xl mb-6">Property Images</h2>
-                
-                <!-- Image Upload Area -->
-                <div class="border-2 border-dashed border-base-300 rounded-2xl p-8 text-center hover:border-primary-300 transition-colors">
-                    <svg class="w-12 h-12 text-base-content/40 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
-                    </svg>
-                    <h3 class="text-lg font-semibold text-base-content mb-2">Upload Property Images</h3>
-                    <p class="text-base-content/60 mb-4">Drag and drop images here, or click to browse</p>
-                    <input type="file" name="images" multiple accept="image/*" class="file-input file-input-bordered file-input-primary w-full max-w-xs">
-                    <p class="text-xs text-base-content/50 mt-2">Supported formats: JPG, PNG, WebP. Max 10 images.</p>
-                </div>
-            </div>
-        </div>
-    {% endif %}
-    
-    <!-- Existing Images (Edit Mode) -->
-    {% if is_edit_mode and property.images.count > 0 %}
-        <div class="card bg-base-100 shadow-soft">
-            <div class="card-body">
-                <h2 class="card-title text-xl mb-6">Current Images</h2>
-                
-                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-6">
-                    {% for image in property.images.all %}
-                        <div class="relative group">
-                            <img src="{{ image.image.url }}" alt="Property image" class="w-full h-32 object-cover rounded-lg">
-                            <div class="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center">
-                                <label class="cursor-pointer">
-                                    <input type="checkbox" name="delete_image_ids" value="{{ image.id }}" class="checkbox checkbox-error">
-                                    <span class="text-white text-sm ml-2">Delete</span>
-                                </label>
-                            </div>
-                            {% if image.is_primary %}
-                                <div class="absolute top-2 left-2">
-                                    <span class="badge badge-primary badge-sm">Primary</span>
-                                </div>
-                            {% endif %}
-                        </div>
+                    {% for error in form.non_field_errors %}
+                        <div>{{ error }}</div>
                     {% endfor %}
                 </div>
+            </div>
+        {% endif %}
+        
+        <!-- Step 1: Basic Information -->
+        <div x-show="currentStep === 1" x-transition class="card bg-base-100 shadow-lg">
+            <div class="card-body">
+                <h2 class="card-title text-2xl mb-6">Basic Information</h2>
                 
-                <!-- Add More Images -->
-                <div class="border-2 border-dashed border-base-300 rounded-xl p-6 text-center">
-                    <h3 class="text-lg font-semibold text-base-content mb-2">Add More Images</h3>
-                    <input type="file" name="images" multiple accept="image/*" class="file-input file-input-bordered file-input-primary w-full max-w-xs">
+                <div class="space-y-6">
+                    <div>
+                        {% include '_components/forms/input.html' with field=form.name label="Property Title" placeholder="e.g., Beautiful 3BR House in Downtown" required=True %}
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            {% include '_components/forms/select.html' with field=form.property_type label="Property Type" placeholder="Select property type" required=True %}
+                        </div>
+                        
+                        <div>
+                            {% include '_components/forms/input.html' with field=form.price label="Price" placeholder="Enter price" required=True icon='<svg class="w-5 h-5 text-base-content/40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path></svg>' %}
+                        </div>
+                    </div>
+                    
+                    <div>
+                        {% include '_components/forms/input.html' with field=form.full_address label="Address" placeholder="Enter full address" required=True icon='<svg class="w-5 h-5 text-base-content/40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>' %}
+                    </div>
                 </div>
             </div>
         </div>
-    {% endif %}
-    
-    <!-- Submit Button -->
-    <div class="flex justify-end space-x-4">
-        <a href="{% if is_edit_mode %}{% url 'properties:detail' property.pk %}{% else %}{% url 'properties:list' %}{% endif %}" 
-           class="btn btn-outline">Cancel</a>
-        <button type="submit" class="btn btn-primary">
-            {% if is_edit_mode %}
-                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                </svg>
-                Update Property
-            {% else %}
-                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-                </svg>
-                Create Property
+        
+        <!-- Step 2: Property Details -->
+        <div x-show="currentStep === 2" x-transition class="card bg-base-100 shadow-lg">
+            <div class="card-body">
+                <h2 class="card-title text-2xl mb-6">Property Details</h2>
+                
+                <div class="space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div>
+                            {% include '_components/forms/input.html' with field=form.bedrooms label="Bedrooms" placeholder="Number of bedrooms" required=True %}
+                        </div>
+                        
+                        <div>
+                            {% include '_components/forms/input.html' with field=form.bathrooms label="Bathrooms" placeholder="Number of bathrooms" required=True %}
+                        </div>
+                        
+                        <div>
+                            {% include '_components/forms/input.html' with field=form.area label="Area (sq ft)" placeholder="Property area" required=True %}
+                        </div>
+                    </div>
+                    
+                    <div>
+                        {% include '_components/forms/textarea.html' with field=form.description label="Description" placeholder="Describe your property, its features, and what makes it special..." rows=6 %}
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            {% include '_components/forms/input.html' with field=form.phone_number label="Phone Number" placeholder="+92-3001234567" required=True %}
+                        </div>
+                        
+                        <div>
+                            {% include '_components/forms/input.html' with field=form.cnic label="CNIC" placeholder="12345-1234567-1" required=True %}
+                        </div>
+                    </div>
+                    
+                    <div class="form-control">
+                        <label class="label cursor-pointer justify-start gap-3">
+                            <input type="checkbox" name="is_published" class="checkbox checkbox-primary" {% if form.is_published.value %}checked{% endif %}>
+                            <span class="label-text">
+                                <strong>Publish Property</strong>
+                                <br>
+                                <small class="text-base-content/60">Make this property visible to other users</small>
+                            </span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Step 3: Images -->
+        <div x-show="currentStep === 3" x-transition>
+            {% if not is_edit_mode or property.images.count == 0 %}
+                <div class="card bg-base-100 shadow-lg">
+                    <div class="card-body">
+                        <h2 class="card-title text-2xl mb-6">Property Images</h2>
+                        
+                        <div class="border-2 border-dashed border-base-300 rounded-2xl p-8 text-center hover:border-primary transition-colors">
+                            <svg class="w-16 h-16 text-base-content/40 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                            </svg>
+                            <h3 class="text-lg font-semibold text-base-content mb-2">Upload Property Images</h3>
+                            <p class="text-base-content/60 mb-4">Drag and drop images here, or click to browse</p>
+                            <input type="file" name="images" multiple accept="image/*" class="file-input file-input-bordered file-input-primary w-full max-w-xs">
+                            <p class="text-xs text-base-content/50 mt-2">Supported formats: JPG, PNG, WebP. Max 10 images.</p>
+                        </div>
+                    </div>
+                </div>
             {% endif %}
-        </button>
-    </div>
-</form>
+            
+            {% if is_edit_mode and property.images.count > 0 %}
+                <div class="card bg-base-100 shadow-lg">
+                    <div class="card-body">
+                        <h2 class="card-title text-2xl mb-6">Current Images</h2>
+                        
+                        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-6">
+                            {% for image in property.images.all %}
+                                <div class="relative group">
+                                    <img src="{{ image.image.url }}" alt="Property image" class="w-full h-32 object-cover rounded-lg">
+                                    <div class="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center">
+                                        <label class="cursor-pointer">
+                                            <input type="checkbox" name="delete_image_ids" value="{{ image.id }}" class="checkbox checkbox-error">
+                                            <span class="text-white text-sm ml-2">Delete</span>
+                                        </label>
+                                    </div>
+                                    {% if image.is_primary %}
+                                        <div class="absolute top-2 left-2">
+                                            <span class="badge badge-primary badge-sm">Primary</span>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
+                        </div>
+                        
+                        <div class="border-2 border-dashed border-base-300 rounded-xl p-6 text-center">
+                            <h3 class="text-lg font-semibold text-base-content mb-2">Add More Images</h3>
+                            <input type="file" name="images" multiple accept="image/*" class="file-input file-input-bordered file-input-primary w-full max-w-xs">
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+        
+        <!-- Step 4: Review -->
+        <div x-show="currentStep === 4" x-transition class="card bg-base-100 shadow-lg">
+            <div class="card-body">
+                <h2 class="card-title text-2xl mb-6">Review Your Property</h2>
+                
+                <div class="alert alert-info mb-6">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <span>Please review all information before submitting. You can go back to any step to make changes.</span>
+                </div>
+                
+                <div class="bg-base-200 rounded-xl p-6 space-y-4">
+                    <h3 class="font-semibold text-lg mb-4">Property Summary</h3>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="flex flex-col">
+                            <span class="text-sm text-base-content/60">Property Title</span>
+                            <span class="font-medium" x-text="formData.name || '-'"></span>
+                        </div>
+                        
+                        <div class="flex flex-col">
+                            <span class="text-sm text-base-content/60">Property Type</span>
+                            <span class="font-medium" x-text="getPropertyTypeLabel()"></span>
+                        </div>
+                        
+                        <div class="flex flex-col">
+                            <span class="text-sm text-base-content/60">Price</span>
+                            <span class="font-medium" x-text="formData.price ? '$' + formData.price : '-'"></span>
+                        </div>
+                        
+                        <div class="flex flex-col">
+                            <span class="text-sm text-base-content/60">Address</span>
+                            <span class="font-medium" x-text="formData.full_address || '-'"></span>
+                        </div>
+                        
+                        <div class="flex flex-col">
+                            <span class="text-sm text-base-content/60">Bedrooms</span>
+                            <span class="font-medium" x-text="formData.bedrooms || '-'"></span>
+                        </div>
+                        
+                        <div class="flex flex-col">
+                            <span class="text-sm text-base-content/60">Bathrooms</span>
+                            <span class="font-medium" x-text="formData.bathrooms || '-'"></span>
+                        </div>
+                        
+                        <div class="flex flex-col">
+                            <span class="text-sm text-base-content/60">Area</span>
+                            <span class="font-medium" x-text="formData.area ? formData.area + ' sq ft' : '-'"></span>
+                        </div>
+                        
+                        <div class="flex flex-col">
+                            <span class="text-sm text-base-content/60">Phone Number</span>
+                            <span class="font-medium" x-text="formData.phone_number || '-'"></span>
+                        </div>
+                        
+                        <div class="flex flex-col">
+                            <span class="text-sm text-base-content/60">CNIC</span>
+                            <span class="font-medium" x-text="formData.cnic || '-'"></span>
+                        </div>
+                        
+                        <div class="flex flex-col">
+                            <span class="text-sm text-base-content/60">Status</span>
+                            <span class="font-medium" x-text="formData.is_published ? 'Published' : 'Draft'"></span>
+                        </div>
+                    </div>
+                    
+                    <div class="flex flex-col" x-show="formData.description">
+                        <span class="text-sm text-base-content/60">Description</span>
+                        <span class="font-medium" x-text="formData.description"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Navigation Buttons -->
+        <div class="flex justify-between items-center">
+            <button type="button" @click="prevStep()" x-show="currentStep > 1" class="btn btn-outline">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                </svg>
+                Previous
+            </button>
+            
+            <div class="flex space-x-3 ml-auto">
+                <a href="{% if is_edit_mode %}{% url 'properties:detail' property.pk %}{% else %}{% url 'properties:list' %}{% endif %}" 
+                   class="btn btn-ghost">Cancel</a>
+                
+                <button type="button" @click="nextStep()" x-show="currentStep < totalSteps" class="btn btn-primary" id="nextStepBtn">
+                    Next Step
+                    <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                </button>
+                
+                <button type="submit" x-show="currentStep === totalSteps" class="btn btn-primary">
+                    {% if is_edit_mode %}
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        Update Property
+                    {% else %}
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                        </svg>
+                        Create Property
+                    {% endif %}
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+function propertyForm() {
+    return {
+        currentStep: 1,
+        totalSteps: 4,
+        maxStepReached: 1,
+        formData: {
+            name: '',
+            property_type: '',
+            price: '',
+            full_address: '',
+            bedrooms: '',
+            bathrooms: '',
+            area: '',
+            description: '',
+            phone_number: '',
+            cnic: '',
+            is_published: false
+        },
+        
+        nextStep() {
+            if (this.currentStep < this.totalSteps) {
+                this.validateStepWithDjango();
+            }
+        },
+        
+        async validateStepWithDjango() {
+            const nextButton = document.getElementById('nextStepBtn');
+            if (nextButton) {
+                nextButton.disabled = true;
+                nextButton.innerHTML = '<span class="loading loading-spinner loading-sm"></span> Validating...';
+            }
+            
+            this.clearStepErrors();
+            
+            const formData = new FormData(document.querySelector('form'));
+            formData.append('step', this.currentStep);
+            
+            try {
+                const response = await fetch('{% url "properties:validate_step" %}', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}',
+                    },
+                });
+                
+                const result = await response.json();
+                
+                if (result.valid) {
+                    this.currentStep++;
+                    if (this.currentStep > this.maxStepReached) {
+                        this.maxStepReached = this.currentStep;
+                    }
+                    this.updateFormData();
+                } else {
+                    this.displayStepErrors(result.errors);
+                }
+            } catch (error) {
+                console.error('Validation error:', error);
+                alert('An error occurred while validating the form. Please try again.');
+            } finally {
+                if (nextButton) {
+                    nextButton.disabled = false;
+                    nextButton.innerHTML = 'Next Step <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>';
+                }
+            }
+        },
+        
+        clearStepErrors() {
+            document.querySelectorAll('.field-error').forEach(el => el.remove());
+            document.querySelectorAll('.input-error, .select-error, .textarea-error').forEach(el => {
+                el.classList.remove('input-error', 'select-error', 'textarea-error');
+            });
+        },
+        
+        displayStepErrors(errors) {
+            for (const fieldName in errors) {
+                const fieldErrors = errors[fieldName];
+                const field = document.querySelector('[name="' + fieldName + '"]');
+                if (field) {
+                    if (field.tagName === 'SELECT') {
+                        field.classList.add('select-error');
+                    } else if (field.tagName === 'TEXTAREA') {
+                        field.classList.add('textarea-error');
+                    } else {
+                        field.classList.add('input-error');
+                    }
+                    
+                    const errorDiv = document.createElement('div');
+                    errorDiv.className = 'field-error text-error text-sm mt-1';
+                    errorDiv.textContent = fieldErrors[0];
+                    
+                    const fieldContainer = field.closest('.form-control') || field.parentElement;
+                    fieldContainer.appendChild(errorDiv);
+                }
+            }
+        },
+        
+        prevStep() {
+            if (this.currentStep > 1) {
+                this.currentStep--;
+            }
+        },
+        
+        updateFormData() {
+            this.formData.name = document.querySelector('[name=name]')?.value || '';
+            this.formData.property_type = document.querySelector('[name=property_type]')?.value || '';
+            this.formData.price = document.querySelector('[name=price]')?.value || '';
+            this.formData.full_address = document.querySelector('[name=full_address]')?.value || '';
+            this.formData.bedrooms = document.querySelector('[name=bedrooms]')?.value || '';
+            this.formData.bathrooms = document.querySelector('[name=bathrooms]')?.value || '';
+            this.formData.area = document.querySelector('[name=area]')?.value || '';
+            this.formData.description = document.querySelector('[name=description]')?.value || '';
+            this.formData.phone_number = document.querySelector('[name=phone_number]')?.value || '';
+            this.formData.cnic = document.querySelector('[name=cnic]')?.value || '';
+            this.formData.is_published = document.querySelector('[name=is_published]')?.checked || false;
+        },
+        
+        getPropertyTypeLabel() {
+            const select = document.querySelector('[name=property_type]');
+            return select?.options[select.selectedIndex]?.text || '-';
+        }
+    }
+}
+</script>

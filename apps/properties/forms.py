@@ -42,6 +42,9 @@ class PropertyForm(forms.ModelForm):
             'cnic',
             'property_type',
             'price',
+            'bedrooms',
+            'bathrooms',
+            'area',
             'documents',
             'is_published',
         ]
@@ -68,6 +71,22 @@ class PropertyForm(forms.ModelForm):
                 'min': '0',
                 'placeholder': 'Enter price',
             }),
+            'bedrooms': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'min': '0',
+                'placeholder': 'Number of bedrooms',
+            }),
+            'bathrooms': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'min': '0',
+                'placeholder': 'Number of bathrooms',
+            }),
+            'area': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'step': '0.01',
+                'min': '0',
+                'placeholder': 'Property area',
+            }),
             'documents': forms.FileInput(attrs={
                 'class': 'form-control',
                 'accept': '.pdf',
@@ -82,6 +101,9 @@ class PropertyForm(forms.ModelForm):
             'full_address': 'Full Address',
             'property_type': 'Property Type',
             'price': 'Price',
+            'bedrooms': 'Bedrooms',
+            'bathrooms': 'Bathrooms',
+            'area': 'Area (sq ft)',
             'documents': 'Documents (PDF)',
             'is_published': 'Publish Property',
         }
@@ -92,8 +114,12 @@ class PropertyForm(forms.ModelForm):
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Make documents field not required (it's optional)
+        # Make optional fields not required
         self.fields['documents'].required = False
+        self.fields['description'].required = False
+        self.fields['bedrooms'].required = True
+        self.fields['bathrooms'].required = True
+        self.fields['area'].required = True
         # Make is_published default to False for new properties
         if not self.instance.pk:
             self.fields['is_published'].initial = False
