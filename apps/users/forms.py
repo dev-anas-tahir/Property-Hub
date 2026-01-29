@@ -121,7 +121,7 @@ class SignupForm(forms.Form):
         }
     )
     
-    password = forms.CharField(
+    password1 = forms.CharField(
         required=True,
         widget=forms.PasswordInput(attrs={
             'class': 'form-control',
@@ -133,7 +133,7 @@ class SignupForm(forms.Form):
         }
     )
     
-    password_confirm = forms.CharField(
+    password2 = forms.CharField(
         required=True,
         widget=forms.PasswordInput(attrs={
             'class': 'form-control',
@@ -166,24 +166,24 @@ class SignupForm(forms.Form):
                 raise ValidationError('This email address is already registered.')
         return email
     
-    def clean_password(self):
+    def clean_password1(self):
         """Validate password strength."""
-        password = self.cleaned_data.get('password')
-        if password:
-            # Use existing validate_password_strength function
-            validate_password_strength(password)
-        return password
+        password1 = self.cleaned_data.get('password1')
+        if password1:
+
+            validate_password_strength(password1)
+        return password1
     
     def clean(self):
         """Validate password confirmation matching."""
         cleaned_data = super().clean()
-        password = cleaned_data.get('password')
-        password_confirm = cleaned_data.get('password_confirm')
+        password1 = cleaned_data.get('password1')
+        password2 = cleaned_data.get('password2')
         
-        if password and password_confirm:
-            if password != password_confirm:
+        if password1 and password2:
+            if password1 != password2:
                 raise ValidationError({
-                    'password_confirm': 'Passwords do not match.'
+                    'password2': 'Passwords do not match.'
                 })
         
         return cleaned_data
