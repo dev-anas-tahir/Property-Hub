@@ -21,6 +21,7 @@ dependencies = [
 dev = [
     "django-debug-toolbar>=5.2.0",
     "pysonar>=1.3.0.4086",
+    "ruff>=0.14.14",
 ]
 
 [build-system]

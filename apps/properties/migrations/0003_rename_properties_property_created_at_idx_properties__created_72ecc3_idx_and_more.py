@@ -5,29 +5,32 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('properties', '0002_auto_update_models'),
+        ("properties", "0002_auto_update_models"),
     ]
 
     operations = [
         migrations.RenameIndex(
-            model_name='property',
-            new_name='properties__created_72ecc3_idx',
-            old_name='properties_property_created_at_idx',
+            model_name="property",
+            new_name="properties__created_72ecc3_idx",
+            old_name="properties_property_created_at_idx",
         ),
         migrations.RenameIndex(
-            model_name='property',
-            new_name='properties__price_32e7c2_idx',
-            old_name='properties_property_price_idx',
+            model_name="property",
+            new_name="properties__price_32e7c2_idx",
+            old_name="properties_property_price_idx",
         ),
         migrations.AlterUniqueTogether(
-            name='favorite',
+            name="favorite",
             unique_together=set(),
         ),
         migrations.AlterField(
-            model_name='property',
-            name='documents',
-            field=models.FileField(blank=True, null=True, upload_to=apps.properties.models.documents_upload_path),
+            model_name="property",
+            name="documents",
+            field=models.FileField(
+                blank=True,
+                null=True,
+                upload_to=apps.properties.models.documents_upload_path,
+            ),
         ),
     ]
