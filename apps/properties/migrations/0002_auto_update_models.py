@@ -3,11 +3,12 @@
 Generated manually to reflect model changes: field alterations, indexes and constraints.
 """
 
+import django.core.validators
+import django.db.models
+import django.db.models.deletion
 from django.conf import settings
 from django.db import migrations, models
-import django.db.models.deletion
-import django.db.models
-import django.core.validators
+
 import apps.properties.models
 
 

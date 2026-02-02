@@ -3,9 +3,11 @@ This module contains utility functions for property-related operations.
 """
 
 import os
+
 from django.contrib import messages
+from django.http import FileResponse, HttpResponseForbidden
+
 from apps.properties.models import Property
-from django.http import HttpResponseForbidden, FileResponse
 
 
 def handle_document_download(request, property_obj: Property) -> FileResponse:

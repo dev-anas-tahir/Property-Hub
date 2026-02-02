@@ -3,16 +3,17 @@ This module contains views for user-related operations such as
 signing up, logging in, and profile management within the Property Hub application.
 """
 
-from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login as auth_login, logout
-from django.contrib.auth.decorators import login_required
-from django.contrib import messages
-from django.http import HttpResponse
-from django.urls import reverse
-from django.conf import settings
-from django.contrib.auth import get_user_model
 from axes.handlers.proxy import AxesProxyHandler
-from apps.users.forms import LoginForm, SignupForm, ProfileForm
+from django.conf import settings
+from django.contrib import messages
+from django.contrib.auth import authenticate, get_user_model, logout
+from django.contrib.auth import login as auth_login
+from django.contrib.auth.decorators import login_required
+from django.http import HttpResponse
+from django.shortcuts import redirect, render
+from django.urls import reverse
+
+from apps.users.forms import LoginForm, ProfileForm, SignupForm
 
 # Get the user model dynamically
 User = get_user_model()

@@ -3,10 +3,9 @@ This module contains admin configurations for property-related models.
 """
 
 from django.contrib import admin
-from django.utils.html import format_html
-from django.urls import reverse
 from django.utils.safestring import mark_safe
-from apps.properties.models import Property, Favorite, PropertyImage
+
+from apps.properties.models import Favorite, Property, PropertyImage
 
 
 class PropertyImageInline(admin.TabularInline):

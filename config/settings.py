@@ -1,11 +1,11 @@
 """Base settings for the Property-Hub project."""
 
-import dj_database_url
-
-from environs import Env
-from pathlib import Path
 from datetime import timedelta
+from pathlib import Path
+
+import dj_database_url
 from django.contrib import messages
+from environs import Env
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -42,9 +42,9 @@ INSTALLED_APPS = [
     "axes",
     "storages",
     # Custom Apps
+    "apps.properties.apps.PropertiesConfig",
     "apps.shared.apps.SharedConfig",
     "apps.users.apps.UsersConfig",
-    "apps.properties.apps.PropertiesConfig",
 ]
 
 MIDDLEWARE = [

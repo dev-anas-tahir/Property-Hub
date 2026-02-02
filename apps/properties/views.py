@@ -6,11 +6,21 @@ All interactive functionality is handled by HTMX and Alpine.js.
 import logging
 
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import get_object_or_404, render, redirect
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.core.paginator import Paginator
-from apps.properties.models import Property, PropertyImage
+from django.http import Http404, JsonResponse
+from django.shortcuts import get_object_or_404, redirect, render
+from apps.properties.utils import delete_property_and_assets
+
+from apps.properties.models import Favorite, Property, PropertyImage
 from apps.properties.utils import handle_document_download
+from apps.properties.forms import PropertyForm
+from django.contrib import messages
+from django.db import transaction
+from django.http import HttpResponse
+from django.urls import reverse
+from apps.properties.validations import phone_validator, cnic_validator
+
 
 
 logger = logging.getLogger(__name__)
@@ -28,8 +38,6 @@ def properties_list_view(request):
         favorites (str): Filter to show only favorited properties ('true')
         my_properties (str): Filter to show only user's own properties ('true')
     """
-    from apps.properties.models import Favorite
-
     # Check if this is an HTMX request
     is_htmx = request.headers.get("HX-Request") == "true"
 
@@ -103,9 +111,6 @@ def property_detail_view(request, pk):
     For HTMX requests, returns only the property detail partial.
     For standard requests, returns the full page template.
     """
-    from apps.properties.models import Favorite
-    from django.http import Http404
-
     # Check if this is an HTMX request
     is_htmx = request.headers.get("HX-Request") == "true"
 
@@ -167,11 +172,6 @@ def property_edit_view(request, pk):
         - Returns full page with form on validation failure
         - Returns standard redirect on success
     """
-    from apps.properties.forms import PropertyForm
-    from django.http import HttpResponse
-    from django.urls import reverse
-    from django.contrib import messages
-    from django.db import transaction
 
     # Load existing property and check ownership
     property_obj = get_object_or_404(Property, pk=pk)
@@ -296,8 +296,6 @@ def favorites_list_view(request):
     All properties in this view are favorited by definition,
     so we set is_favorited=True for each property.
     """
-    from apps.properties.models import Favorite
-
     # Get favorited properties with related data for optimization
     favorite_properties = (
         Property.objects.filter(favorited_by__user=request.user)
@@ -341,11 +339,6 @@ def property_create_view(request):
         - Returns full page with form on validation failure
         - Returns standard redirect on success
     """
-    from apps.properties.forms import PropertyForm
-    from django.http import HttpResponse
-    from django.urls import reverse
-    from django.contrib import messages
-    from django.db import transaction
 
     # Check if this is an HTMX request
     is_htmx = request.headers.get("HX-Request") == "true"
@@ -447,9 +440,6 @@ def property_favorite_toggle_view(request, pk):
     Handles POST requests to add/remove a property from user's favorites.
     Returns JSON response with updated favorite status.
     """
-    from apps.properties.models import Favorite
-    from django.http import JsonResponse
-
     # Only allow POST requests
     if request.method != "POST":
         return JsonResponse({"error": "Method not allowed"}, status=405)
@@ -477,8 +467,6 @@ def property_favorite_toggle_view(request, pk):
 @login_required
 def property_validate_step_view(request):
     """Validate a specific step of the property form via AJAX."""
-    from django.http import JsonResponse
-    from apps.properties.forms import PropertyForm
 
     if request.method != "POST":
         return JsonResponse({"error": "Method not allowed"}, status=405)
@@ -571,10 +559,6 @@ def property_delete_view(request, pk):
     Deletes associated images and documents.
     Returns HX-Redirect header to property list on success.
     """
-    from apps.properties.utils import delete_property_and_assets
-    from django.http import HttpResponse
-    from django.urls import reverse
-    from django.shortcuts import redirect
 
     # Only allow POST or DELETE requests
     if request.method not in ["POST", "DELETE"]:
@@ -609,9 +593,6 @@ def validate_phone_view(request):
     Handles POST requests with phone_number parameter.
     Returns error message HTML or empty response.
     """
-    from django.http import HttpResponse
-    from apps.properties.validations import phone_validator
-    from django.core.exceptions import ValidationError
 
     if request.method != "POST":
         return HttpResponse("", status=200)
@@ -637,9 +618,6 @@ def validate_cnic_view(request):
     Handles POST requests with cnic parameter.
     Returns error message HTML or empty response.
     """
-    from django.http import HttpResponse
-    from apps.properties.validations import cnic_validator
-    from django.core.exceptions import ValidationError
 
     if request.method != "POST":
         return HttpResponse("", status=200)

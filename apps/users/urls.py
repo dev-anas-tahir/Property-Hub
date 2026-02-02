@@ -3,13 +3,14 @@ This module contains URL patterns for user-related operations.
 """
 
 from django.urls import path
+
 from apps.users.views import (
-    signup_view,
     login_view,
-    profile_view,
-    profile_edit_view,
     logout_view,
     password_change_view,
+    profile_edit_view,
+    profile_view,
+    signup_view,
     validate_email_view,
 )
 

@@ -1,17 +1,18 @@
 from django.urls import path
+
 from apps.properties.views import (
-    property_detail_view,
-    properties_list_view,
     favorites_list_view,
     my_properties_list_view,
+    properties_list_view,
     property_create_view,
-    property_edit_view,
+    property_delete_view,
+    property_detail_view,
     property_download_document_view,
+    property_edit_view,
     property_favorite_toggle_view,
     property_validate_step_view,
-    property_delete_view,
-    validate_phone_view,
     validate_cnic_view,
+    validate_phone_view,
 )
 
 app_name = "properties"

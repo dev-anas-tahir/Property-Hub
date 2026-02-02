@@ -3,9 +3,10 @@ This module contains validation utilities and forms for user-related operations.
 """
 
 import string
+
 from django import forms
-from django.core.exceptions import ValidationError
 from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
 
 # Get the user model dynamically
 User = get_user_model()

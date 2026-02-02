@@ -3,8 +3,9 @@ This module contains admin configurations for user-related models.
 """
 
 from django.contrib import admin
-from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth import get_user_model
+from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+
 from apps.properties.models import Favorite
 
 User = get_user_model()
