@@ -3,12 +3,17 @@ This module contains views for property-related operations.
 All interactive functionality is handled by HTMX and Alpine.js.
 """
 
+import logging
+
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, render, redirect
-from django.core.exceptions import PermissionDenied
+from django.core.exceptions import PermissionDenied, ValidationError
 from django.core.paginator import Paginator
 from apps.properties.models import Property, PropertyImage
 from apps.properties.utils import handle_document_download
+
+
+logger = logging.getLogger(__name__)
 
 
 def properties_list_view(request):
@@ -238,8 +243,17 @@ def property_edit_view(request, pk):
                         return redirect("properties:detail", pk=property_obj.pk)
 
             except Exception as e:
-                # If any error occurs during save, add error message
-                form.add_error(None, f"Error updating property: {str(e)}")
+                # Log the error server-side
+                logger.error(
+                    f"Error updating property {property_obj.pk}: {str(e)}",
+                    exc_info=True,
+                )
+
+                # Show generic error to user
+                form.add_error(
+                    None,
+                    "An error occurred while updating the property. Please try again.",
+                )
 
         # If form is invalid or save failed, return form with errors
         context = {
@@ -385,8 +399,13 @@ def property_create_view(request):
                         return redirect("properties:detail", pk=property_obj.pk)
 
             except Exception as e:
-                # If any error occurs during save, add error message
-                form.add_error(None, f"Error saving property: {str(e)}")
+                # Log the error server-side
+                logger.error(f"Error creating property: {str(e)}", exc_info=True)
+                # Show generic error to user
+                form.add_error(
+                    None,
+                    "An error occurred while creating the property. Please try again.",
+                )
 
         # If form is invalid or save failed, return form with errors
         context = {

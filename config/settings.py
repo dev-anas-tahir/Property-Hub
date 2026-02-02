@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "axes",
+    "storages",
     # Custom Apps
     "apps.shared.apps.SharedConfig",
     "apps.users.apps.UsersConfig",
@@ -123,8 +124,28 @@ AXES_LOCKOUT_TEMPLATE = None
 AXES_LOCKOUT_URL = None
 AXES_VERBOSE = True
 
+# AWS S3 Configuration (LocalStack for both dev and prod)
+AWS_HOST_NAME = env("AWS_HOST_NAME", "localhost")
+AWS_ACCESS_KEY_ID = env("AWS_ACCESS_KEY_ID")
+AWS_SECRET_ACCESS_KEY = env("AWS_SECRET_ACCESS_KEY")
+AWS_STORAGE_BUCKET_NAME = env("AWS_STORAGE_BUCKET_NAME")
+AWS_S3_ENDPOINT_URL = f"http://{AWS_HOST_NAME}:4566"
+AWS_S3_CUSTOM_DOMAIN = f"{AWS_HOST_NAME}:4566/{AWS_STORAGE_BUCKET_NAME}"
+AWS_S3_FILE_OVERWRITE = True
+AWS_DEFAULT_ACL = None
+AWS_S3_VERIFY = False
+AWS_QUERYSTRING_AUTH = DEBUG
+
+STORAGES = {
+    "default": {
+        "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
+    },
+    "staticfiles": {
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+    },
+}
+
 if DEBUG:
-    MEDIA_ROOT = BASE_DIR / "media"
     INSTALLED_APPS += ["debug_toolbar", "django_extensions"]
     MIDDLEWARE.insert(
         MIDDLEWARE.index("django.middleware.security.SecurityMiddleware") + 1,
@@ -132,40 +153,44 @@ if DEBUG:
     )
     INTERNAL_IPS = ["127.0.0.1"]
 
-    STORAGES = {
-        "default": {
-            "BACKEND": "django.core.files.storage.FileSystemStorage",
-        },
-        "staticfiles": {
-            "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
-        },
-    }
-else:
-    INSTALLED_APPS += ["storages"]
-
-    AWS_ACCESS_KEY_ID = env("AWS_ACCESS_KEY_ID")
-    AWS_SECRET_ACCESS_KEY = env("AWS_SECRET_ACCESS_KEY")
-    AWS_STORAGE_BUCKET_NAME = env("AWS_STORAGE_BUCKET_NAME")
-    AWS_S3_ENDPOINT_URL = "http://localstack:4566"
-    AWS_S3_CUSTOM_DOMAIN = f"localhost:4566/{AWS_STORAGE_BUCKET_NAME}"
-    # AWS_S3_CUSTOM_DOMAIN = f"mediapropety.loca.lt/{AWS_STORAGE_BUCKET_NAME}"
-    AWS_S3_FILE_OVERWRITE = True
-    AWS_DEFAULT_ACL = None
-    AWS_S3_VERIFY = False
-
-    STORAGES = {
-        "default": {
-            "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
-        },
-        "staticfiles": {
-            "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
-        },
-    }
-
 MESSAGE_TAGS = {
     messages.DEBUG: "alert-info",
     messages.INFO: "alert-info",
     messages.SUCCESS: "alert-success",
     messages.WARNING: "alert-warning",
     messages.ERROR: "alert-danger",
+}
+
+# Logging configuration
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "verbose": {
+            "format": "{levelname} {asctime} {module} {message}",
+            "style": "{",
+        },
+    },
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "formatter": "verbose",
+        },
+    },
+    "root": {
+        "handlers": ["console"],
+        "level": "INFO",
+    },
+    "loggers": {
+        "apps.properties": {
+            "handlers": ["console"],
+            "level": "ERROR",
+            "propagate": False,
+        },
+        "django": {
+            "handlers": ["console"],
+            "level": "INFO",
+            "propagate": False,
+        },
+    },
 }
