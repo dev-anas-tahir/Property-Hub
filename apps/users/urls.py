@@ -10,7 +10,6 @@ from apps.users.views import (
     profile_edit_view,
     logout_view,
     password_change_view,
-    validate_username_view,
     validate_email_view,
 )
 
@@ -24,6 +23,5 @@ urlpatterns = [
     path("logout/", logout_view, name="logout"),
     path("password_change/", password_change_view, name="password_change"),
     # Validation endpoints
-    path("validate/username/", validate_username_view, name="validate_username"),
     path("validate/email/", validate_email_view, name="validate_email"),
 ]

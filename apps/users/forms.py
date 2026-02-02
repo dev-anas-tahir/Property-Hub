@@ -5,7 +5,10 @@ This module contains validation utilities and forms for user-related operations.
 import string
 from django import forms
 from django.core.exceptions import ValidationError
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
+
+# Get the user model dynamically
+User = get_user_model()
 
 
 def validate_password_strength(password: str):
@@ -30,21 +33,21 @@ def validate_password_strength(password: str):
 
 class LoginForm(forms.Form):
     """
-    Form for user login with username and password.
+    Form for user login with email and password.
     """
 
-    username = forms.CharField(
-        max_length=150,
+    email = forms.EmailField(
         required=True,
-        widget=forms.TextInput(
+        widget=forms.EmailInput(
             attrs={
                 "class": "form-control",
-                "placeholder": "Enter your username",
-                "autocomplete": "username",
+                "placeholder": "Enter your email address",
+                "autocomplete": "email",
             }
         ),
         error_messages={
-            "required": "Username is required.",
+            "required": "Email is required.",
+            "invalid": "Enter a valid email address.",
         },
     )
 
@@ -62,33 +65,18 @@ class LoginForm(forms.Form):
         },
     )
 
-    def clean_username(self):
-        """Clean and validate username field."""
-        username = self.cleaned_data.get("username")
-        if username:
-            username = username.strip()
-        return username
+    def clean_email(self):
+        """Clean and validate email field."""
+        email = self.cleaned_data.get("email")
+        if email:
+            email = email.strip().lower()
+        return email
 
 
 class SignupForm(forms.Form):
     """
     Form for user registration with validation.
     """
-
-    username = forms.CharField(
-        max_length=150,
-        required=True,
-        widget=forms.TextInput(
-            attrs={
-                "class": "form-control",
-                "placeholder": "Choose a username",
-                "autocomplete": "username",
-            }
-        ),
-        error_messages={
-            "required": "Username is required.",
-        },
-    )
 
     email = forms.EmailField(
         required=True,
@@ -163,16 +151,6 @@ class SignupForm(forms.Form):
         },
         label="Confirm Password",
     )
-
-    def clean_username(self):
-        """Validate username availability."""
-        username = self.cleaned_data.get("username")
-        if username:
-            username = username.strip()
-            # Check if username already exists
-            if User.objects.filter(username=username).exists():
-                raise ValidationError("This username is already taken.")
-        return username
 
     def clean_email(self):
         """Validate email uniqueness."""
