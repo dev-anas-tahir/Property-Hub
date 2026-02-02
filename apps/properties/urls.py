@@ -21,7 +21,9 @@ urlpatterns = [
     path("", properties_list_view, name="list"),
     path("<int:pk>/", property_detail_view, name="detail"),
     path("<int:pk>/edit/", property_edit_view, name="edit"),
-    path("<int:pk>/download/", property_download_document_view, name="download_document"),
+    path(
+        "<int:pk>/download/", property_download_document_view, name="download_document"
+    ),
     path("<int:pk>/favorite/", property_favorite_toggle_view, name="favorite_toggle"),
     path("<int:pk>/delete/", property_delete_view, name="delete"),
     path("myprops/", my_properties_list_view, name="myprops"),

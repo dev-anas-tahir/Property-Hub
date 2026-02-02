@@ -278,12 +278,12 @@ def my_properties_list_view(request):
 @login_required
 def favorites_list_view(request):
     """Display user's favorite properties with pagination.
-    
+
     All properties in this view are favorited by definition,
     so we set is_favorited=True for each property.
     """
     from apps.properties.models import Favorite
-    
+
     # Get favorited properties with related data for optimization
     favorite_properties = (
         Property.objects.filter(favorited_by__user=request.user)
@@ -291,24 +291,25 @@ def favorites_list_view(request):
         .select_related("user")
         .prefetch_related("images")
     )
-    
+
     # Get page number from query parameters
     page_number = request.GET.get("page", 1)
-    
+
     # Create paginator (10 items per page)
     from django.core.paginator import Paginator
+
     paginator = Paginator(favorite_properties, 10)
     page_obj = paginator.get_page(page_number)
-    
+
     # Set is_favorited=True for all properties (they're all favorites)
     for prop in page_obj.object_list:
         prop.is_favorited = True
-    
+
     context = {
         "properties": page_obj.object_list,
         "page_obj": page_obj,
     }
-    
+
     return render(request, "properties/favorites.html", context)
 
 
@@ -459,35 +460,35 @@ def property_validate_step_view(request):
     """Validate a specific step of the property form via AJAX."""
     from django.http import JsonResponse
     from apps.properties.forms import PropertyForm
-    
+
     if request.method != "POST":
         return JsonResponse({"error": "Method not allowed"}, status=405)
-    
-    step = request.POST.get('step')
+
+    step = request.POST.get("step")
     if not step:
         return JsonResponse({"error": "Step parameter required"}, status=400)
-    
+
     # Create form instance with POST data
     form = PropertyForm(request.POST, request.FILES)
-    
+
     # Define which fields belong to each step
     step_fields = {
-        '1': ['name', 'property_type', 'price', 'full_address'],
-        '2': ['bedrooms', 'bathrooms', 'area', 'phone_number', 'cnic'],
-        '3': [],  # Images step - no validation needed
-        '4': []   # Review step - no validation needed
+        "1": ["name", "property_type", "price", "full_address"],
+        "2": ["bedrooms", "bathrooms", "area", "phone_number", "cnic"],
+        "3": [],  # Images step - no validation needed
+        "4": [],  # Review step - no validation needed
     }
-    
+
     if step not in step_fields:
         return JsonResponse({"error": "Invalid step"}, status=400)
-    
+
     # Get fields for this step
     fields_to_validate = step_fields[step]
-    
+
     # Check if step has any fields to validate
     if not fields_to_validate:
         return JsonResponse({"valid": True})
-    
+
     # Validate only the fields for this step
     errors = {}
     for field_name in fields_to_validate:
@@ -495,45 +496,47 @@ def property_validate_step_view(request):
             errors[field_name] = form.errors[field_name]
         elif field_name in form.fields and form.fields[field_name].required:
             # Check if required field is empty
-            value = request.POST.get(field_name, '').strip()
+            value = request.POST.get(field_name, "").strip()
             if not value:
                 errors[field_name] = [f"This field is required."]
-    
+
     # Run custom field validation for this step
     try:
-        if step == '1':
+        if step == "1":
             # Validate step 1 fields
-            if 'price' in fields_to_validate and 'price' not in errors:
+            if "price" in fields_to_validate and "price" not in errors:
                 form.clean_price()
-        elif step == '2':
+        elif step == "2":
             # Validate step 2 fields - phone and CNIC have custom validators
-            if 'phone_number' in fields_to_validate and 'phone_number' not in errors:
+            if "phone_number" in fields_to_validate and "phone_number" not in errors:
                 try:
-                    phone_value = request.POST.get('phone_number', '').strip()
+                    phone_value = request.POST.get("phone_number", "").strip()
                     if phone_value:
                         from apps.properties.validations import phone_validator
+
                         phone_validator(phone_value)
                 except ValidationError as e:
-                    errors['phone_number'] = [str(e)]
-            
-            if 'cnic' in fields_to_validate and 'cnic' not in errors:
+                    errors["phone_number"] = [str(e)]
+
+            if "cnic" in fields_to_validate and "cnic" not in errors:
                 try:
-                    cnic_value = request.POST.get('cnic', '').strip()
+                    cnic_value = request.POST.get("cnic", "").strip()
                     if cnic_value:
                         from apps.properties.validations import cnic_validator
+
                         cnic_validator(cnic_value)
                 except ValidationError as e:
-                    errors['cnic'] = [str(e)]
-                    
+                    errors["cnic"] = [str(e)]
+
     except ValidationError as e:
         # Handle any validation errors from clean methods
-        if hasattr(e, 'error_dict'):
+        if hasattr(e, "error_dict"):
             for field, field_errors in e.error_dict.items():
                 if field in fields_to_validate:
                     errors[field] = [str(err) for err in field_errors]
         else:
-            errors['__all__'] = [str(e)]
-    
+            errors["__all__"] = [str(e)]
+
     if errors:
         return JsonResponse({"valid": False, "errors": errors})
     else:

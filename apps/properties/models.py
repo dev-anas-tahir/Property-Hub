@@ -19,6 +19,7 @@ from django.db.models import Q, UniqueConstraint, Index
 from django.urls import reverse
 from apps.properties.validations import phone_validator, cnic_validator
 
+
 class PublishedManager(models.Manager):
     """Manager that returns only published properties."""
 
@@ -40,7 +41,11 @@ def property_image_upload_path(instance: "PropertyImage", filename: str) -> str:
 
     Safe to call before the related Property is saved by using property_id.
     """
-    prop_id = getattr(instance, "property_id", None) or getattr(instance.property, "id", None) or "temp"
+    prop_id = (
+        getattr(instance, "property_id", None)
+        or getattr(instance.property, "id", None)
+        or "temp"
+    )
     return f"properties/images/{prop_id}/{filename}"
 
 
@@ -65,15 +70,21 @@ class Property(models.Model):
     price = models.DecimalField(
         max_digits=12, decimal_places=2, validators=[MinValueValidator(0)]
     )
-    bedrooms = models.PositiveIntegerField(blank=True, null=True, help_text="Number of bedrooms")
-    bathrooms = models.PositiveIntegerField(blank=True, null=True, help_text="Number of bathrooms")
+    bedrooms = models.PositiveIntegerField(
+        blank=True, null=True, help_text="Number of bedrooms"
+    )
+    bathrooms = models.PositiveIntegerField(
+        blank=True, null=True, help_text="Number of bathrooms"
+    )
     area = models.DecimalField(
-        max_digits=10, decimal_places=2, blank=True, null=True,
-        validators=[MinValueValidator(0)], help_text="Property area in square feet"
+        max_digits=10,
+        decimal_places=2,
+        blank=True,
+        null=True,
+        validators=[MinValueValidator(0)],
+        help_text="Property area in square feet",
     )
-    documents = models.FileField(
-        upload_to=documents_upload_path, blank=True, null=True
-    )
+    documents = models.FileField(upload_to=documents_upload_path, blank=True, null=True)
     is_published = models.BooleanField(default=False, db_index=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -84,7 +95,7 @@ class Property(models.Model):
     class Meta:
         verbose_name_plural = "Properties"
         ordering = ["-created_at"]
-        indexes = [Index(fields=["created_at"]), Index(fields=["price"]) ]
+        indexes = [Index(fields=["created_at"]), Index(fields=["price"])]
 
     def __str__(self) -> str:  # pragma: no cover - simple representation
         return self.name
@@ -122,7 +133,11 @@ def property_image_upload_path(instance: "PropertyImage", filename: str) -> str:
 
     Safe to call before the related Property is saved by using property_id.
     """
-    prop_id = getattr(instance, "property_id", None) or getattr(instance.property, "id", None) or "temp"
+    prop_id = (
+        getattr(instance, "property_id", None)
+        or getattr(instance.property, "id", None)
+        or "temp"
+    )
     return f"properties/images/{prop_id}/{filename}"
 
 
@@ -143,7 +158,9 @@ class PropertyImage(models.Model):
         constraints = [
             # Ensure only one primary image per property at the DB level
             UniqueConstraint(
-                fields=["property"], condition=Q(is_primary=True), name="one_primary_image_per_property"
+                fields=["property"],
+                condition=Q(is_primary=True),
+                name="one_primary_image_per_property",
             )
         ]
 
@@ -154,7 +171,9 @@ class PropertyImage(models.Model):
         """If marked primary, unset other primary flags for the same property before saving."""
         if self.is_primary:
             # Use filter by property_id to avoid extra joins when possible
-            PropertyImage.objects.filter(property_id=self.property_id, is_primary=True).exclude(pk=self.pk).update(is_primary=False)
+            PropertyImage.objects.filter(
+                property_id=self.property_id, is_primary=True
+            ).exclude(pk=self.pk).update(is_primary=False)
         super().save(*args, **kwargs)
 
 
@@ -162,7 +181,9 @@ class Favorite(models.Model):
     """Model representing a favorite property."""
 
     user = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="user_favorites"
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="user_favorites",
     )
     property = models.ForeignKey(
         Property, on_delete=models.CASCADE, related_name="favorited_by"
@@ -171,7 +192,9 @@ class Favorite(models.Model):
 
     class Meta:
         constraints = [
-            UniqueConstraint(fields=["user", "property"], name="unique_user_property_favorite")
+            UniqueConstraint(
+                fields=["user", "property"], name="unique_user_property_favorite"
+            )
         ]
         ordering = ["-favorited_at"]
 

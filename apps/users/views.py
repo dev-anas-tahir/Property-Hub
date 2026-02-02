@@ -59,7 +59,9 @@ def signup_view(request):
 
         # Return form with errors
         context = {"form": form}
-        template = "_components/forms/signup_form.html" if is_htmx else "users/signup.html"
+        template = (
+            "_components/forms/signup_form.html" if is_htmx else "users/signup.html"
+        )
         return render(request, template, context)
 
     # GET request
@@ -151,7 +153,9 @@ def login_view(request):
 
         # Return form with errors
         context = {"form": form}
-        template = "_components/forms/login_form.html" if is_htmx else "users/login.html"
+        template = (
+            "_components/forms/login_form.html" if is_htmx else "users/login.html"
+        )
         return render(request, template, context)
 
     # GET request
@@ -215,7 +219,9 @@ def profile_edit_view(request):
         user=request.user,
     )
     context = {"form": form}
-    template = "_components/forms/profile_form.html" if is_htmx else "users/profile.html"
+    template = (
+        "_components/forms/profile_form.html" if is_htmx else "users/profile.html"
+    )
     return render(request, template, context)
 
 

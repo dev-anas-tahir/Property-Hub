@@ -5,15 +5,21 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('properties', '0003_rename_properties_property_created_at_idx_properties__created_72ecc3_idx_and_more'),
+        (
+            "properties",
+            "0003_rename_properties_property_created_at_idx_properties__created_72ecc3_idx_and_more",
+        ),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='property',
-            name='documents',
-            field=models.FileField(blank=True, null=True, upload_to=apps.properties.models.documents_upload_path),
+            model_name="property",
+            name="documents",
+            field=models.FileField(
+                blank=True,
+                null=True,
+                upload_to=apps.properties.models.documents_upload_path,
+            ),
         ),
     ]

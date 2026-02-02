@@ -6,35 +6,49 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('properties', '0004_alter_property_documents'),
+        ("properties", "0004_alter_property_documents"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='property',
-            name='area',
-            field=models.DecimalField(blank=True, decimal_places=2, help_text='Property area in square feet', max_digits=10, null=True, validators=[django.core.validators.MinValueValidator(0)]),
+            model_name="property",
+            name="area",
+            field=models.DecimalField(
+                blank=True,
+                decimal_places=2,
+                help_text="Property area in square feet",
+                max_digits=10,
+                null=True,
+                validators=[django.core.validators.MinValueValidator(0)],
+            ),
         ),
         migrations.AddField(
-            model_name='property',
-            name='bathrooms',
-            field=models.PositiveIntegerField(blank=True, help_text='Number of bathrooms', null=True),
+            model_name="property",
+            name="bathrooms",
+            field=models.PositiveIntegerField(
+                blank=True, help_text="Number of bathrooms", null=True
+            ),
         ),
         migrations.AddField(
-            model_name='property',
-            name='bedrooms',
-            field=models.PositiveIntegerField(blank=True, help_text='Number of bedrooms', null=True),
+            model_name="property",
+            name="bedrooms",
+            field=models.PositiveIntegerField(
+                blank=True, help_text="Number of bedrooms", null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='property',
-            name='description',
+            model_name="property",
+            name="description",
             field=models.TextField(blank=True),
         ),
         migrations.AlterField(
-            model_name='property',
-            name='documents',
-            field=models.FileField(blank=True, null=True, upload_to=apps.properties.models.documents_upload_path),
+            model_name="property",
+            name="documents",
+            field=models.FileField(
+                blank=True,
+                null=True,
+                upload_to=apps.properties.models.documents_upload_path,
+            ),
         ),
     ]

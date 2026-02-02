@@ -43,7 +43,7 @@ class FavoriteInlineForProperty(admin.TabularInline):
     verbose_name = "User who favorited"
     verbose_name_plural = "Users who favorited this property"
     show_change_link = False
-    
+
     def has_add_permission(self, request, obj=None):
         return False
 

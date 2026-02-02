@@ -8,7 +8,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
@@ -17,52 +16,131 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='Property',
+            name="Property",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=255)),
-                ('full_address', models.CharField(max_length=255)),
-                ('phone_number', models.CharField(max_length=14)),
-                ('cnic', models.CharField(max_length=15)),
-                ('property_type', models.CharField(choices=[('House', 'House'), ('Plot', 'Plot')], max_length=10)),
-                ('description', models.TextField()),
-                ('price', models.DecimalField(decimal_places=0, max_digits=10, validators=[django.core.validators.MinValueValidator(0)])),
-                ('documents', models.FileField(blank=True, null=True, upload_to='properties/documents/')),
-                ('is_published', models.BooleanField(default=False)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='properties', to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=255)),
+                ("full_address", models.CharField(max_length=255)),
+                ("phone_number", models.CharField(max_length=14)),
+                ("cnic", models.CharField(max_length=15)),
+                (
+                    "property_type",
+                    models.CharField(
+                        choices=[("House", "House"), ("Plot", "Plot")], max_length=10
+                    ),
+                ),
+                ("description", models.TextField()),
+                (
+                    "price",
+                    models.DecimalField(
+                        decimal_places=0,
+                        max_digits=10,
+                        validators=[django.core.validators.MinValueValidator(0)],
+                    ),
+                ),
+                (
+                    "documents",
+                    models.FileField(
+                        blank=True, null=True, upload_to="properties/documents/"
+                    ),
+                ),
+                ("is_published", models.BooleanField(default=False)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                (
+                    "user",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="properties",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={
-                'verbose_name_plural': 'Properties',
-                'ordering': ['-created_at'],
+                "verbose_name_plural": "Properties",
+                "ordering": ["-created_at"],
             },
         ),
         migrations.CreateModel(
-            name='PropertyImage',
+            name="PropertyImage",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('image', models.ImageField(upload_to=apps.properties.models.property_image_upload_path)),
-                ('uploaded_at', models.DateTimeField(auto_now_add=True)),
-                ('is_primary', models.BooleanField(default=False, help_text='Mark as primary image')),
-                ('property', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='images', to='properties.property')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "image",
+                    models.ImageField(
+                        upload_to=apps.properties.models.property_image_upload_path
+                    ),
+                ),
+                ("uploaded_at", models.DateTimeField(auto_now_add=True)),
+                (
+                    "is_primary",
+                    models.BooleanField(
+                        default=False, help_text="Mark as primary image"
+                    ),
+                ),
+                (
+                    "property",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="images",
+                        to="properties.property",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Property Image',
-                'verbose_name_plural': 'Property Images',
-                'ordering': ['-is_primary', 'uploaded_at'],
+                "verbose_name": "Property Image",
+                "verbose_name_plural": "Property Images",
+                "ordering": ["-is_primary", "uploaded_at"],
             },
         ),
         migrations.CreateModel(
-            name='Favorite',
+            name="Favorite",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('favorited_at', models.DateTimeField(auto_now_add=True)),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='user_favorites', to=settings.AUTH_USER_MODEL)),
-                ('property', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='favorited_by', to='properties.property')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("favorited_at", models.DateTimeField(auto_now_add=True)),
+                (
+                    "user",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="user_favorites",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    "property",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="favorited_by",
+                        to="properties.property",
+                    ),
+                ),
             ],
             options={
-                'ordering': ['-favorited_at'],
-                'unique_together': {('user', 'property')},
+                "ordering": ["-favorited_at"],
+                "unique_together": {("user", "property")},
             },
         ),
     ]
