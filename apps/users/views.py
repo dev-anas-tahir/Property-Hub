@@ -3,17 +3,20 @@ This module contains views for user-related operations such as
 signing up, logging in, and profile management within the Property Hub application.
 """
 
-from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login as auth_login, logout
-from django.contrib.auth.decorators import login_required
-from django.contrib import messages
-from django.http import HttpResponse
-from django.urls import reverse
-from django.conf import settings
-from django.contrib.auth.models import User
 from axes.handlers.proxy import AxesProxyHandler
+from django.conf import settings
+from django.contrib import messages
+from django.contrib.auth import authenticate, get_user_model, logout
+from django.contrib.auth import login as auth_login
+from django.contrib.auth.decorators import login_required
+from django.http import HttpResponse
+from django.shortcuts import redirect, render
+from django.urls import reverse
 
-from apps.users.forms import LoginForm, SignupForm, ProfileForm
+from apps.users.forms import LoginForm, ProfileForm, SignupForm
+
+# Get the user model dynamically
+User = get_user_model()
 
 
 def signup_view(request):
@@ -31,7 +34,6 @@ def signup_view(request):
         if form.is_valid():
             # Create new user
             user = User.objects.create_user(
-                username=form.cleaned_data["username"],
                 email=form.cleaned_data["email"],
                 password=form.cleaned_data["password1"],
                 first_name=form.cleaned_data["first_name"],
@@ -106,11 +108,11 @@ def login_view(request):
             return render(request, template, context)
 
         if form.is_valid():
-            username = form.cleaned_data["username"]
+            email = form.cleaned_data["email"]
             password = form.cleaned_data["password"]
 
             # Authenticate user
-            user = authenticate(request, username=username, password=password)
+            user = authenticate(request, username=email, password=password)
 
             if user is not None:
                 if user.is_active:
@@ -120,7 +122,7 @@ def login_view(request):
                         backend="django.contrib.auth.backends.ModelBackend",
                     )
                     messages.success(
-                        request, f"Welcome back, {user.first_name or user.username}!"
+                        request, f"Welcome back, {user.first_name or user.email}!"
                     )
 
                     if is_htmx:
@@ -149,7 +151,7 @@ def login_view(request):
                         error_msg = "Too many failed login attempts. Your account has been temporarily locked."
                     form.add_error(None, error_msg)
                 else:
-                    form.add_error(None, "Invalid username or password.")
+                    form.add_error(None, "Invalid email or password.")
 
         # Return form with errors
         context = {"form": form}
@@ -235,29 +237,6 @@ def logout_view(request):
     """Custom logout view that redirects home after logout."""
     logout(request)
     return redirect("properties:list")
-
-
-def validate_username_view(request):
-    """Validate username availability for real-time feedback.
-
-    Handles POST requests with username parameter.
-    Returns error message HTML or empty response.
-    """
-    if request.method != "POST":
-        return HttpResponse("", status=200)
-
-    username = request.POST.get("username", "").strip()
-
-    if not username:
-        return HttpResponse("", status=200)
-
-    # Check if username already exists
-    if User.objects.filter(username=username).exists():
-        error_html = '<div class="invalid-feedback d-block">This username is already taken.</div>'
-        return HttpResponse(error_html, status=200)
-
-    # Username is available - return empty response
-    return HttpResponse("", status=200)
 
 
 def validate_email_view(request):

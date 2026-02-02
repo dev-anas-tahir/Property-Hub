@@ -1,11 +1,11 @@
 """Base settings for the Property-Hub project."""
 
-import dj_database_url
-
-from environs import Env
-from pathlib import Path
 from datetime import timedelta
+from pathlib import Path
+
+import dj_database_url
 from django.contrib import messages
+from environs import Env
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -42,9 +42,9 @@ INSTALLED_APPS = [
     "axes",
     "storages",
     # Custom Apps
+    "apps.properties.apps.PropertiesConfig",
     "apps.shared.apps.SharedConfig",
     "apps.users.apps.UsersConfig",
-    "apps.properties.apps.PropertiesConfig",
 ]
 
 MIDDLEWARE = [
@@ -123,6 +123,7 @@ AXES_DISABLE_ACCESS_LOG = False
 AXES_LOCKOUT_TEMPLATE = None
 AXES_LOCKOUT_URL = None
 AXES_VERBOSE = True
+AXES_USERNAME_FORM_FIELD = "email"  # Use email field for axes tracking
 
 # AWS S3 Configuration (LocalStack for both dev and prod)
 AWS_HOST_NAME = env("AWS_HOST_NAME", "localhost")
@@ -144,6 +145,9 @@ STORAGES = {
         "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
     },
 }
+
+# Custom User Model
+AUTH_USER_MODEL = "users.User"
 
 if DEBUG:
     INSTALLED_APPS += ["debug_toolbar", "django_extensions"]

@@ -2,8 +2,9 @@
 
 from django import forms
 from django.core.exceptions import ValidationError
+
 from apps.properties.models import Property, PropertyImage
-from apps.properties.validations import phone_validator, cnic_validator
+from apps.properties.validations import cnic_validator, phone_validator
 
 
 class PropertyForm(forms.ModelForm):

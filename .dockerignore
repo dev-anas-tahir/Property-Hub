@@ -39,3 +39,14 @@ docker-compose.dev.yml
 # UV cache directories
 .uv-cache/
 .uv/
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+
+# Tools generates
+.kiro/
+.ruff_cache/

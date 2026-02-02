@@ -15,9 +15,10 @@ from typing import Optional
 from django.conf import settings
 from django.core.validators import MinValueValidator
 from django.db import models
-from django.db.models import Q, UniqueConstraint, Index
+from django.db.models import Index, Q, UniqueConstraint
 from django.urls import reverse
-from apps.properties.validations import phone_validator, cnic_validator
+
+from apps.properties.validations import cnic_validator, phone_validator
 
 
 class PublishedManager(models.Manager):
@@ -117,28 +118,6 @@ class Property(models.Model):
     def primary_image(self) -> Optional["PropertyImage"]:
         """Return the primary image for this property, or the first image if none marked primary."""
         return self.images.filter(is_primary=True).first() or self.images.first()
-
-
-def documents_upload_path(instance: Property, filename: str) -> str:
-    """Generate upload path for property documents.
-
-    Use instance.id when available; fall back to 'temp' so file uploads won't error for unsaved instances.
-    """
-    pid = getattr(instance, "id", None) or "temp"
-    return f"properties/documents/{pid}/{filename}"
-
-
-def property_image_upload_path(instance: "PropertyImage", filename: str) -> str:
-    """Generate upload path for property images.
-
-    Safe to call before the related Property is saved by using property_id.
-    """
-    prop_id = (
-        getattr(instance, "property_id", None)
-        or getattr(instance.property, "id", None)
-        or "temp"
-    )
-    return f"properties/images/{prop_id}/{filename}"
 
 
 class PropertyImage(models.Model):

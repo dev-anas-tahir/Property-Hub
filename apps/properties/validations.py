@@ -1,9 +1,6 @@
 """Validators for property-related fields."""
 
-import re
-from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
-
 
 # Phone number validator - Format: +92-3001234567
 phone_validator = RegexValidator(
