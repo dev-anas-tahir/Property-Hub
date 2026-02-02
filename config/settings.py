@@ -5,6 +5,7 @@ from pathlib import Path
 
 import dj_database_url
 from django.contrib import messages
+from django.templatetags.static import static
 from environs import Env
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -33,6 +34,7 @@ CSRF_TRUSTED_ORIGINS = [
 ]
 
 INSTALLED_APPS = [
+    "unfold",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -195,6 +197,35 @@ LOGGING = {
             "handlers": ["console"],
             "level": "INFO",
             "propagate": False,
+        },
+    },
+}
+
+UNFOLD = {
+    "SITE_TITLE": "PropertyHub Admin",
+    "SITE_HEADER": "PropertyHub",
+    "SHOW_HISTORY": True,
+    "SHOW_VIEW_ON_SITE": True,
+    "SITE_FAVICONS": [
+        {
+            "rel": "icon",
+            "sizes": "32x32",
+            "type": "image/svg+xml",
+            "href": lambda request: static("images/favicon.svg"),
+        },
+    ],
+    "COLORS": {
+        "primary": {
+            "50": "250 245 255",
+            "100": "243 244 255",
+            "200": "216 207 255",
+            "300": "192 190 255",
+            "400": "165 155 255",
+            "500": "139 122 255",
+            "600": "120 84 255",
+            "700": "102 58 255",
+            "800": "85 36 255",
+            "900": "70 13 255",
         },
     },
 }
