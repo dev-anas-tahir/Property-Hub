@@ -64,7 +64,7 @@ Property-Hub/
 ├── docker-compose.*.yml     # Docker compose configs
 ├── tailwind.config.js       # Tailwind configuration
 ├── pyproject.toml           # Python dependencies
-└── Makefile                 # Development commands
+└── justfile                 # Development commands
 ```
 
 ### Design Patterns
@@ -112,7 +112,7 @@ Property-Hub/
 3. **Install dependencies**
    ```bash
    # Install Python dependencies
-   make build
+   just build
    
    # Install Node dependencies
    npm install
@@ -120,7 +120,7 @@ Property-Hub/
 
 4. **Run database migrations**
    ```bash
-   make migrate
+   just migrate
    ```
 
 5. **Build Tailwind CSS**
@@ -134,7 +134,7 @@ Property-Hub/
 
 6. **Start development server**
    ```bash
-   make runserver
+   just runserver
    ```
 
 7. **Access the application**
@@ -155,13 +155,19 @@ docker-compose -f docker-compose.dev.yml up --build
 
 ## 🔧 Development Commands
 
-### Make Commands
+### Just Commands
 
 | Command | Description |
 |---------|-------------|
-| `make build` | Install Python dependencies |
-| `make migrate` | Run migrations and collect static files |
-| `make runserver` | Start Django development server |
+| `just build` | Install Python dependencies |
+| `just migrate` | Apply Django migrations |
+| `just makemigrations` | Create new Django migrations |
+| `just runserver [port]` | Start Django development server (default port: 8000) |
+| `just up` | Start development services with Docker |
+| `just down` | Stop development services |
+| `just prod-up` | Start production services with Docker |
+| `just prod-down` | Stop production services |
+| `just help` | Show all available commands |
 
 ### NPM Commands
 
