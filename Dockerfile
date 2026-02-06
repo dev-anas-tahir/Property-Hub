@@ -1,5 +1,5 @@
 # Production Dockerfile
-FROM python:3.12-slim
+FROM python:3.13-slim
 
 # Install UV
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /bin/uv
@@ -7,6 +7,24 @@ COPY --from=ghcr.io/astral-sh/uv:latest /uv /bin/uv
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 ENV DJANGO_SETTINGS_MODULE=config.settings
+
+# Accept build arguments for collectstatic
+ARG SECRET_KEY
+ARG DEBUG=False
+ARG ALLOWED_HOSTS=localhost
+ARG DATABASE_URL
+ARG AWS_ACCESS_KEY_ID
+ARG AWS_SECRET_ACCESS_KEY
+ARG AWS_STORAGE_BUCKET_NAME
+
+# Set environment variables from build args
+ENV SECRET_KEY=${SECRET_KEY}
+ENV DEBUG=${DEBUG}
+ENV ALLOWED_HOSTS=${ALLOWED_HOSTS}
+ENV DATABASE_URL=${DATABASE_URL}
+ENV AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+ENV AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+ENV AWS_STORAGE_BUCKET_NAME=${AWS_STORAGE_BUCKET_NAME}
 
 WORKDIR /app
 
@@ -20,7 +38,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY pyproject.toml uv.lock /app/
 
 # Install production dependencies only (no dev dependencies)
-RUN uv sync --frozen --without dev
+RUN uv sync --frozen --no-dev
 
 # Copy application code
 COPY . /app/

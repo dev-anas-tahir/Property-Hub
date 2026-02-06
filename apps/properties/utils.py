@@ -3,6 +3,7 @@ This module contains utility functions for property-related operations.
 """
 
 import os
+from typing import Union
 
 from django.contrib import messages
 from django.http import FileResponse, HttpResponseForbidden
@@ -10,7 +11,9 @@ from django.http import FileResponse, HttpResponseForbidden
 from apps.properties.models import Property
 
 
-def handle_document_download(request, property_obj: Property) -> FileResponse:
+def handle_document_download(
+    request, property_obj: Property
+) -> Union[FileResponse, HttpResponseForbidden]:
     """
     Handle document download with permission checks and file response.
     """
@@ -23,7 +26,7 @@ def handle_document_download(request, property_obj: Property) -> FileResponse:
     return FileResponse(
         property_obj.documents,
         as_attachment=True,
-        filename=os.path.basename(property_obj.documents.name),
+        filename=os.path.basename(str(property_obj.documents.name)),
     )
 
 

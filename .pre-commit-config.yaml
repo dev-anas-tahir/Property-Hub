@@ -1,0 +1,31 @@
+repos:
+  # Pre-commit built-in hooks for file hygiene
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-json
+      - id: check-toml
+      - id: check-added-large-files
+        args: [--maxkb=1000]
+      - id: detect-private-key
+      - id: check-merge-conflict
+      - id: mixed-line-ending
+
+  # Ruff: lint + format + isort (import sorting)
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.15.0
+    hooks:
+      - id: ruff
+        args: [--fix, --exit-non-zero-on-fix]  # auto-fix lint/import issues
+        types_or: [python, pyi]
+      - id: ruff-format  # separate hook for formatting (runs after lint fixes)
+
+  # Optional: uv sync / lock on commit (keeps uv.lock up-to-date if deps change)
+  - repo: https://github.com/astral-sh/uv-pre-commit
+    rev: 0.9.30  # check latest at https://github.com/astral-sh/uv-pre-commit/releases
+    hooks:
+      - id: uv-lock
+        # Only runs if pyproject.toml or uv.toml changed

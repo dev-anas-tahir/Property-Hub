@@ -20,7 +20,7 @@ if Path(BASE_DIR / ".env.dev").exists():
 elif Path(BASE_DIR / ".env.prod").exists():
     env.read_env(BASE_DIR / ".env.prod", override=True)
 
-DEBUG = env.bool("DEBUG")
+DEBUG = env.bool("DEBUG", False)
 print("DEBUG", DEBUG)
 
 SECRET_KEY = env.str("SECRET_KEY")

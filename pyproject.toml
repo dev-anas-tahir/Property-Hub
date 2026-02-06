@@ -2,7 +2,7 @@
 name = "property-hub"
 version = "0.1.0"
 description = "Django Property Management System"
-requires-python = ">=3.12"
+requires-python = ">=3.13"
 dependencies = [
     "django>=6.0",
     "pillow>=11.2.1",
@@ -26,6 +26,7 @@ dev = [
     "django-debug-toolbar>=5.2.0",
     "pysonar>=1.3.0.4086",
     "ruff>=0.14.14",
+    "bandit>=1.8.0",
 ]
 prod = [
     "django-compressor>=4.6.0",
@@ -39,3 +40,9 @@ build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
 packages = ["config", "apps", "templates"]
+
+[tool.ty]
+# Disable strict checks for Django ORM patterns
+disable = [
+    "unresolved-attribute",  # Django models have dynamic attributes
+]

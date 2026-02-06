@@ -343,9 +343,6 @@ def property_create_view(request):
         # Create form instances with POST data
         form = PropertyForm(request.POST, request.FILES)
 
-        # Create a temporary property instance for the formset (not saved yet)
-        property_instance = form.instance
-
         # Get image formset - we'll handle images manually from request.FILES
         # since formsets don't work well with HTMX file uploads
         images = request.FILES.getlist("images")
@@ -501,7 +498,7 @@ def property_validate_step_view(request):
             # Check if required field is empty
             value = request.POST.get(field_name, "").strip()
             if not value:
-                errors[field_name] = [f"This field is required."]
+                errors[field_name] = ["This field is required."]
 
     # Run custom field validation for this step
     try:

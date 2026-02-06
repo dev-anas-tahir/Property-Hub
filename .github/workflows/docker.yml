@@ -1,0 +1,38 @@
+name: Docker Security Scan
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: |
+          docker build -t property-hub:test -f Dockerfile . \
+            --build-arg SECRET_KEY=test-secret-key-for-ci \
+            --build-arg DEBUG=True \
+            --build-arg ALLOWED_HOSTS=localhost,127.0.0.1 \
+            --build-arg DATABASE_URL=postgresql://postgres:postgres@localhost:5432/test_db \
+            --build-arg AWS_ACCESS_KEY_ID=test-key \
+            --build-arg AWS_SECRET_ACCESS_KEY=test-secret \
+            --build-arg AWS_STORAGE_BUCKET_NAME=test-bucket
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: property-hub:test
+          format: sarif
+          output: trivy-results.sarif
+        continue-on-error: true
+
+      - name: Upload Trivy results to GitHub Security
+        uses: github/codeql-action/upload-sarif@v4
+        if: always()
+        with:
+          sarif_file: trivy-results.sarif

@@ -26,7 +26,7 @@ class PropertyImageInline(admin.TabularInline):
             )
         return "No image"
 
-    preview_image.short_description = "Preview"
+    preview_image.short_description = "Preview"  # type: ignore[attr-defined]
 
 
 class FavoriteInlineForProperty(admin.TabularInline):

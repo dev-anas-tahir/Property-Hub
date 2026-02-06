@@ -33,17 +33,9 @@ prod-down:
 build:
     uv sync
 
-# Sort the imports
-sort:
-    ruff check --select I --fix .
-
-# Format the code
-format:
-    ruff format .
-
-# Type check 
+# Type check with ty (manual run)
 type-check:
-    uvx ty check
+    uv run ty check .
 
 # Show available commands
 help:
