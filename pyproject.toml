@@ -2,7 +2,7 @@
 name = "property-hub"
 version = "0.1.0"
 description = "Django Property Management System"
-requires-python = ">=3.12"
+requires-python = ">=3.13"
 dependencies = [
     "django>=6.0",
     "pillow>=11.2.1",
