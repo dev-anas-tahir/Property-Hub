@@ -20,7 +20,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY pyproject.toml uv.lock /app/
 
 # Install production dependencies only (no dev dependencies)
-RUN uv sync --frozen --without dev
+RUN uv sync --frozen --no-dev
 
 # Copy application code
 COPY . /app/
