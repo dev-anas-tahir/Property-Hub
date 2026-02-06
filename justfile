@@ -33,6 +33,10 @@ prod-down:
 build:
     uv sync
 
+# Type check with ty (manual run)
+type-check:
+    uv run ty check .
+
 # Show available commands
 help:
     @just --list

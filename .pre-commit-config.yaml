@@ -23,19 +23,6 @@ repos:
         types_or: [python, pyi]
       - id: ruff-format  # separate hook for formatting (runs after lint fixes)
 
-  # ty: type checking (local hook since no official yet)
-  - repo: local
-    hooks:
-      - id: ty-check
-        name: ty type checker
-        entry: ty check .
-        language: system
-        types: [python]
-        pass_filenames: false          # ty works best on whole project (fast anyway)
-        # If you want only staged files (slower but more precise in big repos):
-        # entry: bash -c 'ty check --files $$(git diff --cached --name-only --diff-filter=ACMRTUXB | grep -E "\.pyi?$$") || true'
-        # But whole-project is fine & faster with ty
-
   # Optional: uv sync / lock on commit (keeps uv.lock up-to-date if deps change)
   - repo: https://github.com/astral-sh/uv-pre-commit
     rev: 0.9.30  # check latest at https://github.com/astral-sh/uv-pre-commit/releases

@@ -10,7 +10,7 @@ Improvements for modern Django and Python:
 
 from __future__ import annotations
 
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 
 from django.conf import settings
 from django.core.validators import MinValueValidator
@@ -19,6 +19,9 @@ from django.db.models import Index, Q, UniqueConstraint
 from django.urls import reverse
 
 from apps.properties.validations import cnic_validator, phone_validator
+
+if TYPE_CHECKING:
+    from django.db.models.manager import RelatedManager
 
 
 class PublishedManager(models.Manager):
@@ -93,13 +96,17 @@ class Property(models.Model):
     objects = models.Manager()
     published = PublishedManager()
 
+    if TYPE_CHECKING:
+        images: RelatedManager[PropertyImage]
+        favorited_by: RelatedManager[Favorite]
+
     class Meta:
         verbose_name_plural = "Properties"
         ordering = ["-created_at"]
         indexes = [Index(fields=["created_at"]), Index(fields=["price"])]
 
     def __str__(self) -> str:  # pragma: no cover - simple representation
-        return self.name
+        return str(self.name)
 
     def __repr__(self) -> str:
         return f"<Property id={self.pk!r} name={self.name!r}>"

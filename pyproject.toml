@@ -40,3 +40,9 @@ build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
 packages = ["config", "apps", "templates"]
+
+[tool.ty]
+# Disable strict checks for Django ORM patterns
+disable = [
+    "unresolved-attribute",  # Django models have dynamic attributes
+]
