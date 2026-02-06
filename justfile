@@ -41,6 +41,10 @@ sort:
 format:
     ruff format .
 
+# Type check 
+type-check:
+    uvx ty check
+
 # Show available commands
 help:
     @just --list
