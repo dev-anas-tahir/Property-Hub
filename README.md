@@ -113,23 +113,17 @@ Property-Hub/
    ```bash
    # Install Python dependencies
    just build
-   
-   # Install Node dependencies
-   npm install
    ```
 
-4. **Run database migrations**
+4. **Run all the dev services in Docker**
+   ```bash
+   # Start all services PostgresDB, Redis, Mailhog and Localstack
+   just up
+   ```
+
+5. **Run database migrations**
    ```bash
    just migrate
-   ```
-
-5. **Build Tailwind CSS**
-   ```bash
-   # Development (watch mode)
-   npm run build-css
-   
-   # Production (minified)
-   npm run build-css-prod
    ```
 
 6. **Start development server**
@@ -140,15 +134,6 @@ Property-Hub/
 7. **Access the application**
    ```
    http://127.0.0.1:8000
-   ```
-
-### Docker Development
-
-```bash
-# Start all services
-docker-compose -f docker-compose.dev.yml up --build
-
-# Access at http://localhost:8000
 ```
 
 ---
@@ -159,14 +144,12 @@ docker-compose -f docker-compose.dev.yml up --build
 
 | Command | Description |
 |---------|-------------|
-| `just build` | Install Python dependencies |
+| `just build` | Install Python and Node dependencies |
 | `just migrate` | Apply Django migrations |
 | `just makemigrations` | Create new Django migrations |
 | `just runserver [port]` | Start Django development server (default port: 8000) |
-| `just up` | Start development services with Docker |
+| `just up` | Start development services i.e (PostgresDB, Redis, Localstack and Mailhog) with Docker |
 | `just down` | Stop development services |
-| `just prod-up` | Start production services with Docker |
-| `just prod-down` | Stop production services |
 | `just help` | Show all available commands |
 
 ### NPM Commands
@@ -247,8 +230,6 @@ docker-compose -f docker-compose.prod.yml up
 
 - [ ] Set `DEBUG=False`
 - [ ] Configure `ALLOWED_HOSTS`
-- [ ] Use PostgreSQL database
-- [ ] Configure AWS S3 for media
 - [ ] Set secure `DJANGO_SECRET_KEY`
 - [ ] Enable HTTPS
 - [ ] Configure static file serving
@@ -303,12 +284,6 @@ Types: Add, Update, Fix, Remove, Refactor, Docs
 - Ensure all tests pass
 - Update documentation if needed
 - Keep PRs focused and atomic
-
----
-
-## 📝 License
-
-This project is for educational and demonstration purposes.
 
 ---
 
