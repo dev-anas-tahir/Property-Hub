@@ -111,7 +111,7 @@ Property-Hub/
 
 3. **Install dependencies**
    ```bash
-   # Install Python dependencies
+   # Install Python and Node dependencies
    just build
    ```
 
@@ -163,7 +163,7 @@ Property-Hub/
 
 ## 🔐 Environment Configuration
 
-Create a `.env` file with the following variables:
+Your `.env` file will have the following variables:
 
 ```env
 # Django
@@ -174,7 +174,7 @@ ALLOWED_HOSTS=127.0.0.1,localhost
 # Database
 DATABASE_URL=sqlite:///db.sqlite3
 
-# AWS S3 (optional)
+# AWS S3 (Localstack for local deelopment)
 AWS_ACCESS_KEY_ID=your-access-key
 AWS_SECRET_ACCESS_KEY=your-secret-key
 AWS_STORAGE_BUCKET_NAME=your-bucket-name
