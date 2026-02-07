@@ -2,11 +2,11 @@
 
 # Start development services with Docker
 up:
-    docker compose -f docker-compose.dev.yml up -d
+    docker compose -f docker-compose.yml up -d
 
 # Stop development services
 down:
-    docker compose -f docker-compose.dev.yml down -v
+    docker compose -f docker-compose.yml down -v
 
 # Start Django development server with CSS build
 runserver port="8000":
@@ -21,17 +21,10 @@ makemigrations:
 migrate:
     uv run python manage.py migrate
 
-# Start production services with Docker
-prod-up:
-    docker compose -f docker-compose.prod.yml up --build -d
-
-# Stop production services
-prod-down:
-    docker compose -f docker-compose.prod.yml down -v
-
 # Install Python dependencies
 build:
     uv sync
+    npm install
 
 # Type check with ty (manual run)
 type-check:
