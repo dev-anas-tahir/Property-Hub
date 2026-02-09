@@ -7,7 +7,7 @@ A modern real-estate property management platform built with Django, featuring a
 ## 🛠 Tech Stack
 
 ### Backend
-- **Django 6.0.1** - Web framework
+- **Django 6.0.2** - Web framework
 - **Python 3.13+** - Programming language
 - **PostgreSQL-17** - Database
 - **UV** - Package manager
