@@ -114,20 +114,35 @@
     <div class="card bg-base-100 shadow-soft mb-4">
         <div class="card-body p-0">
             <div id="messages-container" class="h-[500px] overflow-y-auto p-6 space-y-4">
-                {% if messages %}
-                    {% for message in messages %}
+                {% if chat_messages %}
+                    {% for message in chat_messages %}
                         <div class="flex {% if message.sender == user %}justify-end{% else %}justify-start{% endif %}" data-message-id="{{ message.id }}">
                             <div class="max-w-[70%]">
-                                <div class="{% if message.sender == user %}bg-primary-600 text-white{% else %}bg-base-200 text-base-content{% endif %} rounded-lg px-4 py-2 {% if not message.is_read and message.sender != user %}ring-2 ring-primary-400 ring-offset-2{% endif %}">
+                                <div class="{% if message.sender == user %}bg-indigo-600 text-white{% else %}bg-gray-200 text-gray-900{% endif %} rounded-2xl px-4 py-2.5 shadow-sm">
                                     <p class="text-sm break-words">{{ message.content }}</p>
                                 </div>
-                                <div class="flex items-center {% if message.sender == user %}justify-end{% else %}justify-start{% endif %} mt-1 px-2 space-x-2">
-                                    {% if not message.is_read and message.sender != user %}
-                                        <span class="badge badge-primary badge-xs">New</span>
-                                    {% endif %}
-                                    <span class="text-xs text-base-content/50">
+                                <div class="flex items-center {% if message.sender == user %}justify-end{% else %}justify-start{% endif %} mt-1 px-2 space-x-1">
+                                    <span class="text-xs text-gray-500">
                                         {{ message.created_at|date:"M d, Y g:i A" }}
                                     </span>
+                                    {% if message.sender == user %}
+                                        <!-- Read/Unread indicator -->
+                                        {% if message.is_read %}
+                                            <!-- Double tick for read -->
+                                            <span class="text-blue-500">
+                                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                                                    <path d="M0.41,13.41L6,19L7.41,17.58L1.83,12M22.24,5.58L11.66,16.17L7.5,12L6.07,13.41L11.66,19L23.66,7M18,7L16.59,5.58L10.24,11.93L11.66,13.34L18,7Z"/>
+                                                </svg>
+                                            </span>
+                                        {% else %}
+                                            <!-- Single tick for sent but not read -->
+                                            <span class="text-gray-400">
+                                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                                                    <path d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"/>
+                                                </svg>
+                                            </span>
+                                        {% endif %}
+                                    {% endif %}
                                 </div>
                             </div>
                         </div>
@@ -149,21 +164,22 @@
     <!-- Message Input -->
     <div class="card bg-base-100 shadow-soft">
         <div class="card-body p-4">
-            <form id="message-form" class="flex items-end space-x-3">
+            <form id="message-form" class="flex items-start gap-3">
                 <div class="flex-1">
                     <textarea
                         id="message-input"
                         name="message"
-                        rows="2"
-                        class="textarea textarea-bordered w-full resize-none"
+                        rows="1"
+                        class="textarea textarea-bordered w-full resize-none min-h-[44px] max-h-[120px]"
                         placeholder="Type your message..."
                         maxlength="5000"
+                        style="overflow-y: auto;"
                     ></textarea>
-                    <div class="text-xs text-base-content/50 mt-1">
+                    <div class="text-xs text-gray-500 mt-1">
                         <span id="char-count">0</span> / 5000 characters
                     </div>
                 </div>
-                <button type="submit" class="btn btn-primary">
+                <button type="submit" class="btn btn-primary h-[44px] min-h-[44px] px-6">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
                     </svg>
@@ -181,6 +197,10 @@
 
     messageInput.addEventListener('input', function() {
         charCount.textContent = this.value.length;
+
+        // Auto-resize textarea
+        this.style.height = 'auto';
+        this.style.height = Math.min(this.scrollHeight, 120) + 'px';
     });
 
     // Auto-scroll to bottom on page load
@@ -199,9 +219,9 @@
     });
 
     // Initialize ChatClient
-    const conversationId = {{ conversation.id }};
+    const conversationId = Number.parseInt('{{ conversation.id }}', 10);
     const chatClient = new ChatClient(conversationId);
-    const currentUserId = {{ user.id }};
+    const currentUserId = Number.parseInt('{{ user.id }}', 10);
 
     // Connection status elements
     const connectionStatus = document.getElementById('connection-status');
@@ -258,6 +278,8 @@
             // Clear input on successful send
             messageInput.value = '';
             charCount.textContent = '0';
+            // Reset textarea height
+            messageInput.style.height = 'auto';
         } else {
             // Show error if send failed
             showConnectionAlert('Failed to send message. Please try again.', 'error');
@@ -286,14 +308,28 @@
 
         messageDiv.innerHTML = `
             <div class="max-w-[70%]">
-                <div class="${isCurrentUser ? 'bg-primary-600 text-white' : 'bg-base-200 text-base-content'} rounded-lg px-4 py-2 ${isUnread ? 'ring-2 ring-primary-400 ring-offset-2' : ''}">
+                <div class="${isCurrentUser ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-900'} rounded-2xl px-4 py-2.5 shadow-sm">
                     <p class="text-sm break-words">${escapeHtml(data.message)}</p>
                 </div>
-                <div class="flex items-center ${isCurrentUser ? 'justify-end' : 'justify-start'} mt-1 px-2 space-x-2">
-                    ${isUnread ? '<span class="badge badge-primary badge-xs">New</span>' : ''}
-                    <span class="text-xs text-base-content/50">
+                <div class="flex items-center ${isCurrentUser ? 'justify-end' : 'justify-start'} mt-1 px-2 space-x-1">
+                    <span class="text-xs text-gray-500">
                         ${formatTimestamp(data.created_at)}
                     </span>
+                    ${isCurrentUser ? `
+                        ${data.is_read ? `
+                            <span class="text-blue-500">
+                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M0.41,13.41L6,19L7.41,17.58L1.83,12M22.24,5.58L11.66,16.17L7.5,12L6.07,13.41L11.66,19L23.66,7M18,7L16.59,5.58L10.24,11.93L11.66,13.34L18,7Z"/>
+                                </svg>
+                            </span>
+                        ` : `
+                            <span class="text-gray-400">
+                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"/>
+                                </svg>
+                            </span>
+                        `}
+                    ` : ''}
                 </div>
             </div>
         `;

@@ -80,9 +80,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
         # Accept the WebSocket connection
         await self.accept()
 
-        # Send unread messages to the user when they connect
-        # Validates: Requirements 4.2
-        await self.send_unread_messages()
+        # Note: Unread messages are already loaded in the template on page load
+        # No need to send them again via WebSocket to avoid duplication
 
     async def disconnect(self, close_code):
         """
@@ -333,59 +332,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
             # Database error - log and return None to trigger error response
             # In production, this should use proper logging
             return None
-
-    @database_sync_to_async
-    def get_unread_messages(self):
-        """
-        Get all unread messages for the current user in this conversation.
-
-        Returns messages where:
-        - The current user is NOT the sender (recipient)
-        - is_read is False
-
-        Returns:
-            list: List of unread Message objects
-
-        Requirements: 4.2
-        """
-        try:
-            conversation = Conversation.objects.get(id=self.conversation_id)
-            # Get unread messages where current user is the recipient (not the sender)
-            unread_messages = (
-                conversation.messages.filter(is_read=False)
-                .exclude(sender=self.user)
-                .select_related("sender")
-                .order_by("created_at")
-            )
-            return list(unread_messages)
-        except Conversation.DoesNotExist:
-            return []
-
-    async def send_unread_messages(self):
-        """
-        Send all unread messages to the user when they connect.
-
-        This method is called when a user establishes a WebSocket connection
-        to deliver any messages they missed while offline.
-
-        Requirements: 4.2
-        """
-        unread_messages = await self.get_unread_messages()
-
-        for message in unread_messages:
-            await self.send(
-                text_data=json.dumps(
-                    {
-                        "type": "message",
-                        "message": message.content,
-                        "sender_id": message.sender_id,
-                        "sender_email": message.sender.email,
-                        "message_id": message.id,
-                        "created_at": message.created_at.isoformat(),
-                        "is_read": message.is_read,
-                    }
-                )
-            )
 
     def check_rate_limit(self):
         """

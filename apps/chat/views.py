@@ -83,7 +83,7 @@ def conversation_detail(request, conversation_id):
 
     context = {
         "conversation": conversation,
-        "messages": messages,
+        "chat_messages": messages,
         "other_participant": other_participant,
     }
 

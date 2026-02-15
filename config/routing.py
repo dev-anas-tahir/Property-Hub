@@ -6,9 +6,18 @@ by the ASGI application to route WebSocket connections.
 """
 
 from django.urls import path
-from apps.chat.consumers import ChatConsumer
 
-# WebSocket URL patterns for real-time chat
-websocket_urlpatterns = [
-    path("ws/chat/<int:conversation_id>/", ChatConsumer.as_asgi()),
-]
+
+def get_websocket_urlpatterns():
+    """
+    Lazy load websocket URL patterns to avoid importing models before Django apps are ready.
+    """
+    from apps.chat.consumers import ChatConsumer
+
+    return [
+        path("ws/chat/<int:conversation_id>/", ChatConsumer.as_asgi()),
+    ]
+
+
+# This will be evaluated when accessed, not at import time
+websocket_urlpatterns = []

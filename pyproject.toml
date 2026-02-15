@@ -18,6 +18,7 @@ dependencies = [
     "channels-redis>=4.0.0",
     "daphne>=4.0.0",
     "bleach>=6.0.0",
+    "whitenoise>=6.9.0",
 ]
 
 classifiers = [
@@ -35,7 +36,6 @@ dev = [
 prod = [
     "django-compressor>=4.6.0",
     "gunicorn>=23.0.0",
-    "whitenoise>=6.9.0",
 ]
 
 [build-system]
