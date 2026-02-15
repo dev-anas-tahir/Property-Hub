@@ -1,0 +1,436 @@
+{% extends '_layouts/base.html' %}
+{% load static %}
+
+{% block title %}Chat with {{ other_participant.email }} - PropertyHub{% endblock %}
+
+{% block extra_head %}
+<script src="{% static 'src/chat-client.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto">
+    <!-- WebSocket Connection Status Indicator -->
+    <div id="connection-status" class="alert alert-info mb-4 hidden">
+        <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <span id="connection-status-text">Connecting...</span>
+    </div>
+
+    <!-- Chat Header -->
+    <div class="card bg-base-100 shadow-soft mb-4">
+        <div class="card-body py-4">
+            <div class="flex items-center justify-between">
+                <!-- Back Button & Participant Info -->
+                <div class="flex items-center space-x-4">
+                    <a href="{% url 'chat:conversation_list' %}" class="btn btn-ghost btn-sm btn-circle">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                        </svg>
+                    </a>
+
+                    <div class="avatar placeholder">
+                        <div class="bg-primary-100 text-primary-600 rounded-full w-10 h-10">
+                            <span class="text-sm font-semibold">
+                                {{ other_participant.email|slice:":1"|upper }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h2 class="font-semibold text-base-content">
+                            {{ other_participant.email }}
+                        </h2>
+                        <div class="flex items-center text-sm text-base-content/60">
+                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                            </svg>
+                            <a href="{% url 'properties:detail' conversation.property.id %}" class="hover:text-primary-600 transition-colors">
+                                {{ conversation.property.name }}
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Connection Status Badge -->
+                <div class="flex items-center space-x-2">
+                    <div id="connection-badge" class="badge badge-ghost gap-2">
+                        <span class="loading loading-spinner loading-xs"></span>
+                        <span>Connecting</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Property Context Display -->
+    <div class="card bg-base-100 shadow-soft mb-4">
+        <div class="card-body p-4">
+            <div class="flex items-center space-x-4">
+                <!-- Property Image -->
+                {% if conversation.property.images.first %}
+                    <div class="avatar">
+                        <div class="w-16 h-16 rounded-lg">
+                            <img src="{{ conversation.property.images.first.image.url }}" alt="{{ conversation.property.name }}" />
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="avatar placeholder">
+                        <div class="bg-primary-100 text-primary-600 w-16 h-16 rounded-lg">
+                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                            </svg>
+                        </div>
+                    </div>
+                {% endif %}
+
+                <!-- Property Details -->
+                <div class="flex-1 min-w-0">
+                    <h3 class="font-semibold text-base-content truncate">
+                        {{ conversation.property.name }}
+                    </h3>
+                    <div class="flex items-center space-x-3 text-sm text-base-content/60">
+                        <span class="badge badge-sm badge-primary">{{ conversation.property.get_property_type_display }}</span>
+                        <span class="font-semibold text-accent">
+                            ${{ conversation.property.price|floatformat:0 }}
+                            {% if conversation.property.property_type == 'rent' %}/mo{% endif %}
+                        </span>
+                    </div>
+                </div>
+
+                <!-- View Property Link -->
+                <a href="{% url 'properties:detail' conversation.property.id %}" class="btn btn-sm btn-outline">
+                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                    </svg>
+                    View
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Messages Container -->
+    <div class="card bg-base-100 shadow-soft mb-4">
+        <div class="card-body p-0">
+            <div id="messages-container" class="h-[500px] overflow-y-auto p-6 space-y-4">
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="flex {% if message.sender == user %}justify-end{% else %}justify-start{% endif %}" data-message-id="{{ message.id }}">
+                            <div class="max-w-[70%]">
+                                <div class="{% if message.sender == user %}bg-primary-600 text-white{% else %}bg-base-200 text-base-content{% endif %} rounded-lg px-4 py-2 {% if not message.is_read and message.sender != user %}ring-2 ring-primary-400 ring-offset-2{% endif %}">
+                                    <p class="text-sm break-words">{{ message.content }}</p>
+                                </div>
+                                <div class="flex items-center {% if message.sender == user %}justify-end{% else %}justify-start{% endif %} mt-1 px-2 space-x-2">
+                                    {% if not message.is_read and message.sender != user %}
+                                        <span class="badge badge-primary badge-xs">New</span>
+                                    {% endif %}
+                                    <span class="text-xs text-base-content/50">
+                                        {{ message.created_at|date:"M d, Y g:i A" }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="flex items-center justify-center h-full">
+                        <div class="text-center">
+                            <svg class="w-16 h-16 text-base-content/20 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                            </svg>
+                            <p class="text-base-content/60">No messages yet. Start the conversation!</p>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Message Input -->
+    <div class="card bg-base-100 shadow-soft">
+        <div class="card-body p-4">
+            <form id="message-form" class="flex items-end space-x-3">
+                <div class="flex-1">
+                    <textarea
+                        id="message-input"
+                        name="message"
+                        rows="2"
+                        class="textarea textarea-bordered w-full resize-none"
+                        placeholder="Type your message..."
+                        maxlength="5000"
+                    ></textarea>
+                    <div class="text-xs text-base-content/50 mt-1">
+                        <span id="char-count">0</span> / 5000 characters
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+                    </svg>
+                    Send
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Character counter
+    const messageInput = document.getElementById('message-input');
+    const charCount = document.getElementById('char-count');
+
+    messageInput.addEventListener('input', function() {
+        charCount.textContent = this.value.length;
+    });
+
+    // Auto-scroll to bottom on page load
+    const messagesContainer = document.getElementById('messages-container');
+    if (messagesContainer) {
+        // Immediate scroll on page load (no animation needed)
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+
+    // Handle Enter key (Shift+Enter for new line, Enter to send)
+    messageInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            document.getElementById('message-form').dispatchEvent(new Event('submit'));
+        }
+    });
+
+    // Initialize ChatClient
+    const conversationId = {{ conversation.id }};
+    const chatClient = new ChatClient(conversationId);
+    const currentUserId = {{ user.id }};
+
+    // Connection status elements
+    const connectionStatus = document.getElementById('connection-status');
+    const connectionStatusText = document.getElementById('connection-status-text');
+    const connectionBadge = document.getElementById('connection-badge');
+
+    // Handle connection status changes
+    chatClient.onConnectionStatus((status, message, cooldownSeconds) => {
+        console.log('Connection status:', status, message);
+
+        // Update connection badge in header
+        updateConnectionBadge(status, message);
+
+        // Update alert banner for errors/warnings
+        if (status === 'connected') {
+            hideConnectionAlert();
+            enableMessageInput();
+        } else if (status === 'reconnecting') {
+            showConnectionAlert('Reconnecting...', 'warning');
+        } else if (status === 'error' || status === 'failed') {
+            showConnectionAlert(message || 'Connection error', 'error');
+        } else if (status === 'disconnected') {
+            showConnectionAlert('Disconnected from chat', 'info');
+        } else if (status === 'rate_limit') {
+            showRateLimitAlert(message, cooldownSeconds);
+            disableMessageInput(cooldownSeconds);
+        }
+    });
+
+    // Handle incoming messages
+    chatClient.onMessage((data) => {
+        console.log('Received message:', data);
+
+        // Add message to the UI
+        if (data.message && data.sender_id && data.created_at) {
+            appendMessage(data);
+        }
+    });
+
+    // Handle form submission
+    const messageForm = document.getElementById('message-form');
+    messageForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const content = messageInput.value.trim();
+        if (!content) {
+            return;
+        }
+
+        // Send message through WebSocket
+        const success = chatClient.sendMessage(content);
+
+        if (success) {
+            // Clear input on successful send
+            messageInput.value = '';
+            charCount.textContent = '0';
+        } else {
+            // Show error if send failed
+            showConnectionAlert('Failed to send message. Please try again.', 'error');
+        }
+    });
+
+    // Connect to WebSocket when page loads
+    chatClient.connect();
+
+    // Disconnect when page unloads
+    window.addEventListener('beforeunload', () => {
+        chatClient.disconnect();
+    });
+
+    // Helper function to append a message to the UI
+    function appendMessage(data) {
+        const isCurrentUser = data.sender_id === currentUserId;
+
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `flex ${isCurrentUser ? 'justify-end' : 'justify-start'}`;
+        messageDiv.setAttribute('data-message-id', data.message_id || '');
+
+        // Determine if message should be highlighted as unread
+        // Messages from other users that just arrived are considered unread
+        const isUnread = !isCurrentUser && data.is_read === false;
+
+        messageDiv.innerHTML = `
+            <div class="max-w-[70%]">
+                <div class="${isCurrentUser ? 'bg-primary-600 text-white' : 'bg-base-200 text-base-content'} rounded-lg px-4 py-2 ${isUnread ? 'ring-2 ring-primary-400 ring-offset-2' : ''}">
+                    <p class="text-sm break-words">${escapeHtml(data.message)}</p>
+                </div>
+                <div class="flex items-center ${isCurrentUser ? 'justify-end' : 'justify-start'} mt-1 px-2 space-x-2">
+                    ${isUnread ? '<span class="badge badge-primary badge-xs">New</span>' : ''}
+                    <span class="text-xs text-base-content/50">
+                        ${formatTimestamp(data.created_at)}
+                    </span>
+                </div>
+            </div>
+        `;
+
+        messagesContainer.appendChild(messageDiv);
+
+        // Auto-scroll to bottom when new message arrives
+        // Validates: Requirement 3.2 (chronological order with latest visible)
+        autoScrollToBottom();
+    }
+
+    // Helper function to escape HTML
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    // Helper function to format timestamp
+    function formatTimestamp(timestamp) {
+        const date = new Date(timestamp);
+        const options = {
+            month: 'short',
+            day: 'numeric',
+            year: 'numeric',
+            hour: 'numeric',
+            minute: '2-digit',
+            hour12: true
+        };
+        return date.toLocaleString('en-US', options);
+    }
+
+    // Helper function to auto-scroll to bottom
+    // Validates: Task requirement - Auto-scroll to latest message
+    function autoScrollToBottom() {
+        if (messagesContainer) {
+            // Smooth scroll to bottom
+            messagesContainer.scrollTo({
+                top: messagesContainer.scrollHeight,
+                behavior: 'smooth'
+            });
+        }
+    }
+
+    // Helper function to update connection badge
+    function updateConnectionBadge(status, message) {
+        if (status === 'connected') {
+            connectionBadge.className = 'badge badge-success gap-2';
+            connectionBadge.innerHTML = `
+                <span class="w-2 h-2 bg-success-content rounded-full"></span>
+                <span>Connected</span>
+            `;
+        } else if (status === 'connecting') {
+            connectionBadge.className = 'badge badge-ghost gap-2';
+            connectionBadge.innerHTML = `
+                <span class="loading loading-spinner loading-xs"></span>
+                <span>Connecting</span>
+            `;
+        } else if (status === 'reconnecting') {
+            connectionBadge.className = 'badge badge-warning gap-2';
+            connectionBadge.innerHTML = `
+                <span class="loading loading-spinner loading-xs"></span>
+                <span>Reconnecting</span>
+            `;
+        } else if (status === 'error' || status === 'failed') {
+            connectionBadge.className = 'badge badge-error gap-2';
+            connectionBadge.innerHTML = `
+                <span class="w-2 h-2 bg-error-content rounded-full"></span>
+                <span>Disconnected</span>
+            `;
+        } else if (status === 'disconnected') {
+            connectionBadge.className = 'badge badge-ghost gap-2';
+            connectionBadge.innerHTML = `
+                <span class="w-2 h-2 bg-base-content/30 rounded-full"></span>
+                <span>Offline</span>
+            `;
+        }
+    }
+
+    // Helper function to show connection alert
+    function showConnectionAlert(message, type) {
+        const alertClass = type === 'error' ? 'alert-error' :
+                          type === 'warning' ? 'alert-warning' :
+                          'alert-info';
+
+        connectionStatus.className = `alert ${alertClass} mb-4`;
+        connectionStatusText.textContent = message;
+        connectionStatus.classList.remove('hidden');
+    }
+
+    // Helper function to hide connection alert
+    function hideConnectionAlert() {
+        connectionStatus.classList.add('hidden');
+    }
+
+    // Helper function to show rate limit alert with countdown
+    function showRateLimitAlert(message, cooldownSeconds) {
+        connectionStatus.className = 'alert alert-warning mb-4';
+        connectionStatus.classList.remove('hidden');
+
+        // Start countdown timer
+        let remainingSeconds = cooldownSeconds;
+
+        const updateCountdown = () => {
+            if (remainingSeconds > 0) {
+                connectionStatusText.textContent = `Rate limit exceeded. Please wait ${remainingSeconds} second${remainingSeconds !== 1 ? 's' : ''} before sending another message.`;
+                remainingSeconds--;
+                setTimeout(updateCountdown, 1000);
+            } else {
+                hideConnectionAlert();
+                enableMessageInput();
+            }
+        };
+
+        updateCountdown();
+    }
+
+    // Helper function to disable message input during cooldown
+    function disableMessageInput(cooldownSeconds) {
+        const submitButton = messageForm.querySelector('button[type="submit"]');
+        messageInput.disabled = true;
+        submitButton.disabled = true;
+        submitButton.classList.add('btn-disabled');
+
+        // Re-enable after cooldown
+        setTimeout(() => {
+            enableMessageInput();
+        }, cooldownSeconds * 1000);
+    }
+
+    // Helper function to enable message input
+    function enableMessageInput() {
+        const submitButton = messageForm.querySelector('button[type="submit"]');
+        messageInput.disabled = false;
+        submitButton.disabled = false;
+        submitButton.classList.remove('btn-disabled');
+    }
+
+</script>
+{% endblock %}
