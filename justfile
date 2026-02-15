@@ -11,8 +11,7 @@ down:
 # Start Django development server with CSS build
 runserver port="8000":
     npm run build-css &
-    uv run python manage.py collectstatic --noinput
-    daphne config.asgi:application --port {{port}}
+    uv run python manage.py runserver {{port}}
 
 # Create new Django migrations
 makemigrations:

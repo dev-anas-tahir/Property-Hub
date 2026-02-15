@@ -135,6 +135,31 @@ class ConversationAdmin(admin.ModelAdmin):
 
     date_hierarchy = "created_at"
 
+    class MessageInline(admin.TabularInline):
+        """Inline display of messages within a conversation."""
+
+        model = Message
+        extra = 0
+        can_delete = False
+        fields = ["sender", "content_preview", "created_at", "is_read"]
+        readonly_fields = ["sender", "content_preview", "created_at", "is_read"]
+        ordering = ["created_at"]
+
+        def content_preview(self, obj):
+            """Display message content with truncation."""
+            max_length = 100
+            if len(obj.content) > max_length:
+                return obj.content[:max_length] + "..."
+            return obj.content
+
+        content_preview.short_description = "Message"
+
+        def has_add_permission(self, request, obj=None):
+            """Disable adding messages through admin."""
+            return False
+
+    inlines = [MessageInline]
+
     def get_queryset(self, request):
         """Optimize queries by prefetching related objects."""
         queryset = super().get_queryset(request)
@@ -200,7 +225,6 @@ class ConversationAdmin(admin.ModelAdmin):
     participant_two_link.short_description = "Participant 2"
 
 
-@admin.register(Message)
 class MessageAdmin(admin.ModelAdmin):
     """
     Admin interface for viewing messages.
