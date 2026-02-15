@@ -44,7 +44,7 @@
                     {% endif %}
                 </ul>
             </div>
-            
+
             <!-- Logo -->
             <a href="{% url 'properties:list' %}" class="btn btn-ghost text-xl font-display font-bold">
                 <svg class="w-8 h-8 mr-2" fill="currentColor" viewBox="0 0 24 24">
@@ -53,25 +53,25 @@
                 PropertyHub
             </a>
         </div>
-        
+
         <!-- Center: Desktop Menu - Absolutely Centered -->
         <div class="hidden lg:flex absolute left-1/2 transform -translate-x-1/2">
             <ul class="menu menu-horizontal px-1 space-x-2">
                 <li>
-                    <a href="{% url 'properties:list' %}" 
+                    <a href="{% url 'properties:list' %}"
                        class="btn btn-ghost {% if request.resolver_match.url_name == 'list' %}nav-link-active{% endif %}">
                         All Properties
                     </a>
                 </li>
                 {% if user.is_authenticated %}
                     <li>
-                        <a href="{% url 'properties:create' %}" 
+                        <a href="{% url 'properties:create' %}"
                            class="btn btn-ghost {% if request.resolver_match.url_name == 'create' %}nav-link-active{% endif %}">
                             Add Property
                         </a>
                     </li>
                     <li>
-                        <a href="{% url 'properties:favorites' %}" 
+                        <a href="{% url 'properties:favorites' %}"
                            class="btn btn-ghost {% if request.resolver_match.url_name == 'favorites' %}nav-link-active{% endif %}">
                             <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
@@ -82,7 +82,7 @@
                 {% endif %}
             </ul>
         </div>
-        
+
         <!-- Right: User Menu -->
         <div class="flex items-center">
             {% if user.is_authenticated %}
@@ -90,13 +90,13 @@
                     <div tabindex="0" role="button" class="btn btn-ghost btn-circle avatar">
                         <div class="w-10 rounded-full bg-white/20 flex items-center justify-center">
                             <span class="text-white font-semibold">
-                                {{ user.first_name|first|default:user.username|first|upper }}
+                                {{ user.email|slice:":1"|upper }}
                             </span>
                         </div>
                     </div>
                     <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow-large bg-base-100 text-base-content rounded-2xl w-52">
                         <li class="menu-title">
-                            <span>Hello, {{ user.first_name|default:user.username }}!</span>
+                            <span>Hello, {% if user.first_name %}{{ user.first_name }}{% else %}{{ user.email }}{% endif %}!</span>
                         </li>
                         <li><a href="{% url 'properties:myprops' %}" class="{% if request.resolver_match.url_name == 'myprops' %}active{% endif %}">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

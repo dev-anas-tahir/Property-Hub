@@ -34,6 +34,7 @@ CSRF_TRUSTED_ORIGINS = [
 ]
 
 INSTALLED_APPS = [
+    "daphne",
     "unfold",
     "django.contrib.admin",
     "django.contrib.auth",
@@ -41,9 +42,11 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "channels",
     "axes",
     "storages",
     # Custom Apps
+    "apps.chat.apps.ChatConfig",
     "apps.properties.apps.PropertiesConfig",
     "apps.shared.apps.SharedConfig",
     "apps.users.apps.UsersConfig",
@@ -51,6 +54,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -59,10 +63,6 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
-
-# Add WhiteNoise only in production
-if not DEBUG:
-    MIDDLEWARE.insert(1, "whitenoise.middleware.WhiteNoiseMiddleware")
 
 ROOT_URLCONF = "config.urls"
 
@@ -83,6 +83,21 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "config.wsgi.application"
+ASGI_APPLICATION = "config.asgi.application"
+
+# Django Channels Configuration
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [
+                (env.str("REDIS_HOST", "127.0.0.1"), env.int("REDIS_PORT", 6379))
+            ],
+            "capacity": 1500,
+            "expiry": 10,
+        },
+    },
+}
 
 # Database configuration
 DATABASES = {"default": dj_database_url.parse(env.str("DATABASE_URL"))}
