@@ -36,7 +36,6 @@ dev = [
 ]
 prod = [
     "django-compressor>=4.6.0",
-    "gunicorn>=23.0.0",
 ]
 
 [build-system]
