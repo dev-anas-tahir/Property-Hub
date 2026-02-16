@@ -195,6 +195,7 @@ USE_S3_MEDIA = env.bool("USE_S3_MEDIA", False)
 USE_S3_STATIC = env.bool("USE_S3_STATIC", False)
 
 # AWS credentials and configuration
+AWS_HOST_NAME = env.str("AWS_HOST_NAME", "")
 AWS_ACCESS_KEY_ID = env.str("AWS_ACCESS_KEY_ID", "")
 AWS_SECRET_ACCESS_KEY = env.str("AWS_SECRET_ACCESS_KEY", "")
 AWS_S3_ENDPOINT_URL = env.str("AWS_S3_ENDPOINT_URL", None)
