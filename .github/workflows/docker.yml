@@ -24,7 +24,7 @@ jobs:
             --build-arg DATABASE_URL=postgresql://postgres:postgres@localhost:5432/test_db \
             --build-arg AWS_ACCESS_KEY_ID=test-key \
             --build-arg AWS_SECRET_ACCESS_KEY=test-secret \
-            --build-arg AWS_STORAGE_BUCKET_NAME=test-bucket
+            --build-arg AWS_MEDIA_BUCKET_NAME=test-bucket
 
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@master

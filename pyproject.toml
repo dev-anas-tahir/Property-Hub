@@ -19,6 +19,7 @@ dependencies = [
     "daphne>=4.0.0",
     "bleach>=6.0.0",
     "whitenoise>=6.9.0",
+    "twisted[http2,tls]>=25.5.0",
 ]
 
 classifiers = [

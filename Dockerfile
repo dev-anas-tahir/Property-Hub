@@ -15,7 +15,7 @@ ARG ALLOWED_HOSTS=localhost
 ARG DATABASE_URL
 ARG AWS_ACCESS_KEY_ID
 ARG AWS_SECRET_ACCESS_KEY
-ARG AWS_STORAGE_BUCKET_NAME
+ARG AWS_MEDIA_BUCKET_NAME
 
 # Set environment variables from build args
 ENV SECRET_KEY=${SECRET_KEY}
@@ -24,7 +24,7 @@ ENV ALLOWED_HOSTS=${ALLOWED_HOSTS}
 ENV DATABASE_URL=${DATABASE_URL}
 ENV AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
 ENV AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
-ENV AWS_STORAGE_BUCKET_NAME=${AWS_STORAGE_BUCKET_NAME}
+ENV AWS_MEDIA_BUCKET_NAME=${AWS_MEDIA_BUCKET_NAME}
 
 WORKDIR /app
 
@@ -57,7 +57,7 @@ EXPOSE 8000
 HEALTHCHECK --interval=30s --timeout=3s --start-period=40s --retries=3 \
     CMD curl -f http://localhost:8000/health/ || exit 1
 
-CMD ["uv", "run", "gunicorn", "config.wsgi:application", \
+CMD ["uv", "run", "daphne", "config.asgi:application", \
     "--bind", "0.0.0.0:8000", \
     "--workers", "3", \
     "--threads", "2", \

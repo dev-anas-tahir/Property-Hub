@@ -177,7 +177,7 @@ DATABASE_URL=sqlite:///db.sqlite3
 # AWS S3 (Localstack for local deelopment)
 AWS_ACCESS_KEY_ID=your-access-key
 AWS_SECRET_ACCESS_KEY=your-secret-key
-AWS_STORAGE_BUCKET_NAME=your-bucket-name
+AWS_MEDIA_BUCKET_NAME=your-bucket-name
 ```
 
 ---
