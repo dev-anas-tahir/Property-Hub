@@ -1,59 +1,49 @@
-# Production Dockerfile
-FROM python:3.13-slim
+# Stage 1: Build CSS and collect static
+FROM python:3.13-slim AS builder
+COPY --from=ghcr.io/astral-sh/uv:0.8.22 /uv /bin/uv
 
-# Install UV
-COPY --from=ghcr.io/astral-sh/uv:latest /uv /bin/uv
-
-ENV PYTHONDONTWRITEBYTECODE=1
-ENV PYTHONUNBUFFERED=1
-ENV DJANGO_SETTINGS_MODULE=config.settings.production
-
-# Accept build arguments for collectstatic
-ARG SECRET_KEY
-ARG DEBUG=False
-ARG ALLOWED_HOSTS=localhost
-ARG DATABASE_URL
-ARG AWS_ACCESS_KEY_ID
-ARG AWS_SECRET_ACCESS_KEY
-ARG AWS_MEDIA_BUCKET_NAME
-
-# Set environment variables from build args
-ENV SECRET_KEY=${SECRET_KEY}
-ENV DEBUG=${DEBUG}
-ENV ALLOWED_HOSTS=${ALLOWED_HOSTS}
-ENV DATABASE_URL=${DATABASE_URL}
-ENV AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
-ENV AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
-ENV AWS_MEDIA_BUCKET_NAME=${AWS_MEDIA_BUCKET_NAME}
-
-WORKDIR /app
-
-# Install system dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential \
-    curl \
+    build-essential curl \
+    && curl -fsSL https://deb.nodesource.com/setup_lts.x | bash - \
+    && apt-get install -y nodejs \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy dependency files first for better caching
-COPY pyproject.toml uv.lock /app/
+WORKDIR /app
+COPY pyproject.toml uv.lock package.json package-lock.json ./
+RUN uv sync --frozen --no-dev && npm ci
 
-# Install production dependencies only (no dev dependencies)
-RUN uv sync --frozen --no-dev
+COPY . .
+RUN npm run build-css-prod
 
-# Copy application code
-COPY . /app/
-
-# Collect static files
+ARG SECRET_KEY=dummy-build-only-key
+ARG ALLOWED_HOSTS=localhost
+ARG DEBUG=False
+ARG DATABASE_URL
+ENV SECRET_KEY=${SECRET_KEY} ALLOWED_HOSTS=${ALLOWED_HOSTS} DEBUG=${DEBUG} DATABASE_URL=${DATABASE_URL}
+ENV DJANGO_SETTINGS_MODULE=config.settings.production
 RUN uv run python manage.py collectstatic --noinput
 
-# Create non-root user for security
-RUN useradd -m -u 1000 appuser && \
-    chown -R appuser:appuser /app
-USER appuser
+# Stage 2: Lean runtime image
+FROM python:3.13-slim AS runtime
+COPY --from=ghcr.io/astral-sh/uv:0.8.22 /uv /bin/uv
 
+RUN apt-get update && apt-get install -y --no-install-recommends curl \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN useradd -m -u 1000 appuser
+WORKDIR /app
+
+COPY --from=builder --chown=appuser:appuser /app/.venv /app/.venv
+COPY --from=builder --chown=appuser:appuser /app/staticfiles /app/staticfiles
+COPY --chown=appuser:appuser . /app/
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    DJANGO_SETTINGS_MODULE=config.settings.production
+
+USER appuser
 EXPOSE 8000
 
-# Health check
 HEALTHCHECK --interval=30s --timeout=3s --start-period=40s --retries=3 \
     CMD curl -f http://localhost:8000/health/ || exit 1
 
