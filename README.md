@@ -4,6 +4,23 @@ A modern real-estate property management platform built with Django, featuring a
 
 ---
 
+## 📚 Documentation
+
+Comprehensive documentation is available in the [`docs/`](./docs/) directory:
+
+- **[Architecture](./docs/architecture/)** - System design and technical decisions
+- **[Development](./docs/development/)** - Development guides and workflows
+- **[Deployment](./docs/deployment/)** - Production deployment guides
+- **[Guides](./docs/guides/)** - Step-by-step tutorials
+
+**Quick Links:**
+- [Architecture Overview](./docs/architecture/overview.md)
+- [Frontend Architecture](./docs/architecture/frontend.md)
+- [Frontend Setup Guide](./docs/development/frontend-setup.md)
+- [Deployment Checklist](./docs/deployment/checklist.md)
+
+---
+
 ## 🛠 Tech Stack
 
 ### Backend
@@ -193,43 +210,22 @@ AWS_MEDIA_BUCKET_NAME=your-bucket-name
 
 ## 🎨 Frontend Development
 
-### Project Structure
+The frontend uses Tailwind CSS with DaisyUI for styling. Source files are kept separate from production assets.
 
-The frontend follows a clear separation between source and production files:
+**Quick Start:**
+```bash
+npm run build-css        # Watch mode for development
+npm run build-css-prod   # Production build
+```
 
-- **`frontend/`** - Source files that require compilation (Tailwind CSS, source JS)
-- **`static/`** - Production-ready assets (compiled CSS, images, static JS)
-- **`staticfiles/`** - Collected static files for deployment (auto-generated)
+**Learn More:**
+- [Frontend Architecture](./docs/architecture/frontend.md) - Architecture and design decisions
+- [Frontend Setup Guide](./docs/development/frontend-setup.md) - Development workflow and best practices
 
-This structure prevents Django's `collectstatic` from processing source files with build directives (like Tailwind's `@import`), which would cause errors with `ManifestStaticFilesStorage`.
-
-### Tailwind CSS
-
-The project uses Tailwind CSS with DaisyUI for styling. Custom configuration is in `tailwind.config.js`.
-
-**Development workflow:**
-1. Edit templates or `frontend/src/input.css`
-2. Run `npm run build-css` (watch mode) or `npm run build-css-prod` (one-time build)
-3. Compiled CSS is written to `static/dist/output.css`
-4. Django serves it automatically in development
-
-**Production workflow:**
-1. `npm run build-css-prod` - Builds minified CSS
-2. `python manage.py collectstatic` - Collects all static files
-3. WhiteNoise serves with compression and cache-busting
-
-**Custom theme:**
-- Primary color: Indigo (#6366f1)
-- Secondary color: Purple (#d946ef)
-- Accent color: Orange (#f97316)
-
-### Component Development
-
-Components are located in `templates/_components/`:
-- `forms/` - Form inputs and controls
-- `navigation/` - Navbar and footer
-- `properties/` - Property-specific components
-- `ui/` - General UI components
+**Custom Theme:**
+- Primary: Indigo (#6366f1)
+- Secondary: Purple (#d946ef)
+- Accent: Orange (#f97316)
 
 ---
 
@@ -241,79 +237,41 @@ In Progress
 
 ## 📦 Deployment
 
-### Production Build
-
+**Quick Deploy:**
 ```bash
-# Build Docker image
 docker build -t property-hub .
-
-# Run with production compose
 docker-compose -f docker-compose.prod.yml up
 ```
 
-### Production Checklist
-
-- [ ] Set `DEBUG=False`
-- [ ] Configure `ALLOWED_HOSTS`
-- [ ] Set secure `DJANGO_SECRET_KEY`
-- [ ] Enable HTTPS
-- [ ] Configure static file serving
-- [ ] Set up monitoring and logging
+**Complete Guide:**
+See the [Deployment Checklist](./docs/deployment/checklist.md) for detailed production deployment instructions.
 
 ---
 
 ## 🤝 Contributing
 
-### Getting Started
+We welcome contributions! Please see our [Contributing Guide](./docs/guides/contributing.md) for details.
 
+**Quick Start:**
 1. Fork the repository
-2. Create a feature branch
-   ```bash
-   git checkout -b feature/your-feature-name
-   ```
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
 3. Make your changes
-4. Follow the code style guidelines
-5. Write/update tests
-6. Commit your changes
-   ```bash
-   git commit -m "Add: brief description of changes"
-   ```
-7. Push to your fork
-   ```bash
-   git push origin feature/your-feature-name
-   ```
-8. Open a Pull Request
+4. Commit using conventional format (`Add: new feature`)
+5. Push and create a Pull Request
 
-### Code Style
-
-- Follow PEP 8 for Python code
-- Use meaningful variable and function names
-- Add docstrings to functions and classes
-- Keep functions small and focused
-- Write tests for new features
-
-### Commit Message Format
-
-```
-Type: Brief description
-
-Detailed description (optional)
-
-Types: Add, Update, Fix, Remove, Refactor, Docs
-```
-
-### Pull Request Guidelines
-
-- Provide a clear description of changes
-- Reference related issues
-- Ensure all tests pass
-- Update documentation if needed
-- Keep PRs focused and atomic
+See [Contributing Guide](./docs/guides/contributing.md) for detailed guidelines on code style, testing, and documentation.
 
 ---
 
 ## 📚 Resources
 
+### Project Documentation
+- [Documentation Index](./docs/README.md)
+- [Architecture Overview](./docs/architecture/overview.md)
+- [Frontend Guide](./docs/development/frontend-setup.md)
+- [Deployment Guide](./docs/deployment/checklist.md)
+
+### External Resources
 - [Django Documentation](https://docs.djangoproject.com/)
 - [Tailwind CSS Documentation](https://tailwindcss.com/docs)
 - [DaisyUI Documentation](https://daisyui.com/)
