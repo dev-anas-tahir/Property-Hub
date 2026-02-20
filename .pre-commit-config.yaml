@@ -1,7 +1,7 @@
 repos:
   # Pre-commit built-in hooks for file hygiene
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v5.0.0
+    rev: v6.0.0
     hooks:
       - id: trailing-whitespace
       - id: end-of-file-fixer
@@ -16,16 +16,26 @@ repos:
 
   # Ruff: lint + format + isort (import sorting)
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.15.0
+    rev: v0.15.2
     hooks:
       - id: ruff
-        args: [--fix, --exit-non-zero-on-fix]  # auto-fix lint/import issues
+        args: [--fix, --exit-non-zero-on-fix]
         types_or: [python, pyi]
-      - id: ruff-format  # separate hook for formatting (runs after lint fixes)
+      - id: ruff-format
 
-  # Optional: uv sync / lock on commit (keeps uv.lock up-to-date if deps change)
+  # Dockerfile linting
+  - repo: https://github.com/hadolint/hadolint
+    rev: v2.14.0
+    hooks:
+      - id: hadolint-docker
+        args: [
+          --ignore, DL3008,  # apt-get pin versions (annoying in dev)
+          --ignore, DL3009,  # delete apt lists (optional)
+          --failure-threshold, warning
+        ]
+
+  # uv lock
   - repo: https://github.com/astral-sh/uv-pre-commit
-    rev: 0.9.30  # check latest at https://github.com/astral-sh/uv-pre-commit/releases
+    rev: 0.10.4
     hooks:
       - id: uv-lock
-        # Only runs if pyproject.toml or uv.toml changed
