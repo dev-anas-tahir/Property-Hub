@@ -4,6 +4,7 @@ module.exports = {
     './templates/**/*.html',
     './apps/**/*.py',
     './static/js/**/*.js',
+    './frontend/**/*.js',  // Include frontend source files for Tailwind scanning
   ],
   theme: {
     extend: {

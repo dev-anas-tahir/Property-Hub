@@ -44,7 +44,10 @@ Property-Hub/
 │   └── shared/              # Shared utilities
 │
 ├── config/                  # Project configuration
-│   ├── settings.py          # Django settings
+│   ├── settings/            # Environment-specific settings
+│   │   ├── base.py          # Base settings
+│   │   ├── development.py   # Development settings
+│   │   └── production.py    # Production settings
 │   ├── urls.py              # Root URL config
 │   └── wsgi.py              # WSGI config
 │
@@ -54,11 +57,17 @@ Property-Hub/
 │   ├── properties/          # Property templates
 │   └── users/               # User templates
 │
-├── static/                  # Static assets
-│   ├── src/                 # Source CSS
-│   └── dist/                # Compiled CSS
+├── frontend/                # Frontend source files
+│   └── src/                 # Source files (CSS, JS)
+│       ├── input.css        # Tailwind source
+│       └── *.js             # JavaScript source
 │
-├── staticfiles/             # Collected static files
+├── static/                  # Production static assets
+│   ├── dist/                # Compiled CSS/JS
+│   ├── images/              # Images
+│   └── js/                  # Static JavaScript
+│
+├── staticfiles/             # Collected static files (generated)
 ├── media/                   # User uploads
 ├── Dockerfile               # Docker image
 ├── docker-compose.*.yml     # Docker compose configs
@@ -184,14 +193,30 @@ AWS_MEDIA_BUCKET_NAME=your-bucket-name
 
 ## 🎨 Frontend Development
 
+### Project Structure
+
+The frontend follows a clear separation between source and production files:
+
+- **`frontend/`** - Source files that require compilation (Tailwind CSS, source JS)
+- **`static/`** - Production-ready assets (compiled CSS, images, static JS)
+- **`staticfiles/`** - Collected static files for deployment (auto-generated)
+
+This structure prevents Django's `collectstatic` from processing source files with build directives (like Tailwind's `@import`), which would cause errors with `ManifestStaticFilesStorage`.
+
 ### Tailwind CSS
 
 The project uses Tailwind CSS with DaisyUI for styling. Custom configuration is in `tailwind.config.js`.
 
-**Adding new styles:**
-1. Add Tailwind classes to your templates
-2. Run `npm run build-css` to compile
-3. Run `python manage.py collectstatic` to collect files
+**Development workflow:**
+1. Edit templates or `frontend/src/input.css`
+2. Run `npm run build-css` (watch mode) or `npm run build-css-prod` (one-time build)
+3. Compiled CSS is written to `static/dist/output.css`
+4. Django serves it automatically in development
+
+**Production workflow:**
+1. `npm run build-css-prod` - Builds minified CSS
+2. `python manage.py collectstatic` - Collects all static files
+3. WhiteNoise serves with compression and cache-busting
 
 **Custom theme:**
 - Primary color: Indigo (#6366f1)

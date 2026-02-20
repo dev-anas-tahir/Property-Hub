@@ -25,8 +25,7 @@ package-lock.json  # Optional: keep if you want strict parity, ignore if using y
 .pnpm-debug.log*
 
 # Ignore the compiled CSS output (Django will collect it via staticfiles)
-# Adjust this path if your output file is elsewhere (e.g., static/css/dist.css)
-static/css/output.css
+static/dist/output.css
 
 # --- IDEs & Tools ---
 .vscode/
