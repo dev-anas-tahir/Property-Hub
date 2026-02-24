@@ -15,6 +15,7 @@ dependencies = [
     "environs[django]",
     "pillow",
     "psycopg[binary]",
+    "unfold",
     "whitenoise",
 ]
 
