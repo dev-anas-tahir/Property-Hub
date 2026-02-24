@@ -25,7 +25,7 @@ elif (BASE_DIR / ".env.prod").exists():
     env.read_env(str(BASE_DIR / ".env.prod"), recurse=False)
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = env.str("SECRET_KEY")
+SECRET_KEY = env.str("SECRET_KEY", "dummy-build-only-key-not-used-in-runtime")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env.bool("DEBUG", False)
@@ -98,7 +98,7 @@ ASGI_APPLICATION = "config.asgi.application"
 
 DATABASES = {
     "default": dj_database_url.parse(
-        env.str("DATABASE_URL"),
+        env.str("DATABASE_URL", "sqlite:///:memory:"),
         conn_max_age=env.int("DATABASE_CONN_MAX_AGE", 600),
     )
 }
@@ -198,7 +198,7 @@ USE_S3_STATIC = env.bool("USE_S3_STATIC", False)
 AWS_HOST_NAME = env.str("AWS_HOST_NAME", "")
 AWS_ACCESS_KEY_ID = env.str("AWS_ACCESS_KEY_ID", "")
 AWS_SECRET_ACCESS_KEY = env.str("AWS_SECRET_ACCESS_KEY", "")
-AWS_S3_ENDPOINT_URL = env.str("AWS_S3_ENDPOINT_URL", None)
+AWS_S3_ENDPOINT_URL = env.str("AWS_S3_ENDPOINT_URL", "")
 AWS_S3_FILE_OVERWRITE = False
 AWS_DEFAULT_ACL = "public-read"
 AWS_S3_VERIFY = env.bool("AWS_S3_VERIFY", True)

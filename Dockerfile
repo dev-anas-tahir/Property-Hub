@@ -19,15 +19,9 @@ RUN uv sync --frozen --no-dev --group prod && npm ci
 COPY . .
 RUN npm run build-css-prod
 
-# Collectstatic with dummy build-time settings
-ARG SECRET_KEY=dummy-build-only-key
-ARG ALLOWED_HOSTS=localhost
-ARG DEBUG=False
-ENV SECRET_KEY=${SECRET_KEY} \
-    ALLOWED_HOSTS=${ALLOWED_HOSTS} \
-    DEBUG=${DEBUG} \
-    DJANGO_SETTINGS_MODULE=config.settings.production
-RUN uv run python manage.py collectstatic --noinput
+# Collectstatic using base settings (no database/AWS required for build)
+RUN DJANGO_SETTINGS_MODULE=config.settings.base \
+    uv run python manage.py collectstatic --noinput
 
 # Stage 2: Runtime - lean production image
 FROM python:3.13-slim AS runtime
