@@ -4,21 +4,18 @@ version = "0.1.0"
 description = "Django Property Management System"
 requires-python = ">=3.13"
 dependencies = [
-    "django>=6.0",
-    "pillow>=11.2.1",
-    "django-storages>=1.14.6",
-    "boto3>=1.38.35",
-    "django-extensions>=4.1",
-    "django-axes>=8.0.0",
-    "psycopg[binary]>=3.2.10",
-    "werkzeug>=3.1.3",
-    "environs[django]>=14.5.0",
-    "django-unfold>=0.78.0",
-    "channels>=4.0.0",
-    "channels-redis>=4.0.0",
-    "bleach>=6.0.0",
-    "whitenoise>=6.9.0",
-    "twisted[http2,tls]>=25.5.0",
+    "bleach",
+    "boto3",
+    "channels",
+    "channels-redis",
+    "django",
+    "django-axes",
+    "django-storages",
+    "django-unfold",
+    "environs[django]",
+    "pillow",
+    "psycopg[binary]",
+    "whitenoise",
 ]
 
 classifiers = [
@@ -28,16 +25,17 @@ classifiers = [
 
 [dependency-groups]
 dev = [
-    "django-debug-toolbar>=5.2.0",
-    "pysonar>=1.3.0.4086",
-    "ruff>=0.14.14",
-    "bandit>=1.8.0",
-    "daphne>=4.0.0",
+    "daphne",
+    "django-debug-toolbar",
+    "django-extensions",
+    "ruff",
+    "twisted[http2,tls]",
+    "werkzeug",
 ]
 prod = [
-    "django-compressor>=4.6.0",
-    "gunicorn>=25.1.0",
-    "uvicorn>=0.41.0",
+    "django-compressor",
+    "gunicorn",
+    "uvicorn[standard]",
 ]
 
 [build-system]
