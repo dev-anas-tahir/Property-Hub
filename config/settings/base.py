@@ -49,8 +49,9 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     # Third-party apps
-    "channels",
     "axes",
+    "channels",
+    "rangefilter",
     "storages",
     # Local apps
     "apps.chat.apps.ChatConfig",
