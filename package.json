@@ -1,15 +1,15 @@
 {
-  "name": "property-hub-frontend",
-  "version": "1.0.0",
-  "description": "Frontend dependencies for Property Hub",
   "scripts": {
     "build-css": "tailwindcss -i ./frontend/src/input.css -o ./static/dist/output.css --watch",
-    "build-css-prod": "tailwindcss -i ./frontend/src/input.css -o ./static/dist/output.css --minify"
+    "build-css-prod": "tailwindcss -i ./frontend/src/input.css -o ./static/dist/output.css --minify",
+    "build-js": "cp ./frontend/src/chat-client.js ./static/dist/chat-client.js",
+    "watch-js": "nodemon --watch ./frontend/src/chat-client.js --exec 'cp ./frontend/src/chat-client.js ./static/dist/chat-client.js'"
   },
   "devDependencies": {
     "tailwindcss": "^3.4.0",
     "daisyui": "^4.6.0",
     "@tailwindcss/forms": "^0.5.7",
-    "@tailwindcss/typography": "^0.5.10"
+    "@tailwindcss/typography": "^0.5.10",
+    "nodemon": "^3.0.0"
   }
 }

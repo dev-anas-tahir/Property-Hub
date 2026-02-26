@@ -202,7 +202,7 @@ The ChatClient is integrated into the conversation detail template:
 ```html
 {% load static %}
 
-<script src="{% static 'src/chat-client.js' %}"></script>
+<script src="{% static 'dist/chat-client.js' %}"></script>
 
 <script>
     const chatClient = new ChatClient({{ conversation.id }});

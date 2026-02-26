@@ -2,13 +2,13 @@
 Tests for the real-time chat feature.
 """
 
-from django.test import TransactionTestCase, override_settings
-from django.contrib.auth import get_user_model
-from channels.testing import WebsocketCommunicator
-from channels.db import database_sync_to_async
 from apps.chat.consumers import ChatConsumer
 from apps.chat.models import Conversation, Message
 from apps.properties.models import Property
+from channels.testing import WebsocketCommunicator
+from channels.db import database_sync_to_async
+from django.test import TransactionTestCase, override_settings
+from django.contrib.auth import get_user_model
 
 User = get_user_model()
 
@@ -295,10 +295,11 @@ class ChatConsumerTestCase(TransactionTestCase):
         # Receive sanitized message
         response = await communicator.receive_json_from()
         self.assertEqual(response["type"], "message")
-        # Should strip HTML tags
+        # Should strip HTML tags and script content for security
         self.assertNotIn("<script>", response["message"])
         self.assertNotIn("</script>", response["message"])
-        self.assertEqual(response["message"], 'alert("XSS")Hello')
+        self.assertNotIn("alert", response["message"])
+        self.assertEqual(response["message"], "Hello")
 
         # Disconnect
         await communicator.disconnect()
@@ -2194,3 +2195,308 @@ class MessageAdminTestCase(TransactionTestCase):
 
         # Should contain link to conversation
         self.assertContains(response, f"Conversation {self.conversation.id}")
+
+
+@override_settings(
+    CHANNEL_LAYERS={"default": {"BACKEND": "channels.layers.InMemoryChannelLayer"}}
+)
+class MessageTypeProtocolTestCase(TransactionTestCase):
+    """
+    Test cases for the message type protocol.
+
+    Tests cover:
+    - Ping/pong health check messages
+    - Backward compatibility with messages without type field
+    - Unknown message type handling
+    - Message type dispatching
+    """
+
+    @database_sync_to_async
+    def create_test_data(self):
+        """Create test users, property, and conversation."""
+        # Create users
+        self.user1 = User.objects.create_user(
+            email="user1@example.com", password="testpass123"
+        )
+        self.user2 = User.objects.create_user(
+            email="user2@example.com", password="testpass123"
+        )
+
+        # Create property
+        self.property = Property.objects.create(
+            user=self.user2,
+            name="Test Property",
+            full_address="123 Test St, Test City, TS 12345",
+            phone_number="03001234567",
+            cnic="12345-1234567-1",
+            property_type="House",
+            description="A test property",
+            price=100000,
+        )
+
+        # Create conversation
+        self.conversation = Conversation.objects.create(
+            property=self.property,
+            participant_one=self.user1,
+            participant_two=self.user2,
+        )
+
+    async def test_ping_pong_health_check(self):
+        """
+        Test that ping messages receive pong responses.
+
+        This tests the health check functionality for connection monitoring.
+        """
+        await self.create_test_data()
+
+        # Create communicator
+        communicator = WebsocketCommunicator(
+            ChatConsumer.as_asgi(), f"/ws/chat/{self.conversation.id}/"
+        )
+        communicator.scope["user"] = self.user1
+        communicator.scope["url_route"] = {
+            "kwargs": {"conversation_id": self.conversation.id}
+        }
+
+        # Connect
+        connected, _ = await communicator.connect()
+        self.assertTrue(connected)
+
+        # Send ping message
+        await communicator.send_json_to({"type": "ping"})
+
+        # Receive pong response
+        response = await communicator.receive_json_from()
+        self.assertEqual(response["type"], "pong")
+
+        # Disconnect
+        await communicator.disconnect()
+
+    async def test_backward_compatibility_no_type_field(self):
+        """
+        Test that messages without type field default to chat_message.
+
+        This ensures backward compatibility with existing clients.
+        """
+        await self.create_test_data()
+
+        # Create communicator
+        communicator = WebsocketCommunicator(
+            ChatConsumer.as_asgi(), f"/ws/chat/{self.conversation.id}/"
+        )
+        communicator.scope["user"] = self.user1
+        communicator.scope["url_route"] = {
+            "kwargs": {"conversation_id": self.conversation.id}
+        }
+
+        # Connect
+        connected, _ = await communicator.connect()
+        self.assertTrue(connected)
+
+        # Send message without type field (old format)
+        await communicator.send_json_to({"message": "Hello without type field"})
+
+        # Should receive message successfully
+        response = await communicator.receive_json_from()
+        self.assertEqual(response["type"], "message")
+        self.assertEqual(response["message"], "Hello without type field")
+
+        # Disconnect
+        await communicator.disconnect()
+
+    async def test_explicit_chat_message_type(self):
+        """
+        Test that messages with explicit chat_message type work correctly.
+        """
+        await self.create_test_data()
+
+        # Create communicator
+        communicator = WebsocketCommunicator(
+            ChatConsumer.as_asgi(), f"/ws/chat/{self.conversation.id}/"
+        )
+        communicator.scope["user"] = self.user1
+        communicator.scope["url_route"] = {
+            "kwargs": {"conversation_id": self.conversation.id}
+        }
+
+        # Connect
+        connected, _ = await communicator.connect()
+        self.assertTrue(connected)
+
+        # Send message with explicit type
+        await communicator.send_json_to(
+            {"type": "chat_message", "message": "Hello with explicit type"}
+        )
+
+        # Should receive message successfully
+        response = await communicator.receive_json_from()
+        self.assertEqual(response["type"], "message")
+        self.assertEqual(response["message"], "Hello with explicit type")
+
+        # Disconnect
+        await communicator.disconnect()
+
+    async def test_unknown_message_type_returns_error(self):
+        """
+        Test that unknown message types return an error response.
+
+        This ensures the protocol is extensible and handles invalid types gracefully.
+        """
+        await self.create_test_data()
+
+        # Create communicator
+        communicator = WebsocketCommunicator(
+            ChatConsumer.as_asgi(), f"/ws/chat/{self.conversation.id}/"
+        )
+        communicator.scope["user"] = self.user1
+        communicator.scope["url_route"] = {
+            "kwargs": {"conversation_id": self.conversation.id}
+        }
+
+        # Connect
+        connected, _ = await communicator.connect()
+        self.assertTrue(connected)
+
+        # Send message with unknown type
+        await communicator.send_json_to({"type": "unknown_type", "data": "some data"})
+
+        # Should receive error response
+        response = await communicator.receive_json_from()
+        self.assertEqual(response["type"], "error")
+        self.assertIn("Unknown message type", response["message"])
+
+        # Disconnect
+        await communicator.disconnect()
+
+    async def test_ping_does_not_create_message(self):
+        """
+        Test that ping messages do not create database records.
+        """
+        await self.create_test_data()
+
+        # Create communicator
+        communicator = WebsocketCommunicator(
+            ChatConsumer.as_asgi(), f"/ws/chat/{self.conversation.id}/"
+        )
+        communicator.scope["user"] = self.user1
+        communicator.scope["url_route"] = {
+            "kwargs": {"conversation_id": self.conversation.id}
+        }
+
+        # Connect
+        connected, _ = await communicator.connect()
+        self.assertTrue(connected)
+
+        # Get initial message count
+        @database_sync_to_async
+        def get_message_count():
+            return Message.objects.filter(conversation=self.conversation).count()
+
+        initial_count = await get_message_count()
+
+        # Send ping message
+        await communicator.send_json_to({"type": "ping"})
+        await communicator.receive_json_from()
+
+        # Verify no message was created
+        final_count = await get_message_count()
+        self.assertEqual(initial_count, final_count)
+
+        # Disconnect
+        await communicator.disconnect()
+
+    async def test_multiple_ping_pong_exchanges(self):
+        """
+        Test that multiple ping/pong exchanges work correctly.
+        """
+        await self.create_test_data()
+
+        # Create communicator
+        communicator = WebsocketCommunicator(
+            ChatConsumer.as_asgi(), f"/ws/chat/{self.conversation.id}/"
+        )
+        communicator.scope["user"] = self.user1
+        communicator.scope["url_route"] = {
+            "kwargs": {"conversation_id": self.conversation.id}
+        }
+
+        # Connect
+        connected, _ = await communicator.connect()
+        self.assertTrue(connected)
+
+        # Send multiple pings
+        for i in range(5):
+            await communicator.send_json_to({"type": "ping"})
+            response = await communicator.receive_json_from()
+            self.assertEqual(response["type"], "pong")
+
+        # Disconnect
+        await communicator.disconnect()
+
+    async def test_mixed_message_types(self):
+        """
+        Test that different message types can be mixed in the same connection.
+        """
+        await self.create_test_data()
+
+        # Create communicator
+        communicator = WebsocketCommunicator(
+            ChatConsumer.as_asgi(), f"/ws/chat/{self.conversation.id}/"
+        )
+        communicator.scope["user"] = self.user1
+        communicator.scope["url_route"] = {
+            "kwargs": {"conversation_id": self.conversation.id}
+        }
+
+        # Connect
+        connected, _ = await communicator.connect()
+        self.assertTrue(connected)
+
+        # Send ping
+        await communicator.send_json_to({"type": "ping"})
+        response = await communicator.receive_json_from()
+        self.assertEqual(response["type"], "pong")
+
+        # Send chat message
+        await communicator.send_json_to({"type": "chat_message", "message": "Hello"})
+        response = await communicator.receive_json_from()
+        self.assertEqual(response["type"], "message")
+        self.assertEqual(response["message"], "Hello")
+
+        # Send another ping
+        await communicator.send_json_to({"type": "ping"})
+        response = await communicator.receive_json_from()
+        self.assertEqual(response["type"], "pong")
+
+        # Disconnect
+        await communicator.disconnect()
+
+    async def test_invalid_json_returns_error(self):
+        """
+        Test that invalid JSON returns an error message.
+        """
+        await self.create_test_data()
+
+        # Create communicator
+        communicator = WebsocketCommunicator(
+            ChatConsumer.as_asgi(), f"/ws/chat/{self.conversation.id}/"
+        )
+        communicator.scope["user"] = self.user1
+        communicator.scope["url_route"] = {
+            "kwargs": {"conversation_id": self.conversation.id}
+        }
+
+        # Connect
+        connected, _ = await communicator.connect()
+        self.assertTrue(connected)
+
+        # Send invalid JSON
+        await communicator.send_to(text_data="invalid json {")
+
+        # Should receive error response
+        response = await communicator.receive_json_from()
+        self.assertEqual(response["type"], "error")
+        self.assertIn("Invalid message format", response["message"])
+
+        # Disconnect
+        await communicator.disconnect()

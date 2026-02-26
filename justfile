@@ -8,10 +8,13 @@ up:
 down:
     docker compose -f docker-compose.yml down -v
 
-# Start Django development server with CSS build
+# Start Django development server with CSS & JS build
 runserver port="8000":
+    trap 'kill 0' SIGINT SIGTERM
     npm run build-css &
-    uv run python manage.py runserver {{port}}
+    npm run build-js &
+    uv run python manage.py runserver {{port}} &
+    wait
 
 # Create new Django migrations
 makemigrations:

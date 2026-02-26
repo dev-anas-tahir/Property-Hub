@@ -4,7 +4,6 @@ version = "0.1.0"
 description = "Django Property Management System"
 requires-python = ">=3.13"
 dependencies = [
-    "bleach==6.3.0",
     "boto3==1.42.55",
     "channels==4.3.2",
     "channels-redis==4.3.0",
@@ -14,8 +13,10 @@ dependencies = [
     "django-storages==1.14.6",
     "django-unfold==0.80.2",
     "environs[django]==14.6.0",
+    "nh3>=0.3.3",
     "pillow==12.1.1",
     "psycopg[binary]==3.3.3",
+    "redis[hiredis]>=7.2.0",
     "unfold==1.2.4",
     "whitenoise==6.11.0",
 ]
