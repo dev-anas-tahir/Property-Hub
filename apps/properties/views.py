@@ -440,6 +440,12 @@ def property_favorite_toggle_view(request, pk):
     # Get the property
     property_obj = get_object_or_404(Property, pk=pk)
 
+    # Prevent users from favoriting unpublished properties they don't own.
+    # This keeps behavior consistent with detail/list visibility rules.
+    is_owner = property_obj.user == request.user
+    if not property_obj.is_published and not is_owner:
+        raise Http404("Property not found")
+
     # Toggle favorite status
     favorite, created = Favorite.objects.get_or_create(
         user=request.user, property=property_obj
