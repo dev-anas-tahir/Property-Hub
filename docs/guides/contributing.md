@@ -95,6 +95,7 @@ Then create a Pull Request on GitHub with:
 - Reference to related issues
 - Screenshots for UI changes
 - Test results if applicable
+- The exact repository PR template (auto-loaded by GitHub)
 
 ## Code Style Guidelines
 
@@ -244,6 +245,9 @@ class PropertyModelTest(TestCase):
 
 ## Pull Request Guidelines
 
+> Every PR **must** use `.github/pull_request_template.md`.  
+> PRs that do not follow the template format or checklist will fail CI.
+
 ### Before Submitting
 
 - [ ] Code follows style guidelines
@@ -280,6 +284,73 @@ Add screenshots for UI changes
 - [ ] Documentation updated
 - [ ] No breaking changes (or documented)
 ```
+
+### Correct PR Example
+
+Use this level of detail so reviewers can reproduce your changes quickly:
+
+```markdown
+## Description
+Add validation for property area and improve error messages in property form.
+
+## Type of Change
+- [x] Bug fix
+- [ ] New feature
+- [ ] Breaking change
+- [ ] Documentation update
+
+## Related Issues
+Fixes #248
+
+## Testing
+- `uv run ruff check .`
+- `uv run python manage.py check`
+- `uv run python manage.py test apps.properties`
+
+## Screenshots (if applicable)
+N/A (no UI changes)
+
+## Checklist
+- [x] Code follows style guidelines
+- [x] Tests added/updated
+- [x] Documentation updated
+- [x] No breaking changes (or documented)
+```
+
+### Screenshot Example for UI Changes
+
+If your PR changes templates/styles/components, include screenshots:
+
+```markdown
+## Screenshots (if applicable)
+### Before
+![Before property detail page](https://user-images.githubusercontent.com/example/before.png)
+
+### After
+![After property detail page](https://user-images.githubusercontent.com/example/after.png)
+```
+
+### PR Compliance and Audit Process
+
+All pull requests are audited for:
+
+1. Required headings from the PR template
+2. Presence of all checklist items
+3. At least one checked checklist item (`- [x]`) to avoid blank submissions
+4. Non-empty `## Description` and `## Testing` sections
+
+This audit runs automatically in GitHub Actions as the `validate-pr-template` job on every pull request.
+
+### Enforcing PR Templates in GitHub
+
+Repository maintainers should verify these settings in GitHub:
+
+1. Keep `.github/pull_request_template.md` in the default branch.
+2. In **Settings → General → Pull Requests**, ensure contributors are prompted with templates (default behavior when template file exists).
+3. In **Settings → Branches**, require status checks and mark `validate-pr-template` as required for protected branches.
+4. Optionally add additional PR templates in `.github/PULL_REQUEST_TEMPLATE/` for special workflows.
+
+With required checks enabled, non-compliant PR descriptions cannot be merged.
 
 ### Review Process
 
