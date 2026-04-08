@@ -245,7 +245,7 @@ class PropertyModelTest(TestCase):
 
 ## Pull Request Guidelines
 
-> Every PR **must** use `.github/pull_request_template.md`.  
+> Every PR **must** use `.github/pull_request_template.md`.
 > PRs that do not follow the template format or checklist will fail CI.
 
 ### Before Submitting
