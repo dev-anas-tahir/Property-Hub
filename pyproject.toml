@@ -14,7 +14,7 @@ dependencies = [
     "django-unfold==0.80.2",
     "environs[django]==14.6.0",
     "nh3>=0.3.3",
-    "pillow==12.1.1",
+    "pillow==12.2.0",
     "psycopg[binary]==3.3.3",
     "redis[hiredis]>=7.2.0",
     "unfold==1.2.4",
