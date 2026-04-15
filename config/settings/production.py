@@ -3,7 +3,6 @@ Production settings for Property-Hub project.
 """
 
 from .base import *  # noqa: F403, F401
-from .base import LOGGING, TEMPLATES, env, timedelta  # noqa: F401
 
 # ============================================================================
 # SECURITY
@@ -15,7 +14,7 @@ DEBUG = False
 ALLOWED_HOSTS = env.list("ALLOWED_HOSTS")  # noqa: F405
 
 # CSRF trusted origins for production
-CSRF_TRUSTED_ORIGINS = env.list(
+CSRF_TRUSTED_ORIGINS = env.list(  # noqa: F405
     "CSRF_TRUSTED_ORIGINS",
     [
         "https://propertyhub.duckdns.org",

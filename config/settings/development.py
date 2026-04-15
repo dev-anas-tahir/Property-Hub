@@ -3,18 +3,6 @@ Development settings for Property-Hub project.
 """
 
 from .base import *  # noqa: F403, F401
-from .base import (  # noqa: F401
-    AWS_HOST_NAME,
-    AWS_MEDIA_BUCKET_NAME,
-    AWS_STATIC_BUCKET_NAME,
-    LOGGING,
-    MIDDLEWARE,
-    STORAGES,
-    USE_S3_MEDIA,
-    USE_S3_STATIC,
-    env,
-    timedelta,
-)
 
 # ============================================================================
 # DEBUG & DEVELOPMENT
@@ -79,7 +67,7 @@ if USE_S3_MEDIA or USE_S3_STATIC:  # noqa: F405
 
     if USE_S3_STATIC:  # noqa: F405
         AWS_S3_STATIC_CUSTOM_DOMAIN = f"{AWS_HOST_NAME}:4566/{AWS_STATIC_BUCKET_NAME}"  # noqa: F405
-        STORAGES["staticfiles"]["OPTIONS"]["custom_domain"] = (
+        STORAGES["staticfiles"]["OPTIONS"]["custom_domain"] = (  # noqa: F405
             AWS_S3_STATIC_CUSTOM_DOMAIN  # noqa: F405
         )
         STORAGES["staticfiles"]["OPTIONS"]["endpoint_url"] = AWS_S3_ENDPOINT_URL  # noqa: F405
