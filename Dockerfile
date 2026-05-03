@@ -20,7 +20,7 @@ COPY . .
 RUN npm run build-css-prod
 
 # Collectstatic using base settings (no database/AWS required for build)
-RUN DJANGO_SETTINGS_MODULE=config.settings.base \
+RUN DJANGO_SETTINGS_MODULE=config.django.base \
     uv run python manage.py collectstatic --noinput
 
 # Stage 2: Runtime - lean production image
@@ -42,7 +42,7 @@ COPY --chown=appuser:appuser . /app/
 # Set environment
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
-    DJANGO_SETTINGS_MODULE=config.settings.production \
+    DJANGO_SETTINGS_MODULE=config.django.production \
     VIRTUAL_ENV=/app/.venv \
     PATH="/app/.venv/bin:$PATH"
 

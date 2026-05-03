@@ -1,35 +1,20 @@
-"""
-Base settings for Property-Hub project.
-Contains settings common to all environments.
-"""
-
-from datetime import timedelta
 from pathlib import Path
 
-from django.contrib import messages
-from django.templatetags.static import static
-from environs import Env
 import dj_database_url
+from django.contrib import messages
+from environs import Env
 
-# Build paths
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
-# Environment variables
 env = Env()
-# Read .env file from project root
 env.read_env(str(BASE_DIR / ".env"), recurse=False)
-# Also try environment-specific files if they exist
 if (BASE_DIR / ".env.dev").exists():
     env.read_env(str(BASE_DIR / ".env.dev"), recurse=False)
 elif (BASE_DIR / ".env.prod").exists():
     env.read_env(str(BASE_DIR / ".env.prod"), recurse=False)
 
-# SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = env.str("SECRET_KEY", "dummy-build-only-key-not-used-in-runtime")
-
-# SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env.bool("DEBUG", False)
-
 ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", [])
 
 # ============================================================================
@@ -132,18 +117,6 @@ AUTHENTICATION_BACKENDS = [
 
 LOGIN_URL = "users:login"
 
-# Django Axes - Brute force protection
-AXES_ENABLED = True
-AXES_FAILURE_LIMIT = 10
-AXES_COOLOFF_TIME = timedelta(minutes=30)
-AXES_LOCK_OUT_AT_FAILURE = True
-AXES_RESET_ON_SUCCESS = True
-AXES_DISABLE_ACCESS_LOG = False
-AXES_LOCKOUT_TEMPLATE = None
-AXES_LOCKOUT_URL = None
-AXES_VERBOSE = True
-AXES_USERNAME_FORM_FIELD = "email"
-
 # ============================================================================
 # INTERNATIONALIZATION
 # ============================================================================
@@ -154,114 +127,12 @@ USE_I18N = True
 USE_TZ = True
 
 # ============================================================================
-# STATIC FILES (CSS, JavaScript, Images)
+# STATIC & MEDIA PATHS
 # ============================================================================
 
-STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 STATICFILES_DIRS = [BASE_DIR / "static"]
-
-# ============================================================================
-# MEDIA FILES (User uploads)
-# ============================================================================
-
-MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
-
-# ============================================================================
-# DJANGO CHANNELS & REDIS
-# ============================================================================
-
-CHANNEL_LAYERS = {
-    "default": {
-        "BACKEND": "channels_redis.core.RedisChannelLayer",
-        "CONFIG": {
-            "hosts": [
-                (
-                    env.str("REDIS_HOST", "127.0.0.1"),
-                    env.int("REDIS_PORT", 6379),
-                )
-            ],
-            "capacity": 1500,
-            "expiry": 10,
-        },
-    },
-}
-
-REDIS_URL = (
-    f"redis://{env.str('REDIS_HOST', '127.0.0.1')}:{env.int('REDIS_PORT', 6379)}/0"
-)
-
-# ============================================================================
-# AWS S3 STORAGE CONFIGURATION
-# ============================================================================
-
-USE_S3_MEDIA = env.bool("USE_S3_MEDIA", False)
-USE_S3_STATIC = env.bool("USE_S3_STATIC", False)
-
-# AWS credentials and configuration
-AWS_HOST_NAME = env.str("AWS_HOST_NAME", "")
-AWS_ACCESS_KEY_ID = env.str("AWS_ACCESS_KEY_ID", "")
-AWS_SECRET_ACCESS_KEY = env.str("AWS_SECRET_ACCESS_KEY", "")
-AWS_S3_ENDPOINT_URL = env.str("AWS_S3_ENDPOINT_URL", "")
-AWS_S3_FILE_OVERWRITE = False
-AWS_DEFAULT_ACL = "public-read"
-AWS_S3_VERIFY = env.bool("AWS_S3_VERIFY", True)
-AWS_QUERYSTRING_AUTH = False
-
-# S3 bucket names
-AWS_MEDIA_BUCKET_NAME = env.str("AWS_MEDIA_BUCKET_NAME", "propertyhub-media")
-AWS_STATIC_BUCKET_NAME = env.str("AWS_STATIC_BUCKET_NAME", "propertyhub-static")
-
-# Storage backends configuration
-STORAGES = {
-    "default": {
-        "BACKEND": "django.core.files.storage.FileSystemStorage",
-    },
-    "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
-    },
-}
-
-# Configure S3 for media files if enabled
-if USE_S3_MEDIA:
-    AWS_S3_CUSTOM_DOMAIN = env.str(
-        "AWS_S3_CUSTOM_DOMAIN",
-        f"{AWS_MEDIA_BUCKET_NAME}.s3.amazonaws.com",
-    )
-    STORAGES["default"] = {
-        "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
-        "OPTIONS": {
-            "bucket_name": AWS_MEDIA_BUCKET_NAME,
-            "custom_domain": AWS_S3_CUSTOM_DOMAIN,
-            "file_overwrite": AWS_S3_FILE_OVERWRITE,
-            "default_acl": AWS_DEFAULT_ACL,
-            "querystring_auth": AWS_QUERYSTRING_AUTH,
-        },
-    }
-    if AWS_S3_ENDPOINT_URL:
-        STORAGES["default"]["OPTIONS"]["endpoint_url"] = AWS_S3_ENDPOINT_URL
-    MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/"
-
-# Configure S3 for static files if enabled (typically production only)
-if USE_S3_STATIC:
-    AWS_S3_STATIC_CUSTOM_DOMAIN = env.str(
-        "AWS_S3_STATIC_CUSTOM_DOMAIN",
-        f"{AWS_STATIC_BUCKET_NAME}.s3.amazonaws.com",
-    )
-    STORAGES["staticfiles"] = {
-        "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
-        "OPTIONS": {
-            "bucket_name": AWS_STATIC_BUCKET_NAME,
-            "custom_domain": AWS_S3_STATIC_CUSTOM_DOMAIN,
-            "file_overwrite": True,
-            "default_acl": AWS_DEFAULT_ACL,
-            "querystring_auth": False,
-        },
-    }
-    if AWS_S3_ENDPOINT_URL:
-        STORAGES["staticfiles"]["OPTIONS"]["endpoint_url"] = AWS_S3_ENDPOINT_URL
-    STATIC_URL = f"https://{AWS_S3_STATIC_CUSTOM_DOMAIN}/"
 
 # ============================================================================
 # MESSAGES FRAMEWORK
@@ -317,40 +188,16 @@ LOGGING = {
 }
 
 # ============================================================================
-# THIRD-PARTY: UNFOLD ADMIN
-# ============================================================================
-
-UNFOLD = {
-    "SITE_TITLE": "PropertyHub Admin",
-    "SITE_HEADER": "PropertyHub",
-    "SHOW_HISTORY": True,
-    "SHOW_VIEW_ON_SITE": True,
-    "SITE_FAVICONS": [
-        {
-            "rel": "icon",
-            "sizes": "32x32",
-            "type": "image/svg+xml",
-            "href": lambda request: static("images/favicon.svg"),
-        },
-    ],
-    "COLORS": {
-        "primary": {
-            "50": "250 245 255",
-            "100": "243 244 255",
-            "200": "216 207 255",
-            "300": "192 190 255",
-            "400": "165 155 255",
-            "500": "139 122 255",
-            "600": "120 84 255",
-            "700": "102 58 255",
-            "800": "85 36 255",
-            "900": "70 13 255",
-        },
-    },
-}
-
-# ============================================================================
 # MISCELLANEOUS
 # ============================================================================
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# ============================================================================
+# THIRD-PARTY INTEGRATION SETTINGS
+# ============================================================================
+
+from config.settings.axes import *  # noqa: E402, F401, F403
+from config.settings.channels import *  # noqa: E402, F401, F403
+from config.settings.storages import *  # noqa: E402, F401, F403
+from config.settings.unfold import *  # noqa: E402, F401, F403

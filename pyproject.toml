@@ -11,13 +11,12 @@ dependencies = [
     "django-admin-rangefilter==0.13.5",
     "django-axes==8.3.1",
     "django-storages==1.14.6",
-    "django-unfold==0.80.2",
+    "django-unfold>=0.81.0",
     "environs[django]==14.6.0",
     "nh3>=0.3.3",
     "pillow==12.2.0",
     "psycopg[binary]==3.3.3",
     "redis[hiredis]>=7.2.0",
-    "unfold==1.2.4",
     "whitenoise==6.11.0",
 ]
 

@@ -1,8 +1,4 @@
-"""
-Production settings for Property-Hub project.
-"""
-
-from .base import *  # noqa: F403, F401
+from .base import *  # noqa: F401, F403
 
 # ============================================================================
 # SECURITY
@@ -10,10 +6,8 @@ from .base import *  # noqa: F403, F401
 
 DEBUG = False
 
-# Strict host validation in production
 ALLOWED_HOSTS = env.list("ALLOWED_HOSTS")  # noqa: F405
 
-# CSRF trusted origins for production
 CSRF_TRUSTED_ORIGINS = env.list(  # noqa: F405
     "CSRF_TRUSTED_ORIGINS",
     [
@@ -22,7 +16,6 @@ CSRF_TRUSTED_ORIGINS = env.list(  # noqa: F405
     ],
 )
 
-# Security settings for production
 SECURE_SSL_REDIRECT = env.bool("SECURE_SSL_REDIRECT", True)  # noqa: F405
 SECURE_HSTS_SECONDS = env.int("SECURE_HSTS_SECONDS", 31536000)  # noqa: F405
 SECURE_HSTS_INCLUDE_SUBDOMAINS = env.bool("SECURE_HSTS_INCLUDE_SUBDOMAINS", True)  # noqa: F405
@@ -30,7 +23,6 @@ SECURE_HSTS_PRELOAD = env.bool("SECURE_HSTS_PRELOAD", True)  # noqa: F405
 SECURE_CONTENT_TYPE_NOSNIFF = True
 SECURE_BROWSER_XSS_FILTER = True
 
-# Cookie security
 SESSION_COOKIE_SECURE = True
 SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SAMESITE = "Lax"
@@ -42,7 +34,6 @@ CSRF_COOKIE_SAMESITE = "Lax"
 # PERFORMANCE
 # ============================================================================
 
-# Template caching
 TEMPLATES[0]["OPTIONS"]["loaders"] = [  # noqa: F405
     (
         "django.template.loaders.cached.Loader",
@@ -73,7 +64,7 @@ LOGGING["loggers"]["django.security"] = {  # noqa: F405
 }
 
 # ============================================================================
-# EMAIL (Configure for production)
+# EMAIL
 # ============================================================================
 
 EMAIL_BACKEND = env.str(  # noqa: F405
