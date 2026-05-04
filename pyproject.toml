@@ -30,6 +30,7 @@ dev = [
     "daphne==4.2.1",
     "django-debug-toolbar==6.2.0",
     "django-extensions==4.1",
+    "factory-boy>=3.3.0",
     "ruff==0.15.2",
     "twisted[http2,tls]==25.5.0",
     "werkzeug==3.1.6",

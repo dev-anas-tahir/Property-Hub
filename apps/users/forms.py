@@ -2,34 +2,13 @@
 This module contains validation utilities and forms for user-related operations.
 """
 
-import string
-
 from django import forms
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 
-# Get the user model dynamically
+from apps.shared.validators import validate_password_strength  # noqa: F401
+
 User = get_user_model()
-
-
-def validate_password_strength(password: str):
-    """
-    Validate password strength requirements.
-
-    Args:
-        password: The password string to validate
-
-    Raises:
-        ValidationError: If password doesn't meet strength requirements
-    """
-    if len(password) < 8:
-        raise ValidationError("Password must be at least 8 characters long.")
-    if not any(char.isdigit() for char in password):
-        raise ValidationError("Password must contain at least one digit.")
-    if not any(char.isupper() for char in password):
-        raise ValidationError("Password must contain at least one uppercase letter.")
-    if not any(char in string.punctuation for char in password):
-        raise ValidationError("Password must contain at least one special character.")
 
 
 class LoginForm(forms.Form):
