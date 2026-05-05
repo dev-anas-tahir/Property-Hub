@@ -1,21 +1,8 @@
-"""
-This module contains validation utilities and forms for user-related operations.
-"""
-
 from django import forms
-from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
-
-from apps.shared.validators import validate_password_strength  # noqa: F401
-
-User = get_user_model()
 
 
 class LoginForm(forms.Form):
-    """
-    Form for user login with email and password.
-    """
-
     email = forms.EmailField(
         required=True,
         widget=forms.EmailInput(
@@ -46,7 +33,6 @@ class LoginForm(forms.Form):
     )
 
     def clean_email(self):
-        """Clean and validate email field."""
         email = self.cleaned_data.get("email")
         if email:
             email = email.strip().lower()
@@ -54,10 +40,6 @@ class LoginForm(forms.Form):
 
 
 class SignupForm(forms.Form):
-    """
-    Form for user registration with validation.
-    """
-
     email = forms.EmailField(
         required=True,
         widget=forms.EmailInput(
@@ -133,40 +115,23 @@ class SignupForm(forms.Form):
     )
 
     def clean_email(self):
-        """Validate email uniqueness."""
         email = self.cleaned_data.get("email")
         if email:
             email = email.strip().lower()
-            # Check if email already exists
-            if User.objects.filter(email=email).exists():
-                raise ValidationError("This email address is already registered.")
         return email
 
-    def clean_password1(self):
-        """Validate password strength."""
-        password1 = self.cleaned_data.get("password1")
-        if password1:
-            validate_password_strength(password1)
-        return password1
-
     def clean(self):
-        """Validate password confirmation matching."""
         cleaned_data = super().clean()
         password1 = cleaned_data.get("password1")
         password2 = cleaned_data.get("password2")
 
-        if password1 and password2:
-            if password1 != password2:
-                raise ValidationError({"password2": "Passwords do not match."})
+        if password1 and password2 and password1 != password2:
+            raise ValidationError({"password2": "Passwords do not match."})
 
         return cleaned_data
 
 
 class ProfileForm(forms.Form):
-    """
-    Form for editing user profile information.
-    """
-
     first_name = forms.CharField(
         max_length=150,
         required=True,
@@ -213,26 +178,11 @@ class ProfileForm(forms.Form):
     )
 
     def __init__(self, *args, user=None, **kwargs):
-        """
-        Initialize form with current user instance for email validation.
-
-        Args:
-            user: The User instance being edited
-        """
         self.user = user
         super().__init__(*args, **kwargs)
 
     def clean_email(self):
-        """Validate email uniqueness (excluding current user)."""
         email = self.cleaned_data.get("email")
         if email:
             email = email.strip().lower()
-            # Check if email already exists for a different user
-            existing_user = (
-                User.objects.filter(email=email)
-                .exclude(pk=self.user.pk if self.user else None)
-                .first()
-            )
-            if existing_user:
-                raise ValidationError("This email address is already registered.")
         return email
