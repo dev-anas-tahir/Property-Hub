@@ -1,0 +1,99 @@
+from django.db import transaction
+
+from apps.properties.models import Favorite, Property, PropertyImage
+
+
+def property_create(*, user, form_data: dict, images: list) -> Property:
+    prop = Property(
+        user=user,
+        name=form_data["name"],
+        description=form_data.get("description", ""),
+        full_address=form_data["full_address"],
+        phone_number=form_data["phone_number"],
+        cnic=form_data["cnic"],
+        property_type=form_data["property_type"],
+        price=form_data["price"],
+        bedrooms=form_data.get("bedrooms"),
+        bathrooms=form_data.get("bathrooms"),
+        area=form_data.get("area"),
+        documents=form_data.get("documents") or None,
+        is_published=form_data.get("is_published", False),
+    )
+    prop.full_clean()
+    with transaction.atomic():
+        prop.save()
+        for idx, image_file in enumerate(images or []):
+            PropertyImage(property=prop, image=image_file, is_primary=(idx == 0)).save()
+
+    return prop
+
+
+def property_update(
+    *,
+    property_obj: Property,
+    form_data: dict,
+    images: list,
+    delete_image_ids: list,
+    remove_document: bool,
+) -> Property:
+    non_file_fields = [
+        "name",
+        "description",
+        "full_address",
+        "phone_number",
+        "cnic",
+        "property_type",
+        "price",
+        "bedrooms",
+        "bathrooms",
+        "area",
+        "is_published",
+    ]
+    for field in non_file_fields:
+        if field in form_data:
+            setattr(property_obj, field, form_data[field])
+
+    new_doc = form_data.get("documents")
+    if new_doc and new_doc is not False:
+        property_obj.documents = new_doc
+
+    property_obj.full_clean()
+    with transaction.atomic():
+        property_obj.save()
+
+        if remove_document and property_obj.documents:
+            property_obj.documents.delete(save=False)
+            property_obj.documents = None
+            property_obj.save(update_fields=["documents"])
+
+        if delete_image_ids:
+            PropertyImage.objects.filter(
+                id__in=delete_image_ids, property=property_obj
+            ).delete()
+
+        if images:
+            existing_count = property_obj.images.count()
+            for idx, image_file in enumerate(images):
+                PropertyImage(
+                    property=property_obj,
+                    image=image_file,
+                    is_primary=(idx == 0 and existing_count == 0),
+                ).save()
+
+    return property_obj
+
+
+def property_delete(*, property_obj: Property) -> None:
+    for img in property_obj.images.all():
+        img.image.delete(save=False)
+    if property_obj.documents:
+        property_obj.documents.delete(save=False)
+    property_obj.delete()
+
+
+def favorite_toggle(*, user, property_obj: Property) -> bool:
+    favorite, created = Favorite.objects.get_or_create(user=user, property=property_obj)
+    if not created:
+        favorite.delete()
+        return False
+    return True

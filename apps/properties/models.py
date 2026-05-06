@@ -18,7 +18,8 @@ from django.db import models
 from django.db.models import Index, Q, UniqueConstraint
 from django.urls import reverse
 
-from apps.properties.validations import cnic_validator, phone_validator
+from apps.shared.models import BaseModel
+from apps.shared.validators import cnic_validator, phone_validator
 
 if TYPE_CHECKING:
     from django.db.models.manager import RelatedManager
@@ -53,7 +54,7 @@ def property_image_upload_path(instance: "PropertyImage", filename: str) -> str:
     return f"properties/images/{prop_id}/{filename}"
 
 
-class Property(models.Model):
+class Property(BaseModel):
     """Model representing a property."""
 
     PROPERTY_TYPE = (
@@ -90,7 +91,6 @@ class Property(models.Model):
     )
     documents = models.FileField(upload_to=documents_upload_path, blank=True, null=True)
     is_published = models.BooleanField(default=False, db_index=True)
-    created_at = models.DateTimeField(auto_now_add=True)
 
     # Managers
     objects = models.Manager()
@@ -103,7 +103,7 @@ class Property(models.Model):
     class Meta:
         verbose_name_plural = "Properties"
         ordering = ["-created_at"]
-        indexes = [Index(fields=["created_at"]), Index(fields=["price"])]
+        indexes = [Index(fields=["price"])]
 
     def __str__(self) -> str:  # pragma: no cover - simple representation
         return str(self.name)
@@ -127,7 +127,7 @@ class Property(models.Model):
         return self.images.filter(is_primary=True).first() or self.images.first()
 
 
-class PropertyImage(models.Model):
+class PropertyImage(BaseModel):
     """Model representing an image of a property."""
 
     property = models.ForeignKey(
@@ -163,7 +163,7 @@ class PropertyImage(models.Model):
         super().save(*args, **kwargs)
 
 
-class Favorite(models.Model):
+class Favorite(BaseModel):
     """Model representing a favorite property."""
 
     user = models.ForeignKey(
