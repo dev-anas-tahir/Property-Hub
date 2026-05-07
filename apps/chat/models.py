@@ -5,8 +5,10 @@ Models for the real-time chat feature.
 from django.conf import settings
 from django.db import models
 
+from apps.shared.models import BaseModel
 
-class Conversation(models.Model):
+
+class Conversation(BaseModel):
     """
     Represents a chat conversation between two users about a property.
 
@@ -27,8 +29,6 @@ class Conversation(models.Model):
         on_delete=models.CASCADE,
         related_name="conversations_as_p2",
     )
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         unique_together = ("property", "participant_one", "participant_two")
