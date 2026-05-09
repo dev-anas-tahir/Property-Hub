@@ -93,6 +93,40 @@ staticfiles/        # Collected files (auto-generated)
 - Each app is self-contained and reusable
 - Shared utilities in `apps/shared/`
 
+Each app follows the [HackSoftware Django Style Guide](https://github.com/HackSoftware/Django-Styleguide):
+
+```
+apps/<app>/
+├── models.py      # Data layer only — no business logic
+├── services.py    # All writes: create/update/delete, raises ApplicationError
+├── selectors.py   # All reads: pure query functions, no mutation
+├── forms.py       # I/O shape only: field validation, no DB queries, no .save()
+├── views.py       # Thin: call form → call service/selector → render
+├── urls.py
+└── admin.py
+```
+
+**Services** (`services.py`):
+- Keyword-only arguments (`def foo(*, param)`)
+- Call `full_clean()` before every `.save()`
+- Raise `ApplicationError` for domain violations
+- Wrap multi-step writes in `transaction.atomic()`
+
+**Selectors** (`selectors.py`):
+- Pure reads — never mutate state
+- Return QuerySets or plain values
+- Named `<entity>_<query>` (e.g. `property_list_published`)
+
+**Forms** (`forms.py`):
+- Validate field shape/format only (email format, passwords match)
+- No database queries, no uniqueness checks — those belong in services
+- Never call `.save()` when a service exists
+
+**Shared infrastructure** (`apps/shared/`):
+- `BaseModel`: abstract model with `created_at` (db_index=True) + `updated_at`
+- `ApplicationError`: domain exception with `message: str` + optional `extra: dict`
+- `model_update()`: helper for partial updates via `update_fields`
+
 ### Component-Based Templates
 - Reusable UI components
 - Consistent design system
@@ -188,8 +222,10 @@ Browser ← WebSocket → Channels → Redis → Channels → WebSocket → Brow
 4. Hot reload for templates
 
 ### Testing
-- Unit tests for models and views
-- Integration tests for workflows
+- Plain `django.test.TestCase` (sync) or `TransactionTestCase` (async/WebSocket)
+- `factory_boy` for test data — factories in `apps/<app>/tests/factories.py`
+- Tests split by layer: `test_services.py`, `test_views.py`, `test_consumers.py`, `test_admin.py`
+- Run with SQLite: `DATABASE_URL=sqlite:///test.db python manage.py test`
 - Frontend tests for JavaScript
 - E2E tests (future)
 

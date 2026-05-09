@@ -40,14 +40,17 @@ Branch naming conventions:
 ### 3. Test Your Changes
 
 ```bash
-# Run tests (when available)
-pytest
+# Run all tests (SQLite — no local Postgres required)
+DATABASE_URL=sqlite:///test.db python manage.py test
 
-# Check code style
-ruff check .
+# Run a specific app
+DATABASE_URL=sqlite:///test.db python manage.py test apps.properties
 
-# Format code
-ruff format .
+# Quality gates — run all before committing
+DATABASE_URL=sqlite:///test.db python manage.py check
+DATABASE_URL=sqlite:///test.db python manage.py makemigrations --check
+uv run ruff check .
+uv run ruff format --check .
 
 # Test frontend build
 npm run build-css-prod
@@ -101,28 +104,51 @@ Then create a Pull Request on GitHub with:
 
 ### Python
 
-- Follow [PEP 8](https://pep8.org/)
-- Use meaningful variable and function names
-- Add docstrings to functions and classes
-- Keep functions small and focused
-- Maximum line length: 88 characters (Black default)
+This project follows the [HackSoftware Django Style Guide](https://github.com/HackSoftware/Django-Styleguide).
 
-**Example:**
+Core rules:
+- **Services** (`services.py`) handle all writes; **selectors** (`selectors.py`) handle all reads
+- Views are thin: validate form → call service/selector → render
+- Forms validate I/O shape only — no DB queries, no `.save()`
+- Services use keyword-only arguments and call `full_clean()` before saving
+- Raise `ApplicationError` for domain violations, never `ValidationError` from services
+- `ruff` enforces formatting; maximum line length 88 characters
+
+**Service example:**
 ```python
-def calculate_property_price(property: Property, discount: float = 0.0) -> Decimal:
-    """
-    Calculate the final price of a property with optional discount.
+# apps/properties/services.py
+from apps.shared.exceptions import ApplicationError
 
-    Args:
-        property: The property instance
-        discount: Discount percentage (0.0 to 1.0)
+def property_create(*, user, name: str, price: int) -> Property:
+    if price <= 0:
+        raise ApplicationError("Price must be positive.")
+    prop = Property(user=user, name=name, price=price)
+    prop.full_clean()
+    prop.save()
+    return prop
+```
 
-    Returns:
-        Final price as Decimal
-    """
-    base_price = property.price
-    discount_amount = base_price * Decimal(str(discount))
-    return base_price - discount_amount
+**Selector example:**
+```python
+# apps/properties/selectors.py
+def property_list_published(*, user=None) -> QuerySet:
+    return Property.published.all().select_related("user")
+```
+
+**Thin view example:**
+```python
+# apps/properties/views.py
+@login_required
+def property_create_view(request):
+    form = PropertyForm(request.POST or None, request.FILES or None)
+    if form.is_valid():
+        try:
+            prop = property_create(user=request.user, **form.cleaned_data)
+        except ApplicationError as e:
+            form.add_error(None, e.message)
+        else:
+            return redirect("properties:detail", pk=prop.pk)
+    return render(request, "properties/create.html", {"form": form})
 ```
 
 ### HTML/Templates
@@ -189,33 +215,43 @@ function initPropertyFilters(container) {
 
 ### Writing Tests
 
-- Write tests for new features
-- Update tests when changing existing features
-- Aim for high test coverage
-- Test edge cases and error conditions
+- Test services and selectors directly — not through views
+- Use `factory_boy` factories for test data; never inline raw `create_user()` in every test
+- Use `django.test.TestCase` for sync tests; `TransactionTestCase` for async or WebSocket tests
+- Split tests by layer: `test_services.py`, `test_views.py`, `test_consumers.py`, `test_admin.py`
+- Test edge cases and error conditions (especially `ApplicationError` paths)
 
 ### Test Structure
 
 ```python
+# apps/properties/tests/factories.py
+import factory
+from django.contrib.auth import get_user_model
+
+class UserFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = get_user_model()
+    email = factory.Sequence(lambda n: f"user{n}@example.com")
+    password = factory.django.Password("TestPass1!")
+```
+
+```python
+# apps/properties/tests/test_services.py
 from django.test import TestCase
-from apps.properties.models import Property
+from apps.properties.services import property_create
+from apps.shared.exceptions import ApplicationError
+from apps.shared.tests.factories import UserFactory
 
-class PropertyModelTest(TestCase):
-    def setUp(self):
-        """Set up test data"""
-        self.property = Property.objects.create(
-            title="Test Property",
-            price=100000
-        )
+class PropertyCreateTest(TestCase):
+    def test_creates_property(self):
+        user = UserFactory()
+        prop = property_create(user=user, name="Test", price=100000)
+        self.assertEqual(prop.name, "Test")
 
-    def test_property_creation(self):
-        """Test that property is created correctly"""
-        self.assertEqual(self.property.title, "Test Property")
-        self.assertEqual(self.property.price, 100000)
-
-    def test_property_str_representation(self):
-        """Test string representation"""
-        self.assertEqual(str(self.property), "Test Property")
+    def test_raises_for_zero_price(self):
+        user = UserFactory()
+        with self.assertRaises(ApplicationError):
+            property_create(user=user, name="Test", price=0)
 ```
 
 ## Documentation Guidelines

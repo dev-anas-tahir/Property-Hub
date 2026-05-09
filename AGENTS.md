@@ -104,7 +104,32 @@ Property-Hub/
 
 ## Key Implementation Patterns
 
-### 1. Frontend Build Strategy
+### 1. Services, Selectors & Forms (HackSoftware Style Guide)
+
+The project follows the [HackSoftware Django Style Guide](https://github.com/HackSoftware/Django-Styleguide). Every app has:
+
+| File | Responsibility |
+|---|---|
+| `models.py` | Data shape only — no business logic |
+| `services.py` | All **writes** — create/update/delete, raises `ApplicationError` |
+| `selectors.py` | All **reads** — pure query functions, no mutation |
+| `forms.py` | **I/O shape only** — field format/validation, no DB queries |
+| `views.py` | **Thin** — call form → call service/selector → render |
+
+**Rules:**
+- Services use keyword-only args: `def user_create(*, email, password, ...)`
+- Services call `full_clean()` before every `.save()`
+- Domain violations raise `ApplicationError(message, extra={})` — never `ValidationError` from services
+- Selectors are named `<entity>_<query>`: `conversation_list_for_user`, `property_get_with_related`
+- Forms validate field shape (email format, passwords match) but never DB uniqueness — that's for services
+- Views catch `ApplicationError` and surface it via `form.add_error(None, e.message)` or `HttpResponseForbidden`
+
+**Shared infrastructure in `apps/shared/`:**
+- `BaseModel`: abstract with `created_at` (db_index=True) + `updated_at`; inherit for new models
+- `ApplicationError`: `message: str` + optional `extra: dict`
+- `model_update(instance, fields, data)`: partial update helper
+
+### 2. Frontend Build Strategy
 
 **Critical:** Source files (`frontend/`) are **separated** from production assets (`static/`). This prevents `collectstatic` errors with Tailwind's `@import` directives.
 
@@ -126,7 +151,7 @@ python manage.py collectstatic --noinput
 
 **See:** [Frontend Architecture](./docs/architecture/frontend.md) | [Frontend Setup](./docs/development/frontend-setup.md)
 
-### 2. Django Settings Organization
+### 3. Django Settings Organization
 
 Settings are split by environment:
 - `config/settings/base.py` - Common settings
@@ -159,7 +184,7 @@ STORAGES = {
 }
 ```
 
-### 3. Component-Based Templates
+### 4. Component-Based Templates
 
 Templates use a component architecture for DRY code:
 
@@ -177,7 +202,7 @@ Templates use a component architecture for DRY code:
 - Properties: `templates/_components/properties/`
 - UI elements: `templates/_components/ui/`
 
-### 4. WebSocket Chat Implementation
+### 5. WebSocket Chat Implementation
 
 The chat system uses Django Channels with Redis as the channel layer.
 
@@ -193,7 +218,7 @@ The chat system uses Django Channels with Redis as the channel layer.
 
 **See:** [Chat Client Documentation](./docs/development/chat-client.md)
 
-### 5. Database & Migrations
+### 6. Database & Migrations
 
 - **Database**: PostgreSQL 17 (development uses Docker)
 - **Migrations**: Located in each app's `migrations/` directory
@@ -205,7 +230,7 @@ python manage.py makemigrations
 python manage.py migrate
 ```
 
-### 6. Static Files & Media
+### 7. Static Files & Media
 
 - **Static files**: CSS, JS, images in `static/` (compiled) and `frontend/src/` (source)
 - **Media uploads**: User-uploaded files in `media/`
@@ -273,13 +298,34 @@ http://127.0.0.1:8000
 
 ### Python Tests
 ```bash
-pytest  # When tests are implemented
+# Run all tests (SQLite — no local Postgres needed)
+DATABASE_URL=sqlite:///test.db python manage.py test
+
+# Run a specific app
+DATABASE_URL=sqlite:///test.db python manage.py test apps.chat
+
+# Run a specific test file
+DATABASE_URL=sqlite:///test.db python manage.py test apps.chat.tests.test_services
 ```
+
+Test conventions:
+- Use `django.test.TestCase` for sync tests, `TransactionTestCase` for async/WebSocket
+- Use `factory_boy` for test data — factories live in `apps/<app>/tests/factories.py`
+- Split tests by layer: `test_services.py`, `test_views.py`, `test_consumers.py`, `test_admin.py`
+- Never mock the database — tests hit SQLite directly
 
 ### Code Style
 ```bash
-ruff check .    # Lint check
-ruff format .   # Auto-format
+uv run ruff check .    # Lint check
+uv run ruff format .   # Auto-format
+```
+
+### Quality Gates (run before every commit)
+```bash
+DATABASE_URL=sqlite:///test.db python manage.py check
+DATABASE_URL=sqlite:///test.db python manage.py makemigrations --check
+uv run ruff check .
+uv run ruff format --check .
 ```
 
 ### Frontend Build Test
@@ -319,6 +365,7 @@ Open `static/src/chat-client.test.html` in browser or run programmatically with 
 - django-debug-toolbar==6.2.0
 - django-extensions==4.1
 - ruff==0.15.2 (lint/format)
+- factory-boy>=3.3.0 (test factories)
 
 **Prod:**
 - gunicorn==25.1.0 (WSGI server)
@@ -337,35 +384,46 @@ Open `static/src/chat-client.test.html` in browser or run programmatically with 
 ## Important Notes for Agents
 
 ### Do NOT:
-1. **Modify** `frontend/` files during Django `collectstatic` - they are source files, not production assets
-2. **Add** source files to `STATICFILES_DIRS` - only `static/` should be collected
-3. **Hardcode** secrets or environment-specific values - always use environment variables
-4. **Commit** compiled `static/dist/output.css` if CI/CD builds it - but it's okay to commit for releases
-5. **Edit** generated files in `staticfiles/` - this directory is auto-generated
-6. **Change** `AUTH_USER_MODEL` after migrations are created - requires database migration strategy
-7. **Disable** security features (CSRF, Axes) without explicit requirement and mitigation plan
+1. **Put business logic in views** — views call services/selectors, nothing more
+2. **Put DB queries in forms** — forms validate shape only; uniqueness checks go in services
+3. **Call `.save()` directly in views** — always go through a service
+4. **Raise `ValidationError` from services** — raise `ApplicationError(message)` instead
+5. **Skip `full_clean()`** before saving a model in a service
+6. **Modify** `frontend/` files during Django `collectstatic` - they are source files, not production assets
+7. **Add** source files to `STATICFILES_DIRS` - only `static/` should be collected
+8. **Hardcode** secrets or environment-specific values - always use environment variables
+9. **Commit** compiled `static/dist/output.css` if CI/CD builds it - but it's okay to commit for releases
+10. **Edit** generated files in `staticfiles/` - this directory is auto-generated
+11. **Change** `AUTH_USER_MODEL` after migrations are created - requires database migration strategy
+12. **Disable** security features (CSRF, Axes) without explicit requirement and mitigation plan
 
 ### Do:
-1. **Follow** the component-based template structure in `templates/_components/`
-2. **Use** Tailwind utility classes first, custom CSS only when necessary
-3. **Add** custom CSS in `frontend/src/input.css` within `@layer` directives
-4. **Write** reusable components for repeated UI patterns
-5. **Document** complex logic with comments
-6. **Run** `ruff check` and `ruff format` before committing
-7. **Test** frontend build and collectstatic before deployment
-8. **Reference** existing documentation in `docs/` before making architectural changes
-9. **Use** the `ChatClient` class for WebSocket communication (don't create raw WebSocket connections)
-10. **Keep** settings in environment-specific files, not in code
+1. **Use services for writes, selectors for reads** — the single most important rule
+2. **Inherit `BaseModel`** for new models (provides `created_at` + `updated_at`)
+3. **Raise `ApplicationError`** for domain violations in services
+4. **Use keyword-only args** in all service and selector functions
+5. **Follow** the component-based template structure in `templates/_components/`
+6. **Use** Tailwind utility classes first, custom CSS only when necessary
+7. **Add** custom CSS in `frontend/src/input.css` within `@layer` directives
+8. **Write** reusable components for repeated UI patterns
+9. **Run** quality gates (`check`, `makemigrations --check`, `ruff check`, `ruff format --check`) before committing
+10. **Use** `factory_boy` factories for test data — never inline `User.objects.create_*` in production tests
+11. **Reference** existing documentation in `docs/` before making architectural changes
+12. **Use** the `ChatClient` class for WebSocket communication (don't create raw WebSocket connections)
+13. **Keep** settings in environment-specific files, not in code
 
 ---
 
 ## Quick Decision Guide
 
 ### Adding a new page?
-1. Create view in appropriate `apps/<app>/views.py`
-2. Add URL pattern in `apps/<app>/urls.py`
-3. Create template in `templates/<app>/` using `_layouts/base.html`
-4. Reuse components from `templates/_components/` as needed
+1. Write a **service** in `apps/<app>/services.py` if it involves a write
+2. Write a **selector** in `apps/<app>/selectors.py` if it involves a read
+3. Add/update a **form** in `apps/<app>/forms.py` for input validation (shape only)
+4. Create a **thin view** in `apps/<app>/views.py`: validate form → call service/selector → render
+5. Add URL pattern in `apps/<app>/urls.py`
+6. Create template in `templates/<app>/` using `_layouts/base.html`
+7. Reuse components from `templates/_components/` as needed
 
 ### Adding new styles?
 1. Use Tailwind utility classes directly in HTML
