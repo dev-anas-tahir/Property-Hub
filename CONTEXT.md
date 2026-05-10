@@ -78,9 +78,3 @@ Abstract model in `apps/shared/models.py` providing `created_at` + `updated_at`.
 
 > **Dev:** "When a User signs up, the **Form** validates the email format. Where does the uniqueness check go?"
 > **Architect:** "Format goes in the Form. Uniqueness is a business rule — Service. `user_create` raises `ApplicationError('email already taken')`. The View catches it and calls `form.add_error('email', e.message)`."
-
-## Flagged ambiguities
-
-- "account" was used to mean both **User** and **Owner** — resolved: **User** is the auth identity; **Owner** is the role of a User who has created a Property. A User without Properties is still a User, never an Owner.
-- "lister" was sometimes used in templates — resolved: replace with **Owner**.
-- "thread" was used colloquially for chat — resolved: **Conversation**.
