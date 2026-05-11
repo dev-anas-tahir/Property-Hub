@@ -1,3 +1,4 @@
+import json
 import logging
 
 from django.contrib import messages
@@ -87,6 +88,7 @@ def property_detail_view(request, pk):
     is_favorited = False
     if request.user.is_authenticated:
         is_favorited = favorite_exists(user=request.user, property_obj=property_obj)
+    property_obj.is_favorited = is_favorited
 
     context = {
         "property": property_obj,
@@ -263,6 +265,24 @@ def property_favorite_toggle_view(request, pk):
         raise Http404("Property not found")
 
     is_favorited = favorite_toggle(user=request.user, property_obj=property_obj)
+
+    if request.headers.get("HX-Request"):
+        property_obj.is_favorited = is_favorited
+        response = render(
+            request,
+            "_components/properties/favorite_button.html",
+            {"property": property_obj},
+        )
+        response["HX-Trigger"] = json.dumps(
+            {
+                "favorite-toggled": {
+                    "propertyId": property_obj.pk,
+                    "isFavorited": is_favorited,
+                }
+            }
+        )
+        return response
+
     return JsonResponse({"is_favorited": is_favorited})
 
 

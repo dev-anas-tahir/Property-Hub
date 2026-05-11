@@ -17,7 +17,7 @@ RUN uv sync --frozen --no-dev --group prod && npm ci
 
 # Copy app and build
 COPY . .
-RUN npm run build-css-prod
+RUN npm run build
 
 # Collectstatic using base settings (no database/AWS required for build)
 RUN DJANGO_SETTINGS_MODULE=config.django.base \
