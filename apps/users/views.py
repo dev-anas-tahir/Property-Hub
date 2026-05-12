@@ -4,21 +4,30 @@ from django.contrib import messages
 from django.contrib.auth import authenticate
 from django.contrib.auth import login as auth_login
 from django.contrib.auth import logout
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse
+from django.views import View
 
 from apps.shared.exceptions import ApplicationError
+from apps.shared.mixins import HTMXMixin
 from apps.users.forms import LoginForm, ProfileForm, SignupForm
 from apps.users.selectors import user_get_by_email
 from apps.users.services import user_create, user_update
 
 
-def signup_view(request):
-    is_htmx = request.headers.get("HX-Request") == "true"
+class SignupView(HTMXMixin, View):
+    def get(self, request):
+        form = SignupForm()
+        template = (
+            "_components/forms/signup_form.html"
+            if self.is_htmx
+            else "users/signup.html"
+        )
+        return render(request, template, {"form": form})
 
-    if request.method == "POST":
+    def post(self, request):
         form = SignupForm(request.POST)
 
         if form.is_valid():
@@ -39,49 +48,53 @@ def signup_view(request):
                     request,
                     f"Welcome to PropertyHub, {user.first_name}! Your account has been created successfully.",
                 )
-                if is_htmx:
+                if self.is_htmx:
                     response = HttpResponse()
                     response["HX-Redirect"] = reverse("properties:list")
                     return response
                 return redirect("properties:list")
 
-        context = {"form": form}
         template = (
-            "_components/forms/signup_form.html" if is_htmx else "users/signup.html"
+            "_components/forms/signup_form.html"
+            if self.is_htmx
+            else "users/signup.html"
         )
-        return render(request, template, context)
-
-    form = SignupForm()
-    context = {"form": form}
-    template = "_components/forms/signup_form.html" if is_htmx else "users/signup.html"
-    return render(request, template, context)
+        return render(request, template, {"form": form})
 
 
-def login_view(request):
-    is_htmx = request.headers.get("HX-Request") == "true"
+class LoginView(HTMXMixin, View):
+    def _get_cooloff_message(self, prefix):
+        cooloff_time = getattr(settings, "AXES_COOLOFF_TIME", None)
+        if cooloff_time:
+            cooloff_seconds = int(cooloff_time.total_seconds())
+            if cooloff_seconds < 60:
+                time_msg = f"{cooloff_seconds} seconds"
+            elif cooloff_seconds < 3600:
+                time_msg = f"{cooloff_seconds // 60} minutes"
+            else:
+                time_msg = f"{cooloff_seconds // 3600} hours"
+            return f"{prefix} {time_msg}."
+        return "Too many failed login attempts. Please contact support."
 
-    if request.method == "POST":
+    def get(self, request):
+        form = LoginForm()
+        template = (
+            "_components/forms/login_form.html" if self.is_htmx else "users/login.html"
+        )
+        return render(request, template, {"form": form})
+
+    def post(self, request):
         form = LoginForm(request.POST)
+        template = (
+            "_components/forms/login_form.html" if self.is_htmx else "users/login.html"
+        )
 
         if AxesProxyHandler.is_locked(request):
-            cooloff_time = getattr(settings, "AXES_COOLOFF_TIME", None)
-            if cooloff_time:
-                cooloff_seconds = int(cooloff_time.total_seconds())
-                if cooloff_seconds < 60:
-                    time_msg = f"{cooloff_seconds} seconds"
-                elif cooloff_seconds < 3600:
-                    time_msg = f"{cooloff_seconds // 60} minutes"
-                else:
-                    time_msg = f"{cooloff_seconds // 3600} hours"
-                error_msg = f"Too many failed login attempts. Please try again after {time_msg}."
-            else:
-                error_msg = "Too many failed login attempts. Please contact support."
-            form.add_error(None, error_msg)
-            context = {"form": form}
-            template = (
-                "_components/forms/login_form.html" if is_htmx else "users/login.html"
+            error_msg = self._get_cooloff_message(
+                "Too many failed login attempts. Please try again after"
             )
-            return render(request, template, context)
+            form.add_error(None, error_msg)
+            return render(request, template, {"form": form})
 
         if form.is_valid():
             email = form.cleaned_data["email"]
@@ -98,7 +111,7 @@ def login_view(request):
                     messages.success(
                         request, f"Welcome back, {user.first_name or user.email}!"
                     )
-                    if is_htmx:
+                    if self.is_htmx:
                         response = HttpResponse()
                         response["HX-Redirect"] = reverse("properties:list")
                         return response
@@ -107,45 +120,45 @@ def login_view(request):
                     form.add_error(None, "Your account has been disabled.")
             else:
                 if AxesProxyHandler.is_locked(request):
-                    cooloff_time = getattr(settings, "AXES_COOLOFF_TIME", None)
-                    if cooloff_time:
-                        cooloff_seconds = int(cooloff_time.total_seconds())
-                        if cooloff_seconds < 60:
-                            time_msg = f"{cooloff_seconds} seconds"
-                        elif cooloff_seconds < 3600:
-                            time_msg = f"{cooloff_seconds // 60} minutes"
-                        else:
-                            time_msg = f"{cooloff_seconds // 3600} hours"
-                        error_msg = f"Too many failed login attempts. Your account has been temporarily locked for {time_msg}."
-                    else:
-                        error_msg = "Too many failed login attempts. Your account has been temporarily locked."
-                    form.add_error(None, error_msg)
+                    error_msg = self._get_cooloff_message(
+                        "Too many failed login attempts. Your account has been temporarily locked for"
+                    )
                 else:
-                    form.add_error(None, "Invalid email or password.")
+                    error_msg = "Invalid email or password."
+                form.add_error(None, error_msg)
 
-        context = {"form": form}
-        template = (
-            "_components/forms/login_form.html" if is_htmx else "users/login.html"
+        return render(request, template, {"form": form})
+
+
+class ProfileView(LoginRequiredMixin, View):
+    def get(self, request):
+        return render(request, "users/profile.html")
+
+
+class ProfileEditView(LoginRequiredMixin, HTMXMixin, View):
+    def get(self, request):
+        form = ProfileForm(
+            initial={
+                "first_name": request.user.first_name,
+                "last_name": request.user.last_name,
+                "email": request.user.email,
+            },
+            user=request.user,
         )
-        return render(request, template, context)
+        template = (
+            "_components/forms/profile_form.html"
+            if self.is_htmx
+            else "users/profile.html"
+        )
+        return render(request, template, {"form": form})
 
-    form = LoginForm()
-    context = {"form": form}
-    template = "_components/forms/login_form.html" if is_htmx else "users/login.html"
-    return render(request, template, context)
-
-
-@login_required
-def profile_view(request):
-    return render(request, "users/profile.html")
-
-
-@login_required
-def profile_edit_view(request):
-    is_htmx = request.headers.get("HX-Request") == "true"
-
-    if request.method == "POST":
+    def post(self, request):
         form = ProfileForm(request.POST, user=request.user)
+        template = (
+            "_components/forms/profile_form.html"
+            if self.is_htmx
+            else "users/profile.html"
+        )
 
         if form.is_valid():
             try:
@@ -159,54 +172,35 @@ def profile_edit_view(request):
                 form.add_error(None, e.message)
             else:
                 messages.success(request, "Your profile has been updated successfully.")
-                if is_htmx:
+                if self.is_htmx:
                     response = HttpResponse()
                     response["HX-Redirect"] = reverse("users:profile")
                     return response
                 return redirect("users:profile")
 
-        context = {"form": form}
-        template = (
-            "_components/forms/profile_form.html" if is_htmx else "users/profile.html"
-        )
-        return render(request, template, context)
-
-    form = ProfileForm(
-        initial={
-            "first_name": request.user.first_name,
-            "last_name": request.user.last_name,
-            "email": request.user.email,
-        },
-        user=request.user,
-    )
-    context = {"form": form}
-    template = (
-        "_components/forms/profile_form.html" if is_htmx else "users/profile.html"
-    )
-    return render(request, template, context)
+        return render(request, template, {"form": form})
 
 
-@login_required
-def password_change_view(request):
-    return render(request, "users/password_change.html")
+class PasswordChangeView(LoginRequiredMixin, View):
+    def get(self, request):
+        return render(request, "users/password_change.html")
 
 
-def logout_view(request):
-    logout(request)
-    return redirect("properties:list")
+class LogoutView(View):
+    def post(self, request):
+        logout(request)
+        return redirect("properties:list")
 
 
-def validate_email_view(request):
-    if request.method != "POST":
+class ValidateEmailView(View):
+    def post(self, request):
+        email = request.POST.get("email", "").strip().lower()
+
+        if not email:
+            return HttpResponse("", status=200)
+
+        if user_get_by_email(email=email) is not None:
+            error_html = '<div class="invalid-feedback d-block">This email address is already registered.</div>'
+            return HttpResponse(error_html, status=200)
+
         return HttpResponse("", status=200)
-
-    email = request.POST.get("email", "").strip().lower()
-
-    if not email:
-        return HttpResponse("", status=200)
-
-    if user_get_by_email(email=email) is not None:
-        error_html = '<div class="invalid-feedback d-block">This email address is already registered.</div>'
-        return HttpResponse(error_html, status=200)
-
-    return HttpResponse("", status=200)
