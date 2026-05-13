@@ -4,7 +4,7 @@
     <!-- Property Image -->
     <figure class="relative h-48 overflow-hidden">
         {% if property.images.first %}
-            <img src="{{ property.images.first.image.url }}" 
+            <img src="{{ property.images.first.image.url }}"
                  alt="{{ property.name }}"
                  class="w-full h-full object-cover transition-transform duration-300 hover:scale-105">
         {% else %}
@@ -14,22 +14,22 @@
                 </svg>
             </div>
         {% endif %}
-        
+
         <!-- Property Type Badge -->
         <div class="absolute top-3 left-3">
             <span class="badge badge-primary badge-sm font-medium">
                 {{ property.get_property_type_display }}
             </span>
         </div>
-        
+
         <!-- Favorite Button -->
-        {% if user.is_authenticated %}
-            <div class="absolute top-3 right-3" 
+        {% if user.is_authenticated and user != property.user %}
+            <div class="absolute top-3 right-3"
                  @favorite-toggled.window="if ($event.detail.propertyId === {{ property.pk }} && !$event.detail.isFavorited && window.location.pathname.includes('favorites')) { $el.closest('[data-property-card]').remove(); }">
                 {% include '_components/properties/favorite_button.html' with property=property %}
             </div>
         {% endif %}
-        
+
         <!-- Price Badge -->
         <div class="absolute bottom-3 left-3">
             <span class="badge badge-accent badge-lg font-bold text-white">
@@ -38,7 +38,7 @@
             </span>
         </div>
     </figure>
-    
+
     <!-- Property Details -->
     <div class="card-body p-4">
         <!-- Title and Location -->
@@ -54,7 +54,7 @@
                 {{ property.full_address|truncatechars:30 }}
             </p>
         </div>
-        
+
         <!-- Property Features -->
         <div class="flex items-center space-x-4 text-sm text-base-content/70 mb-4">
             <div class="flex items-center">
@@ -70,14 +70,14 @@
                 {{ property.created_at|date:"M Y" }}
             </div>
         </div>
-        
+
         <!-- Description -->
         {% if property.description %}
             <p class="text-base-content/70 text-sm line-clamp-2 mb-4">
                 {{ property.description|truncatechars:100 }}
             </p>
         {% endif %}
-        
+
         <!-- Owner Info -->
         <div class="flex items-center justify-between">
             <div class="flex items-center space-x-2">
@@ -97,9 +97,9 @@
                     </p>
                 </div>
             </div>
-            
+
             <!-- View Details Button -->
-            <a href="{% url 'properties:detail' property.pk %}" 
+            <a href="{% url 'properties:detail' property.pk %}"
                class="btn btn-primary btn-sm">
                 View Details
             </a>

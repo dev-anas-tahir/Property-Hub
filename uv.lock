@@ -878,6 +878,7 @@ dev = [
     { name = "django-debug-toolbar" },
     { name = "django-extensions" },
     { name = "factory-boy" },
+    { name = "remote-pdb" },
     { name = "ruff" },
     { name = "twisted", extra = ["http2", "tls"] },
     { name = "werkzeug" },
@@ -912,6 +913,7 @@ dev = [
     { name = "django-debug-toolbar", specifier = "==6.2.0" },
     { name = "django-extensions", specifier = "==4.1" },
     { name = "factory-boy", specifier = ">=3.3.0" },
+    { name = "remote-pdb", specifier = ">=2.1.0" },
     { name = "ruff", specifier = "==0.15.2" },
     { name = "twisted", extras = ["http2", "tls"], specifier = "==25.5.0" },
     { name = "werkzeug", specifier = "==3.1.6" },
@@ -1117,6 +1119,15 @@ wheels = [
 [package.optional-dependencies]
 hiredis = [
     { name = "hiredis" },
+]
+
+[[package]]
+name = "remote-pdb"
+version = "2.1.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/e4/b5/4944cac06fd9fc4a2e168313ec220aa25ed96ce83947b63eea5b4045b22d/remote-pdb-2.1.0.tar.gz", hash = "sha256:2d70c6f41e0eabf0165e8f1be58f82aa7a605aaeab8f2aefeb9ce246431091c1", size = 22295, upload-time = "2020-07-24T13:31:32.985Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/71/c5/d208c66344bb785d800adb61aef512290d3473052b9e7697890f0547aff2/remote_pdb-2.1.0-py2.py3-none-any.whl", hash = "sha256:94f73a92ac1248cf16189211011f97096bdada8a7baac8c79372663bbb57b5d0", size = 6304, upload-time = "2020-07-24T13:31:31.535Z" },
 ]
 
 [[package]]

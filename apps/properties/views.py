@@ -304,67 +304,29 @@ class PropertyDeleteView(LoginRequiredMixin, OwnerRequiredMixin, HTMXMixin, View
 
 
 class PropertyValidateStepView(LoginRequiredMixin, View):
+    STEP_FIELDS = {
+        "1": ["name", "property_type", "price", "full_address"],
+        "2": ["bedrooms", "bathrooms", "area", "phone_number", "cnic"],
+        "3": [],
+        "4": [],
+    }
+
     def post(self, request):
         step = request.POST.get("step")
-        if not step:
-            return JsonResponse({"error": "Step parameter required"}, status=400)
+        if not step or step not in self.STEP_FIELDS:
+            return JsonResponse({"error": "Invalid step parameter"}, status=400)
 
-        form = PropertyForm(request.POST, request.FILES)
-
-        step_fields = {
-            "1": ["name", "property_type", "price", "full_address"],
-            "2": ["bedrooms", "bathrooms", "area", "phone_number", "cnic"],
-            "3": [],
-            "4": [],
-        }
-
-        if step not in step_fields:
-            return JsonResponse({"error": "Invalid step"}, status=400)
-
-        fields_to_validate = step_fields[step]
+        fields_to_validate = self.STEP_FIELDS[step]
         if not fields_to_validate:
             return JsonResponse({"valid": True})
 
-        errors = {}
-        for field_name in fields_to_validate:
-            if field_name in form.errors:
-                errors[field_name] = form.errors[field_name]
-            elif field_name in form.fields and form.fields[field_name].required:
-                value = request.POST.get(field_name, "").strip()
-                if not value:
-                    errors[field_name] = ["This field is required."]
-
-        try:
-            if step == "1":
-                if "price" in fields_to_validate and "price" not in errors:
-                    form.clean_price()
-            elif step == "2":
-                if (
-                    "phone_number" in fields_to_validate
-                    and "phone_number" not in errors
-                ):
-                    try:
-                        phone_value = request.POST.get("phone_number", "").strip()
-                        if phone_value:
-                            phone_validator(phone_value)
-                    except ValidationError as e:
-                        errors["phone_number"] = [str(e)]
-
-                if "cnic" in fields_to_validate and "cnic" not in errors:
-                    try:
-                        cnic_value = request.POST.get("cnic", "").strip()
-                        if cnic_value:
-                            cnic_validator(cnic_value)
-                    except ValidationError as e:
-                        errors["cnic"] = [str(e)]
-
-        except ValidationError as e:
-            if hasattr(e, "error_dict"):
-                for field, field_errors in e.error_dict.items():
-                    if field in fields_to_validate:
-                        errors[field] = [str(err) for err in field_errors]
-            else:
-                errors["__all__"] = [str(e)]
+        form = PropertyForm(request.POST, request.FILES)
+        form.is_valid()
+        errors = {
+            field: form.errors[field]
+            for field in fields_to_validate
+            if field in form.errors
+        }
 
         if errors:
             return JsonResponse({"valid": False, "errors": errors})
