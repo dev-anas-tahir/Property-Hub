@@ -1,17 +1,13 @@
 from django import forms
 from django.core.exceptions import ValidationError
 
+from apps.shared.validators import validate_password_strength
+
 
 class LoginForm(forms.Form):
     email = forms.EmailField(
         required=True,
-        widget=forms.EmailInput(
-            attrs={
-                "class": "form-control",
-                "placeholder": "Enter your email address",
-                "autocomplete": "email",
-            }
-        ),
+        widget=forms.EmailInput(attrs={"autocomplete": "email"}),
         error_messages={
             "required": "Email is required.",
             "invalid": "Enter a valid email address.",
@@ -20,13 +16,7 @@ class LoginForm(forms.Form):
 
     password = forms.CharField(
         required=True,
-        widget=forms.PasswordInput(
-            attrs={
-                "class": "form-control",
-                "placeholder": "Enter your password",
-                "autocomplete": "current-password",
-            }
-        ),
+        widget=forms.PasswordInput(attrs={"autocomplete": "current-password"}),
         error_messages={
             "required": "Password is required.",
         },
@@ -42,13 +32,7 @@ class LoginForm(forms.Form):
 class SignupForm(forms.Form):
     email = forms.EmailField(
         required=True,
-        widget=forms.EmailInput(
-            attrs={
-                "class": "form-control",
-                "placeholder": "Enter your email address",
-                "autocomplete": "email",
-            }
-        ),
+        widget=forms.EmailInput(attrs={"autocomplete": "email"}),
         error_messages={
             "required": "Email is required.",
             "invalid": "Enter a valid email address.",
@@ -58,13 +42,7 @@ class SignupForm(forms.Form):
     first_name = forms.CharField(
         max_length=150,
         required=True,
-        widget=forms.TextInput(
-            attrs={
-                "class": "form-control",
-                "placeholder": "Enter your first name",
-                "autocomplete": "given-name",
-            }
-        ),
+        widget=forms.TextInput(attrs={"autocomplete": "given-name"}),
         error_messages={
             "required": "First name is required.",
         },
@@ -73,13 +51,7 @@ class SignupForm(forms.Form):
     last_name = forms.CharField(
         max_length=150,
         required=True,
-        widget=forms.TextInput(
-            attrs={
-                "class": "form-control",
-                "placeholder": "Enter your last name",
-                "autocomplete": "family-name",
-            }
-        ),
+        widget=forms.TextInput(attrs={"autocomplete": "family-name"}),
         error_messages={
             "required": "Last name is required.",
         },
@@ -87,13 +59,7 @@ class SignupForm(forms.Form):
 
     password1 = forms.CharField(
         required=True,
-        widget=forms.PasswordInput(
-            attrs={
-                "class": "form-control",
-                "placeholder": "Create a password",
-                "autocomplete": "new-password",
-            }
-        ),
+        widget=forms.PasswordInput(attrs={"autocomplete": "new-password"}),
         error_messages={
             "required": "Password is required.",
         },
@@ -101,13 +67,7 @@ class SignupForm(forms.Form):
 
     password2 = forms.CharField(
         required=True,
-        widget=forms.PasswordInput(
-            attrs={
-                "class": "form-control",
-                "placeholder": "Confirm your password",
-                "autocomplete": "new-password",
-            }
-        ),
+        widget=forms.PasswordInput(attrs={"autocomplete": "new-password"}),
         error_messages={
             "required": "Password confirmation is required.",
         },
@@ -135,13 +95,7 @@ class ProfileForm(forms.Form):
     first_name = forms.CharField(
         max_length=150,
         required=True,
-        widget=forms.TextInput(
-            attrs={
-                "class": "form-control",
-                "placeholder": "Enter your first name",
-                "autocomplete": "given-name",
-            }
-        ),
+        widget=forms.TextInput(attrs={"autocomplete": "given-name"}),
         error_messages={
             "required": "First name is required.",
         },
@@ -150,13 +104,7 @@ class ProfileForm(forms.Form):
     last_name = forms.CharField(
         max_length=150,
         required=True,
-        widget=forms.TextInput(
-            attrs={
-                "class": "form-control",
-                "placeholder": "Enter your last name",
-                "autocomplete": "family-name",
-            }
-        ),
+        widget=forms.TextInput(attrs={"autocomplete": "family-name"}),
         error_messages={
             "required": "Last name is required.",
         },
@@ -164,13 +112,7 @@ class ProfileForm(forms.Form):
 
     email = forms.EmailField(
         required=True,
-        widget=forms.EmailInput(
-            attrs={
-                "class": "form-control",
-                "placeholder": "Enter your email address",
-                "autocomplete": "email",
-            }
-        ),
+        widget=forms.EmailInput(attrs={"autocomplete": "email"}),
         error_messages={
             "required": "Email is required.",
             "invalid": "Enter a valid email address.",
@@ -186,3 +128,53 @@ class ProfileForm(forms.Form):
         if email:
             email = email.strip().lower()
         return email
+
+
+class PasswordChangeForm(forms.Form):
+    old_password = forms.CharField(
+        required=True,
+        widget=forms.PasswordInput(attrs={"autocomplete": "current-password"}),
+        error_messages={"required": "Current password is required."},
+        label="Current Password",
+    )
+
+    new_password1 = forms.CharField(
+        required=True,
+        widget=forms.PasswordInput(attrs={"autocomplete": "new-password"}),
+        error_messages={"required": "New password is required."},
+        label="New Password",
+    )
+
+    new_password2 = forms.CharField(
+        required=True,
+        widget=forms.PasswordInput(attrs={"autocomplete": "new-password"}),
+        error_messages={"required": "Password confirmation is required."},
+        label="Confirm New Password",
+    )
+
+    def __init__(self, *args, user=None, **kwargs):
+        self.user = user
+        super().__init__(*args, **kwargs)
+
+    def clean_old_password(self):
+        old_password = self.cleaned_data.get("old_password")
+        if old_password and not self.user.check_password(old_password):
+            raise forms.ValidationError("Current password is incorrect.")
+        return old_password
+
+    def clean_new_password1(self):
+        new_password = self.cleaned_data.get("new_password1")
+        if new_password:
+            try:
+                validate_password_strength(new_password)
+            except ValidationError as e:
+                raise forms.ValidationError(e.message) from e
+        return new_password
+
+    def clean(self):
+        cleaned_data = super().clean()
+        new_password1 = cleaned_data.get("new_password1")
+        new_password2 = cleaned_data.get("new_password2")
+        if new_password1 and new_password2 and new_password1 != new_password2:
+            raise ValidationError({"new_password2": "Passwords do not match."})
+        return cleaned_data

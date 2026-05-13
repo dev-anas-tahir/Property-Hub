@@ -14,12 +14,6 @@ class PropertyForm(forms.ModelForm):
     phone_number = forms.CharField(
         max_length=16,
         validators=[phone_validator],
-        widget=forms.TextInput(
-            attrs={
-                "class": "form-control",
-                "placeholder": "+92-3001234567",
-            }
-        ),
         help_text="Format: +92-3001234567",
         label="Phone Number",
     )
@@ -27,12 +21,6 @@ class PropertyForm(forms.ModelForm):
     cnic = forms.CharField(
         max_length=15,
         validators=[cnic_validator],
-        widget=forms.TextInput(
-            attrs={
-                "class": "form-control",
-                "placeholder": "12345-1234567-1",
-            }
-        ),
         help_text="Format: 12345-1234567-1",
         label="CNIC",
     )
@@ -54,71 +42,16 @@ class PropertyForm(forms.ModelForm):
             "is_published",
         ]
         widgets = {
-            "name": forms.TextInput(
-                attrs={
-                    "class": "form-control",
-                    "placeholder": "Enter property name",
-                }
-            ),
-            "description": forms.Textarea(
-                attrs={
-                    "class": "form-control",
-                    "rows": 4,
-                    "placeholder": "Enter property description",
-                }
-            ),
-            "full_address": forms.TextInput(
-                attrs={
-                    "class": "form-control",
-                    "placeholder": "Enter full address",
-                }
-            ),
-            "property_type": forms.Select(
-                attrs={
-                    "class": "form-select",
-                }
-            ),
-            "price": forms.NumberInput(
-                attrs={
-                    "class": "form-control",
-                    "step": "0.01",
-                    "min": "0",
-                    "placeholder": "Enter price",
-                }
-            ),
-            "bedrooms": forms.NumberInput(
-                attrs={
-                    "class": "form-control",
-                    "min": "0",
-                    "placeholder": "Number of bedrooms",
-                }
-            ),
-            "bathrooms": forms.NumberInput(
-                attrs={
-                    "class": "form-control",
-                    "min": "0",
-                    "placeholder": "Number of bathrooms",
-                }
-            ),
-            "area": forms.NumberInput(
-                attrs={
-                    "class": "form-control",
-                    "step": "0.01",
-                    "min": "0",
-                    "placeholder": "Property area",
-                }
-            ),
-            "documents": forms.FileInput(
-                attrs={
-                    "class": "form-control",
-                    "accept": ".pdf",
-                }
-            ),
-            "is_published": forms.CheckboxInput(
-                attrs={
-                    "class": "form-check-input",
-                }
-            ),
+            "name": forms.TextInput(),
+            "description": forms.Textarea(),
+            "full_address": forms.TextInput(),
+            "property_type": forms.Select(),
+            "price": forms.NumberInput(attrs={"step": "0.01", "min": "0"}),
+            "bedrooms": forms.NumberInput(attrs={"min": "0"}),
+            "bathrooms": forms.NumberInput(attrs={"min": "0"}),
+            "area": forms.NumberInput(attrs={"step": "0.01", "min": "0"}),
+            "documents": forms.FileInput(attrs={"accept": ".pdf"}),
+            "is_published": forms.CheckboxInput(),
         }
         labels = {
             "name": "Property Name",
@@ -177,17 +110,8 @@ class PropertyImageForm(forms.ModelForm):
         model = PropertyImage
         fields = ["image", "is_primary"]
         widgets = {
-            "image": forms.FileInput(
-                attrs={
-                    "class": "form-control",
-                    "accept": "image/*",
-                }
-            ),
-            "is_primary": forms.CheckboxInput(
-                attrs={
-                    "class": "form-check-input",
-                }
-            ),
+            "image": forms.FileInput(attrs={"accept": "image/*"}),
+            "is_primary": forms.CheckboxInput(),
         }
 
     def clean_image(self):

@@ -28,6 +28,11 @@ def user_create(*, email: str, password: str, first_name: str, last_name: str) -
     return user
 
 
+def user_password_change(*, user: User, new_password: str) -> None:
+    user.set_password(new_password)
+    user.save(update_fields=["password"])
+
+
 def user_update(*, user: User, first_name: str, last_name: str, email: str) -> User:
     email = email.strip().lower()
 

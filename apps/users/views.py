@@ -3,7 +3,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import authenticate
 from django.contrib.auth import login as auth_login
-from django.contrib.auth import logout
+from django.contrib.auth import logout, update_session_auth_hash
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
@@ -12,9 +12,9 @@ from django.views import View
 
 from apps.shared.exceptions import ApplicationError
 from apps.shared.mixins import HTMXMixin
-from apps.users.forms import LoginForm, ProfileForm, SignupForm
+from apps.users.forms import LoginForm, PasswordChangeForm, ProfileForm, SignupForm
 from apps.users.selectors import user_get_by_email
-from apps.users.services import user_create, user_update
+from apps.users.services import user_create, user_password_change, user_update
 
 
 class SignupView(HTMXMixin, View):
@@ -183,7 +183,26 @@ class ProfileEditView(LoginRequiredMixin, HTMXMixin, View):
 
 class PasswordChangeView(LoginRequiredMixin, View):
     def get(self, request):
-        return render(request, "users/password_change.html")
+        form = PasswordChangeForm(user=request.user)
+        return render(request, "users/password_change.html", {"form": form})
+
+    def post(self, request):
+        form = PasswordChangeForm(request.POST, user=request.user)
+        if form.is_valid():
+            try:
+                user_password_change(
+                    user=request.user,
+                    new_password=form.cleaned_data["new_password1"],
+                )
+            except ApplicationError as e:
+                form.add_error(None, e.message)
+            else:
+                update_session_auth_hash(request, request.user)
+                messages.success(
+                    request, "Your password has been changed successfully."
+                )
+                return redirect("users:profile")
+        return render(request, "users/password_change.html", {"form": form})
 
 
 class LogoutView(View):
