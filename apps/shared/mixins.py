@@ -8,16 +8,8 @@ class HTMXMixin:
 
 
 class OwnerRequiredMixin:
-    """Raises PermissionDenied if request.user is not the object owner.
+    owner_field = "user"
 
-    Override get_owner() to return the owner of the object being accessed.
-    """
-
-    def get_owner(self):
-        raise NotImplementedError("Subclasses must implement get_owner()")
-
-    def dispatch(self, request, *args, **kwargs):
-        response = super().dispatch(request, *args, **kwargs)
-        if request.user != self.get_owner():
+    def check_owner(self, obj):
+        if getattr(obj, self.owner_field) != self.request.user:
             raise PermissionDenied
-        return response

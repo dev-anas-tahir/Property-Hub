@@ -4,7 +4,7 @@ import os
 
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.core.exceptions import PermissionDenied, ValidationError
+from django.core.exceptions import ValidationError
 from django.core.paginator import Paginator
 from django.http import (
     FileResponse,
@@ -31,7 +31,7 @@ from apps.properties.services import (
     property_delete,
     property_update,
 )
-from apps.shared.mixins import HTMXMixin
+from apps.shared.mixins import HTMXMixin, OwnerRequiredMixin
 from apps.shared.validators import cnic_validator, phone_validator
 
 logger = logging.getLogger(__name__)
@@ -148,15 +148,14 @@ class PropertyCreateView(LoginRequiredMixin, HTMXMixin, View):
         return render(request, template, {"form": form, "is_edit_mode": False})
 
 
-class PropertyEditView(LoginRequiredMixin, HTMXMixin, View):
-    def _get_property(self, request, pk):
+class PropertyEditView(LoginRequiredMixin, OwnerRequiredMixin, HTMXMixin, View):
+    def _get_property(self, pk):
         property_obj = get_object_or_404(Property, pk=pk)
-        if property_obj.user != request.user:
-            raise PermissionDenied("You don't have permission to edit this property")
+        self.check_owner(property_obj)
         return property_obj
 
     def get(self, request, pk):
-        property_obj = self._get_property(request, pk)
+        property_obj = self._get_property(pk)
         form = PropertyForm(instance=property_obj)
         template = (
             "_components/properties/property_form.html"
@@ -170,7 +169,7 @@ class PropertyEditView(LoginRequiredMixin, HTMXMixin, View):
         )
 
     def post(self, request, pk):
-        property_obj = self._get_property(request, pk)
+        property_obj = self._get_property(pk)
         form = PropertyForm(request.POST, request.FILES, instance=property_obj)
         new_images = request.FILES.getlist("images")
         delete_image_ids = request.POST.getlist("delete_image_ids")
@@ -289,12 +288,10 @@ class PropertyFavoriteToggleView(LoginRequiredMixin, View):
         return JsonResponse({"is_favorited": is_favorited})
 
 
-class PropertyDeleteView(LoginRequiredMixin, HTMXMixin, View):
+class PropertyDeleteView(LoginRequiredMixin, OwnerRequiredMixin, HTMXMixin, View):
     def post(self, request, pk):
         property_obj = get_object_or_404(Property, pk=pk)
-
-        if property_obj.user != request.user:
-            raise PermissionDenied("You don't have permission to delete this property")
+        self.check_owner(property_obj)
 
         property_delete(property_obj=property_obj)
         messages.success(request, "Property deleted successfully.")
