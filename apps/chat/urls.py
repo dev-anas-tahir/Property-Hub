@@ -3,18 +3,25 @@ URL configuration for the chat app.
 """
 
 from django.urls import path
-from apps.chat import views
+
+from apps.chat.views import (
+    ConversationDetailView,
+    ConversationListView,
+    StartConversationView,
+)
 
 app_name = "chat"
 
 urlpatterns = [
-    path("conversations/", views.conversation_list, name="conversation_list"),
+    path("conversations/", ConversationListView.as_view(), name="conversation_list"),
     path(
         "conversations/<int:conversation_id>/",
-        views.conversation_detail,
+        ConversationDetailView.as_view(),
         name="conversation_detail",
     ),
     path(
-        "start/<int:property_id>/", views.start_conversation, name="start_conversation"
+        "start/<int:property_id>/",
+        StartConversationView.as_view(),
+        name="start_conversation",
     ),
 ]
