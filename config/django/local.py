@@ -42,29 +42,6 @@ SESSION_COOKIE_SECURE = False
 CSRF_COOKIE_SECURE = False
 
 # ============================================================================
-# AWS S3 (LocalStack for development)
-# ============================================================================
-
-if USE_S3_MEDIA or USE_S3_STATIC:  # noqa: F405
-    AWS_HOST_NAME = env.str("AWS_HOST_NAME", "localhost")  # noqa: F405
-    AWS_S3_ENDPOINT_URL = env.str("AWS_S3_ENDPOINT_URL", f"http://{AWS_HOST_NAME}:4566")  # noqa: F405
-    AWS_S3_VERIFY = False
-
-    if USE_S3_MEDIA:  # noqa: F405
-        AWS_S3_CUSTOM_DOMAIN = f"{AWS_HOST_NAME}:4566/{AWS_MEDIA_BUCKET_NAME}"  # noqa: F405
-        STORAGES["default"]["OPTIONS"]["custom_domain"] = AWS_S3_CUSTOM_DOMAIN  # noqa: F405
-        STORAGES["default"]["OPTIONS"]["endpoint_url"] = AWS_S3_ENDPOINT_URL  # noqa: F405
-        MEDIA_URL = f"http://{AWS_S3_CUSTOM_DOMAIN}/"  # noqa: F405
-
-    if USE_S3_STATIC:  # noqa: F405
-        AWS_S3_STATIC_CUSTOM_DOMAIN = f"{AWS_HOST_NAME}:4566/{AWS_STATIC_BUCKET_NAME}"  # noqa: F405
-        STORAGES["staticfiles"]["OPTIONS"]["custom_domain"] = (  # noqa: F405
-            AWS_S3_STATIC_CUSTOM_DOMAIN  # noqa: F405
-        )
-        STORAGES["staticfiles"]["OPTIONS"]["endpoint_url"] = AWS_S3_ENDPOINT_URL  # noqa: F405
-        STATIC_URL = f"http://{AWS_S3_STATIC_CUSTOM_DOMAIN}/"  # noqa: F405
-
-# ============================================================================
 # AXES (Relaxed for development)
 # ============================================================================
 

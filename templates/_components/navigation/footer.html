@@ -32,7 +32,7 @@
                     </a>
                 </div>
             </div>
-            
+
             <!-- Quick Links -->
             <div>
                 <h3 class="font-semibold text-base-content mb-4">Quick Links</h3>
@@ -40,7 +40,7 @@
                     <li><a href="{% url 'properties:list' %}" class="text-base-content/70 hover:text-primary transition-colors">Browse Properties</a></li>
                     {% if user.is_authenticated %}
                         <li><a href="{% url 'properties:create' %}" class="text-base-content/70 hover:text-primary transition-colors">List Property</a></li>
-                        <li><a href="{% url 'properties:myprops' %}" class="text-base-content/70 hover:text-primary transition-colors">My Properties</a></li>
+                        <li><a href="{% url 'properties:my-properties' %}" class="text-base-content/70 hover:text-primary transition-colors">My Properties</a></li>
                         <li><a href="{% url 'properties:favorites' %}" class="text-base-content/70 hover:text-primary transition-colors">Favorites</a></li>
                     {% else %}
                         <li><a href="{% url 'users:signup' %}" class="text-base-content/70 hover:text-primary transition-colors">Sign Up</a></li>
@@ -48,7 +48,7 @@
                     {% endif %}
                 </ul>
             </div>
-            
+
             <!-- Support -->
             <div>
                 <h3 class="font-semibold text-base-content mb-4">Support</h3>
@@ -60,9 +60,9 @@
                 </ul>
             </div>
         </div>
-        
+
         <div class="divider"></div>
-        
+
         <div class="flex flex-col md:flex-row justify-between items-center">
             <p class="text-base-content/60 text-sm">
                 © {% now "Y" %} PropertyHub. All rights reserved.

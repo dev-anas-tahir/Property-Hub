@@ -1,7 +1,7 @@
 services:
   db:
     image: postgres:17
-    container_name: propertyhub-db
+    container_name: db
     restart: always
     environment:
       POSTGRES_USER: propertyhub
@@ -19,7 +19,7 @@ services:
 
   redis:
     image: redis:7-alpine
-    container_name: propertyhub-redis
+    container_name: redis
     restart: always
     ports:
       - "6379:6379"
@@ -29,24 +29,9 @@ services:
       timeout: 3s
       retries: 5
 
-  localstack:
-    image: localstack/localstack:3.4.0
-    container_name: propertyhub-localstack
-    ports:
-      - "4566:4566"
-    environment:
-      - SERVICES=s3,ses,sqs
-      - DEBUG=1
-      - AWS_ACCESS_KEY_ID=test
-      - AWS_SECRET_ACCESS_KEY=test
-      - DATA_DIR=/var/lib/localstack/data
-    volumes:
-      - ./scripts/localstack-init.sh:/etc/localstack/init/ready.d/init.sh
-      - localstack-data:/var/lib/localstack
-
   pgadmin:
     image: dpage/pgadmin4
-    container_name: propertyhub-pgadmin
+    container_name: pgadmin
     environment:
       PGADMIN_DEFAULT_EMAIL: admin@propertyhub.dev
       PGADMIN_DEFAULT_PASSWORD: admin
@@ -55,12 +40,5 @@ services:
     depends_on:
       - db
 
-  mailhog:
-    image: mailhog/mailhog
-    container_name: propertyhub-mailhog
-    ports:
-      - "8025:8025"
-
 volumes:
   pgdata:
-  localstack-data:

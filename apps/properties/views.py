@@ -217,7 +217,7 @@ class PropertyEditView(LoginRequiredMixin, OwnerRequiredMixin, HTMXMixin, View):
 
 class MyPropertiesListView(LoginRequiredMixin, View):
     def get(self, request):
-        return render(request, "properties/myprops.html")
+        return render(request, "properties/my-properties.html")
 
 
 class FavoritesListView(LoginRequiredMixin, View):

@@ -37,7 +37,7 @@
                         <p class="text-base-content/60">{{ user.email }}</p>
                     </div>
                 </div>
-                
+
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                         <h3 class="font-semibold text-base-content mb-2">Account Details</h3>
@@ -56,7 +56,7 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     <div>
                         <h3 class="font-semibold text-base-content mb-2">Activity Summary</h3>
                         <div class="space-y-2 text-sm">
@@ -77,18 +77,18 @@
                 </div>
             </div>
         </div>
-        
+
         <!-- Recent Activity -->
         <div class="card bg-base-100 shadow-soft">
             <div class="card-body">
                 <h3 class="card-title text-xl mb-4">Recent Activity</h3>
-                
+
                 {% if user.properties.exists %}
                     <div class="space-y-4">
                         {% for property in user.properties.all|slice:":5" %}
                             <div class="flex items-center space-x-4 p-3 bg-base-200 rounded-lg">
                                 {% if property.images.first %}
-                                    <img src="{{ property.images.first.image.url }}" 
+                                    <img src="{{ property.images.first.image.url }}"
                                          alt="{{ property.name }}"
                                          class="w-12 h-12 object-cover rounded-lg">
                                 {% else %}
@@ -121,7 +121,7 @@
             </div>
         </div>
     </div>
-    
+
     <!-- Sidebar -->
     <div class="space-y-6">
         <!-- Quick Actions -->
@@ -135,7 +135,7 @@
                         </svg>
                         Add Property
                     </a>
-                    <a href="{% url 'properties:myprops' %}" class="btn btn-outline w-full justify-start">
+                    <a href="{% url 'properties:my-properties' %}" class="btn btn-outline w-full justify-start">
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
                         </svg>
@@ -156,7 +156,7 @@
                 </div>
             </div>
         </div>
-        
+
         <!-- Account Settings -->
         <div class="card bg-base-100 shadow-soft">
             <div class="card-body">

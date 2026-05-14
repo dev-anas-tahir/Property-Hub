@@ -135,9 +135,6 @@ jobs:
           SECRET_KEY: test-secret-key-for-ci
           DEBUG: "True"
           ALLOWED_HOSTS: localhost,127.0.0.1
-          AWS_ACCESS_KEY_ID: test-key
-          AWS_SECRET_ACCESS_KEY: test-secret
-          AWS_MEDIA_BUCKET_NAME: test-bucket
 
       - name: Run migrations
         run: uv run python manage.py migrate --noinput
@@ -146,9 +143,6 @@ jobs:
           SECRET_KEY: test-secret-key-for-ci
           DEBUG: "True"
           ALLOWED_HOSTS: localhost,127.0.0.1
-          AWS_ACCESS_KEY_ID: test-key
-          AWS_SECRET_ACCESS_KEY: test-secret
-          AWS_MEDIA_BUCKET_NAME: test-bucket
 
   security:
     runs-on: ubuntu-latest

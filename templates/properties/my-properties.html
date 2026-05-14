@@ -27,7 +27,7 @@
         <div class="stat-value text-primary">{{ properties|length }}</div>
         <div class="stat-desc">Properties listed</div>
     </div>
-    
+
     <div class="stat bg-base-100 shadow-soft rounded-2xl">
         <div class="stat-figure text-success">
             <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -39,7 +39,7 @@
         <div class="stat-value text-success">{{ total_views|default:0 }}</div>
         <div class="stat-desc">Across all properties</div>
     </div>
-    
+
     <div class="stat bg-base-100 shadow-soft rounded-2xl">
         <div class="stat-figure text-warning">
             <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -71,7 +71,7 @@
                     <li><a>Recently Added</a></li>
                 </ul>
             </div>
-            
+
             <div class="dropdown">
                 <div tabindex="0" role="button" class="btn btn-outline btn-sm">
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -87,12 +87,12 @@
                 </ul>
             </div>
         </div>
-        
+
         <div class="text-sm text-base-content/60">
             {{ properties|length }} propert{{ properties|length|pluralize:"y,ies" }}
         </div>
     </div>
-    
+
     <!-- Properties Grid -->
     <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
         {% for property in properties %}
@@ -100,7 +100,7 @@
                 <!-- Property Image -->
                 <figure class="relative h-48">
                     {% if property.images.first %}
-                        <img src="{{ property.images.first.image.url }}" 
+                        <img src="{{ property.images.first.image.url }}"
                              alt="{{ property.name }}"
                              class="w-full h-full object-cover">
                     {% else %}
@@ -110,12 +110,12 @@
                             </svg>
                         </div>
                     {% endif %}
-                    
+
                     <!-- Status Badge -->
                     <div class="absolute top-3 left-3">
                         <span class="badge badge-primary badge-sm">{{ property.get_property_type_display }}</span>
                     </div>
-                    
+
                     <!-- Actions Menu -->
                     <div class="absolute top-3 right-3">
                         <div class="dropdown dropdown-end">
@@ -132,12 +132,12 @@
                         </div>
                     </div>
                 </figure>
-                
+
                 <!-- Property Details -->
                 <div class="card-body p-4">
                     <h3 class="card-title text-lg line-clamp-1">{{ property.name }}</h3>
                     <p class="text-base-content/60 text-sm line-clamp-2 mb-3">{{ property.full_address }}</p>
-                    
+
                     <!-- Property Stats -->
                     <div class="flex items-center justify-between text-sm text-base-content/70 mb-4">
                         <div class="flex items-center space-x-3">
@@ -145,13 +145,13 @@
                         </div>
                         <span class="font-bold text-accent">${{ property.price|floatformat:0 }}</span>
                     </div>
-                    
+
                     <!-- Property Metrics -->
                     <div class="flex items-center justify-between text-xs text-base-content/60 mb-4">
                         <span>{{ property.view_count|default:0 }} views</span>
                         <span>{{ property.created_at|timesince }} ago</span>
                     </div>
-                    
+
                     <!-- Action Buttons -->
                     <div class="card-actions justify-end">
                         <a href="{% url 'properties:edit' property.pk %}" class="btn btn-outline btn-sm">Edit</a>
@@ -161,14 +161,14 @@
             </div>
         {% endfor %}
     </div>
-    
+
     <!-- Pagination -->
     {% if page_obj %}
         <div class="mt-8">
             {% include '_components/ui/pagination.html' with page_obj=page_obj %}
         </div>
     {% endif %}
-    
+
 {% else %}
     <!-- Empty State -->
     <div class="text-center py-16">

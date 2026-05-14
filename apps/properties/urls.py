@@ -33,7 +33,7 @@ urlpatterns = [
         name="favorite_toggle",
     ),
     path("<int:pk>/delete/", PropertyDeleteView.as_view(), name="delete"),
-    path("myprops/", MyPropertiesListView.as_view(), name="myprops"),
+    path("my-properties/", MyPropertiesListView.as_view(), name="my-properties"),
     path("favorites/", FavoritesListView.as_view(), name="favorites"),
     # Validation endpoints
     path("validate/step/", PropertyValidateStepView.as_view(), name="validate_step"),
