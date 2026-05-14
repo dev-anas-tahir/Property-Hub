@@ -10,11 +10,25 @@ down:
 
 # Start Django development server with CSS & JS build
 runserver port="8000":
-    trap 'kill 0' SIGINT SIGTERM
+    #!/usr/bin/env bash
+    set -euo pipefail
+
+    css_pid=""
+
+    cleanup() {
+        if [[ -n "$css_pid" ]]; then
+            kill "$css_pid" 2>/dev/null || true
+            wait "$css_pid" 2>/dev/null || true
+        fi
+    }
+
+    trap cleanup EXIT INT TERM
+
+    npm run build-js
     npm run build-css &
-    npm run build-js &
-    uv run python manage.py runserver {{port}} &
-    wait
+    css_pid=$!
+
+    uv run python manage.py runserver {{port}}
 
 # Create new Django migrations
 makemigrations:
