@@ -3,8 +3,11 @@ from django.http import HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views import View
 
-from apps.chat.models import Conversation
-from apps.chat.selectors import conversation_list_for_user, messages_for_conversation
+from apps.chat.selectors import (
+    conversation_get_for_user,
+    conversation_list_for_user,
+    messages_for_conversation,
+)
 from apps.chat.services import conversation_start, messages_mark_read
 from apps.properties.models import Property
 from apps.shared.exceptions import ApplicationError
@@ -13,19 +16,6 @@ from apps.shared.exceptions import ApplicationError
 class ConversationListView(LoginRequiredMixin, View):
     def get(self, request):
         conversations = conversation_list_for_user(user=request.user)
-
-        for conversation in conversations:
-            if conversation.participant_one == request.user:
-                conversation.other_participant = conversation.participant_two
-            else:
-                conversation.other_participant = conversation.participant_one
-
-            conversation.unread_count = (
-                conversation.messages.filter(is_read=False)
-                .exclude(sender=request.user)
-                .count()
-            )
-
         return render(
             request, "chat/conversation_list.html", {"conversations": conversations}
         )
@@ -33,24 +23,15 @@ class ConversationListView(LoginRequiredMixin, View):
 
 class ConversationDetailView(LoginRequiredMixin, View):
     def get(self, request, conversation_id):
-        conversation = get_object_or_404(Conversation, id=conversation_id)
-
-        if (
-            conversation.participant_one != request.user
-            and conversation.participant_two != request.user
-        ):
-            return HttpResponseForbidden(
-                "You are not a participant in this conversation."
+        try:
+            conversation, other_participant = conversation_get_for_user(
+                conversation_id=conversation_id, user=request.user
             )
+        except ApplicationError as e:
+            return HttpResponseForbidden(e.message)
 
         chat_messages = messages_for_conversation(conversation=conversation)
         messages_mark_read(conversation=conversation, user=request.user)
-
-        other_participant = (
-            conversation.participant_two
-            if conversation.participant_one == request.user
-            else conversation.participant_one
-        )
 
         context = {
             "conversation": conversation,
