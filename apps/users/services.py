@@ -8,16 +8,20 @@ from apps.shared.validators import validate_password_strength
 User = get_user_model()
 
 
+def _check_password_strength(password: str) -> None:
+    try:
+        validate_password_strength(password)
+    except ValidationError as e:
+        raise ApplicationError(e.message) from e
+
+
 def user_create(*, email: str, password: str, first_name: str, last_name: str) -> User:
     email = email.strip().lower()
 
     if User.objects.filter(email=email).exists():
         raise ApplicationError("This email address is already registered.")
 
-    try:
-        validate_password_strength(password)
-    except ValidationError as e:
-        raise ApplicationError(e.message) from e
+    _check_password_strength(password)
 
     user = User.objects.create_user(
         email=email,
@@ -32,10 +36,7 @@ def user_password_change(*, user: User, old_password: str, new_password: str) ->
     if not user.check_password(old_password):
         raise ApplicationError("Current password is incorrect.")
 
-    try:
-        validate_password_strength(new_password)
-    except ValidationError as e:
-        raise ApplicationError(e.message) from e
+    _check_password_strength(new_password)
 
     user.set_password(new_password)
     user.save(update_fields=["password"])
