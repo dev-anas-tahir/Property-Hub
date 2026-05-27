@@ -1,10 +1,13 @@
-from apps.chat.consumers import ChatConsumer
-from apps.chat.models import Conversation, Message
-from apps.properties.models import Property
+from unittest.mock import AsyncMock, patch
+
 from channels.db import database_sync_to_async
 from channels.testing import WebsocketCommunicator
 from django.contrib.auth import get_user_model
 from django.test import TransactionTestCase, override_settings
+
+from apps.chat.consumers import ChatConsumer
+from apps.chat.models import Conversation, Message
+from apps.properties.models import Property
 
 User = get_user_model()
 
@@ -13,6 +16,14 @@ User = get_user_model()
     CHANNEL_LAYERS={"default": {"BACKEND": "channels.layers.InMemoryChannelLayer"}}
 )
 class ChatConsumerTestCase(TransactionTestCase):
+    def setUp(self):
+        self.rate_limit_patcher = patch(
+            "apps.chat.services.rate_limit_check",
+            new=AsyncMock(return_value=(True, 0)),
+        )
+        self.rate_limit_patcher.start()
+        self.addCleanup(self.rate_limit_patcher.stop)
+
     @database_sync_to_async
     def create_test_data(self):
         self.user1 = User.objects.create_user(
@@ -182,8 +193,9 @@ class ChatConsumerTestCase(TransactionTestCase):
             Conversation.objects.filter(id=self.conversation.id).delete()
 
         await delete_conversation()
-        await communicator.send_json_to({"message": "This should fail to save"})
-        response = await communicator.receive_json_from()
+        with self.assertLogs("apps.chat.consumers", level="ERROR"):
+            await communicator.send_json_to({"message": "This should fail to save"})
+            response = await communicator.receive_json_from()
         self.assertEqual(response["type"], "error")
         self.assertIn("Failed to save message", response["message"])
         await communicator.disconnect()
@@ -193,6 +205,14 @@ class ChatConsumerTestCase(TransactionTestCase):
     CHANNEL_LAYERS={"default": {"BACKEND": "channels.layers.InMemoryChannelLayer"}}
 )
 class MessageTypeProtocolTestCase(TransactionTestCase):
+    def setUp(self):
+        self.rate_limit_patcher = patch(
+            "apps.chat.services.rate_limit_check",
+            new=AsyncMock(return_value=(True, 0)),
+        )
+        self.rate_limit_patcher.start()
+        self.addCleanup(self.rate_limit_patcher.stop)
+
     @database_sync_to_async
     def create_test_data(self):
         self.user1 = User.objects.create_user(

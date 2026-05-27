@@ -1,16 +1,15 @@
 import re
 import time
+from unittest import skip
 
-from apps.chat.models import Conversation, Message
-from apps.properties.models import Property
 from channels.db import database_sync_to_async
 from channels.testing import WebsocketCommunicator
 from django.contrib.auth import get_user_model
-from unittest import skip
-
 from django.test import TransactionTestCase, override_settings
 
 from apps.chat.consumers import ChatConsumer
+from apps.chat.models import Conversation, Message
+from apps.properties.models import Property
 
 User = get_user_model()
 

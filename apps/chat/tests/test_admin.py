@@ -1,7 +1,8 @@
-from apps.chat.models import Conversation, Message
-from apps.properties.models import Property
 from django.contrib.auth import get_user_model
 from django.test import TransactionTestCase
+
+from apps.chat.models import Conversation, Message
+from apps.properties.models import Property
 
 User = get_user_model()
 

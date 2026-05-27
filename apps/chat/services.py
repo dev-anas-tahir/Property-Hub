@@ -1,4 +1,9 @@
 import time
+from dataclasses import dataclass
+from enum import Enum
+
+import nh3
+from channels.db import database_sync_to_async
 
 from apps.chat.models import Conversation, Message
 from apps.shared.exceptions import ApplicationError
@@ -7,12 +12,86 @@ RATE_LIMIT_MESSAGES = 10
 RATE_LIMIT_WINDOW = 60
 
 
+class MessageDeliveryStatus(Enum):
+    DELIVERED = "delivered"
+    REJECTED = "rejected"
+    RATE_LIMITED = "rate_limited"
+
+
+@dataclass(frozen=True)
+class MessageDeliveryResult:
+    status: MessageDeliveryStatus
+    message: Message | None = None
+    payload: dict | None = None
+    error_message: str = ""
+    cooldown_seconds: int = 0
+
+
 def message_create(*, conversation: Conversation, sender, content: str) -> Message:
     message = Message(conversation=conversation, sender=sender, content=content)
     message.full_clean()
     message.save()
     conversation.save(update_fields=["updated_at"])
     return message
+
+
+async def message_deliver(
+    *, conversation: Conversation, sender, content: str, redis_url: str
+) -> MessageDeliveryResult:
+    content = content.strip() if isinstance(content, str) else ""
+    if not content:
+        return MessageDeliveryResult(
+            status=MessageDeliveryStatus.REJECTED,
+            error_message="Message content cannot be empty",
+        )
+
+    if len(content) > 5000:
+        return MessageDeliveryResult(
+            status=MessageDeliveryStatus.REJECTED,
+            error_message="Message exceeds maximum length of 5000 characters",
+        )
+
+    is_allowed, cooldown_seconds = await rate_limit_check(
+        user_id=sender.id, redis_url=redis_url
+    )
+    if not is_allowed:
+        return MessageDeliveryResult(
+            status=MessageDeliveryStatus.RATE_LIMITED,
+            error_message=(
+                "Rate limit exceeded. Please wait "
+                f"{cooldown_seconds} seconds before sending another message."
+            ),
+            cooldown_seconds=cooldown_seconds,
+        )
+
+    recipient_id = (
+        conversation.participant_two_id
+        if conversation.participant_one_id == sender.id
+        else conversation.participant_one_id
+    )
+    if recipient_id == sender.id:
+        return MessageDeliveryResult(
+            status=MessageDeliveryStatus.REJECTED,
+            error_message="Cannot send messages to yourself",
+        )
+
+    sanitized_content = nh3.clean(content, tags=set())
+    message = await database_sync_to_async(message_create)(
+        conversation=conversation,
+        sender=sender,
+        content=sanitized_content,
+    )
+    return MessageDeliveryResult(
+        status=MessageDeliveryStatus.DELIVERED,
+        message=message,
+        payload={
+            "message": sanitized_content,
+            "sender_id": sender.id,
+            "sender_email": sender.email,
+            "message_id": message.id,
+            "created_at": message.created_at.isoformat(),
+        },
+    )
 
 
 def conversation_get_or_create(

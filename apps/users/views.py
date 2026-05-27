@@ -1,9 +1,8 @@
 from axes.handlers.proxy import AxesProxyHandler
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.auth import authenticate
+from django.contrib.auth import authenticate, logout, update_session_auth_hash
 from django.contrib.auth import login as auth_login
-from django.contrib.auth import logout, update_session_auth_hash
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse
 from django.shortcuts import redirect, render

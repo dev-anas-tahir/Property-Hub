@@ -1,12 +1,15 @@
-from apps.chat.consumers import ChatConsumer
-from apps.chat.models import Conversation, Message
-from apps.properties.models import Property
+from unittest import skip
+from unittest.mock import AsyncMock, patch
+
 from channels.db import database_sync_to_async
 from channels.testing import WebsocketCommunicator
 from django.contrib.auth import get_user_model
-from unittest import skip
-
 from django.test import TransactionTestCase, override_settings
+
+from apps.chat import services
+from apps.chat.consumers import ChatConsumer
+from apps.chat.models import Conversation, Message
+from apps.properties.models import Property
 
 User = get_user_model()
 
@@ -15,6 +18,21 @@ User = get_user_model()
     CHANNEL_LAYERS={"default": {"BACKEND": "channels.layers.InMemoryChannelLayer"}}
 )
 class RateLimitingTestCase(TransactionTestCase):
+    def setUp(self):
+        self.rate_limit_calls = 0
+
+        async def fake_rate_limit_check(*, user_id, redis_url):
+            self.rate_limit_calls += 1
+            if self.rate_limit_calls <= 10:
+                return True, 0
+            return False, 42
+
+        self.rate_limit_patcher = patch(
+            "apps.chat.services.rate_limit_check", side_effect=fake_rate_limit_check
+        )
+        self.rate_limit_patcher.start()
+        self.addCleanup(self.rate_limit_patcher.stop)
+
     @database_sync_to_async
     def create_test_data(self):
         self.user1 = User.objects.create_user(
@@ -121,3 +139,74 @@ class RateLimitingTestCase(TransactionTestCase):
 
         self.assertEqual(await check_message_count(), 10)
         await communicator.disconnect()
+
+
+class MessageDeliveryTestCase(TransactionTestCase):
+    @database_sync_to_async
+    def create_test_data(self):
+        self.user1 = User.objects.create_user(
+            email="user1@example.com", password="testpass123"
+        )
+        self.user2 = User.objects.create_user(
+            email="user2@example.com", password="testpass123"
+        )
+        self.property = Property.objects.create(
+            user=self.user2,
+            name="Test Property",
+            full_address="123 Test St, Test City, TS 12345",
+            phone_number="03001234567",
+            cnic="12345-1234567-1",
+            property_type="House",
+            description="A test property",
+            price=100000,
+        )
+        self.conversation = Conversation.objects.create(
+            property=self.property,
+            participant_one=self.user1,
+            participant_two=self.user2,
+        )
+
+    async def test_rejects_empty_message_without_persisting(self):
+        await self.create_test_data()
+
+        result = await services.message_deliver(
+            conversation=self.conversation,
+            sender=self.user1,
+            content="   ",
+            redis_url="redis://unused",
+        )
+
+        self.assertEqual(result.status, services.MessageDeliveryStatus.REJECTED)
+        self.assertEqual(result.error_message, "Message content cannot be empty")
+
+        @database_sync_to_async
+        def message_count():
+            return Message.objects.filter(conversation=self.conversation).count()
+
+        self.assertEqual(await message_count(), 0)
+
+    async def test_delivers_sanitized_message_with_transport_neutral_payload(self):
+        await self.create_test_data()
+
+        with patch.object(
+            services, "rate_limit_check", new=AsyncMock(return_value=(True, 0))
+        ):
+            result = await services.message_deliver(
+                conversation=self.conversation,
+                sender=self.user1,
+                content='<script>alert("XSS")</script>Hello',
+                redis_url="redis://unused",
+            )
+
+        self.assertEqual(result.status, services.MessageDeliveryStatus.DELIVERED)
+        self.assertEqual(result.message.content, "Hello")
+        self.assertEqual(
+            result.payload,
+            {
+                "message": "Hello",
+                "sender_id": self.user1.id,
+                "sender_email": self.user1.email,
+                "message_id": result.message.id,
+                "created_at": result.message.created_at.isoformat(),
+            },
+        )

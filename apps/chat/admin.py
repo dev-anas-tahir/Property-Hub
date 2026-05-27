@@ -5,15 +5,15 @@ Provides administrative access to conversations and messages with filtering,
 searching, and display capabilities as specified in Requirements 11.1-11.5.
 """
 
-from apps.chat.models import Conversation, Message
-from apps.properties.models import Property
-
 from django.contrib import admin
 from django.contrib.admin.utils import quote
 from django.contrib.auth import get_user_model
 from django.db.models import Count, Q
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
+
+from apps.chat.models import Conversation, Message
+from apps.properties.models import Property
 
 User = get_user_model()
 
