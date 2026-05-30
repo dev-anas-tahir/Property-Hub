@@ -305,6 +305,10 @@ function propertyForm() {
             is_published: false
         },
 
+        init() {
+            this.updateFormData();
+        },
+
         nextStep() {
             if (this.currentStep < this.totalSteps) {
                 this.validateStepWithDjango();
@@ -335,11 +339,11 @@ function propertyForm() {
                 const result = await response.json();
 
                 if (result.valid) {
+                    this.updateFormData();
                     this.currentStep++;
                     if (this.currentStep > this.maxStepReached) {
                         this.maxStepReached = this.currentStep;
                     }
-                    this.updateFormData();
                 } else {
                     this.displayStepErrors(result.errors);
                 }
@@ -405,8 +409,13 @@ function propertyForm() {
         },
 
         getPropertyTypeLabel() {
+            const value = this.formData.property_type;
+            if (!value) {
+                return '-';
+            }
             const select = document.querySelector('[name=property_type]');
-            return select?.options[select.selectedIndex]?.text || '-';
+            const selectedOption = Array.from(select?.options || []).find(option => option.value === value);
+            return selectedOption?.text || value;
         }
     }
 }
