@@ -20,9 +20,7 @@ class SignupView(HTMXMixin, View):
     def get(self, request):
         form = SignupForm()
         template = (
-            "_components/forms/signup_form.html"
-            if self.is_htmx
-            else "users/signup.html"
+            "users/partials/signup_form.html" if self.is_htmx else "users/signup.html"
         )
         return render(request, template, {"form": form})
 
@@ -54,9 +52,7 @@ class SignupView(HTMXMixin, View):
                 return redirect("properties:list")
 
         template = (
-            "_components/forms/signup_form.html"
-            if self.is_htmx
-            else "users/signup.html"
+            "users/partials/signup_form.html" if self.is_htmx else "users/signup.html"
         )
         return render(request, template, {"form": form})
 
@@ -78,14 +74,14 @@ class LoginView(HTMXMixin, View):
     def get(self, request):
         form = LoginForm()
         template = (
-            "_components/forms/login_form.html" if self.is_htmx else "users/login.html"
+            "users/partials/login_form.html" if self.is_htmx else "users/login.html"
         )
         return render(request, template, {"form": form})
 
     def post(self, request):
         form = LoginForm(request.POST)
         template = (
-            "_components/forms/login_form.html" if self.is_htmx else "users/login.html"
+            "users/partials/login_form.html" if self.is_htmx else "users/login.html"
         )
 
         if AxesProxyHandler.is_locked(request):
@@ -145,18 +141,14 @@ class ProfileEditView(LoginRequiredMixin, HTMXMixin, View):
             user=request.user,
         )
         template = (
-            "_components/forms/profile_form.html"
-            if self.is_htmx
-            else "users/profile.html"
+            "users/partials/profile_form.html" if self.is_htmx else "users/profile.html"
         )
         return render(request, template, {"form": form})
 
     def post(self, request):
         form = ProfileForm(request.POST, user=request.user)
         template = (
-            "_components/forms/profile_form.html"
-            if self.is_htmx
-            else "users/profile.html"
+            "users/partials/profile_form.html" if self.is_htmx else "users/profile.html"
         )
 
         if form.is_valid():

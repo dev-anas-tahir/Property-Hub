@@ -10,8 +10,8 @@
         <h1 class="text-3xl font-display font-bold text-base-content mb-2">Add New Property</h1>
         <p class="text-base-content/60">List your property and reach thousands of potential buyers or renters</p>
     </div>
-    
+
     <!-- Property Form Component -->
-    {% include '_components/properties/property_form.html' with form=form is_edit_mode=False %}
+    {% include 'properties/partials/property_form.html' with form=form is_edit_mode=False %}
 </div>
 {% endblock %}

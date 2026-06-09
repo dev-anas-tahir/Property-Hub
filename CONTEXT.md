@@ -59,6 +59,10 @@ Abstract model in `apps/shared/models.py` providing `created_at` + `updated_at`.
 A project-root layout under `templates/_layouts/` (`base.html`, `auth.html`, `dashboard.html`). Owns global UI structure, theme attribute, HTMX/Alpine setup, and navigation. App pages extend a shell; HTMX partials do not.
 _Avoid_: Putting domain markup in shell templates
 
+**App template**:
+A page or fragment owned by one Django app, under `apps/<app>/templates/<app>/`. Full pages at the app root; HTMX fragments in `partials/`; reusable domain widgets in `components/`.
+_Avoid_: Putting app pages in project-root `templates/<app>/`
+
 **Field primitive**:
 The single reusable form control at `templates/_components/forms/field.html`. Renders any bound form field via `widget_tweaks` (`render_field`). App form partials compose fields; they do not hand-build `<input>` markup.
 _Avoid_: `input.html`, per-type field templates, scattering `add_class` across pages
@@ -68,7 +72,7 @@ An app-scoped template that lays out fields for one form (e.g. `login_form.html`
 _Avoid_: Calling full-page templates "partials"
 
 **HTMX partial**:
-A template fragment returned when `request.htmx` is true. No `extends`; swapped into an existing DOM target. Colocated with the owning app under a `partials/` directory (target layout; migration in progress).
+A template fragment returned when `request.htmx` is true. No `extends`; swapped into an existing DOM target. Colocated with the owning app under `apps/<app>/templates/<app>/partials/`.
 _Avoid_: Extending `base.html` in a partial, putting partials in root `_components/<app>/`
 
 ## Relationships

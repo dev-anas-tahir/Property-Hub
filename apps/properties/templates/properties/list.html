@@ -35,13 +35,13 @@
                 Discover amazing properties in your desired location
             {% endif %}
         </p>
-        
+
         {% if not show_my_properties and not show_favorites %}
             <!-- Search Bar -->
             <div class="max-w-2xl mx-auto">
                 <div class="join w-full">
-                    <input type="text" 
-                           placeholder="Search by location, property type..." 
+                    <input type="text"
+                           placeholder="Search by location, property type..."
                            class="input input-bordered join-item flex-1 text-base-content">
                     <button class="btn btn-accent join-item">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -75,7 +75,7 @@
                     <li><a>Bathrooms</a></li>
                 </ul>
             </div>
-            
+
             <!-- Sort Dropdown -->
             <div class="dropdown">
                 <div tabindex="0" role="button" class="btn btn-outline">
@@ -92,7 +92,7 @@
                 </ul>
             </div>
         </div>
-        
+
         <!-- Action Buttons -->
         <div class="flex items-center space-x-3">
             {% if user.is_authenticated and not show_favorites %}
@@ -103,7 +103,7 @@
                     Add Property
                 </a>
             {% endif %}
-            
+
             <!-- View Toggle -->
             <div class="join">
                 <button class="btn btn-outline join-item btn-active">
@@ -130,7 +130,7 @@
     {% endif %}
 
     <!-- Properties Grid -->
-    {% include '_components/properties/property_grid.html' with properties=properties page_obj=page_obj %}
+    {% include 'properties/partials/property_grid.html' with properties=properties page_obj=page_obj %}
 </div>
 
 {% endblock %}

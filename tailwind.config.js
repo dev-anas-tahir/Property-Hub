@@ -2,6 +2,7 @@
 module.exports = {
   content: [
     './templates/**/*.html',
+    './apps/**/templates/**/*.html',
     './apps/**/*.py',
     './static/js/**/*.js',
     './frontend/**/*.js',  // Include frontend source files for Tailwind scanning

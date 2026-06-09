@@ -75,7 +75,7 @@ class PropertyListView(HTMXMixin, View):
         }
 
         if self.is_htmx:
-            return render(request, "_components/properties/property_grid.html", context)
+            return render(request, "properties/partials/property_grid.html", context)
         return render(request, "properties/list.html", context)
 
 
@@ -101,9 +101,7 @@ class PropertyDetailView(HTMXMixin, View):
         }
 
         if self.is_htmx:
-            return render(
-                request, "_components/properties/property_detail.html", context
-            )
+            return render(request, "properties/partials/property_detail.html", context)
         return render(request, "properties/detail.html", context)
 
 
@@ -111,7 +109,7 @@ class PropertyCreateView(LoginRequiredMixin, HTMXMixin, View):
     def get(self, request):
         form = PropertyForm()
         template = (
-            "_components/properties/property_form.html"
+            "properties/partials/property_form.html"
             if self.is_htmx
             else "properties/create.html"
         )
@@ -147,7 +145,7 @@ class PropertyCreateView(LoginRequiredMixin, HTMXMixin, View):
                 return redirect("properties:detail", pk=property_obj.pk)
 
         template = (
-            "_components/properties/property_form.html"
+            "properties/partials/property_form.html"
             if self.is_htmx
             else "properties/create.html"
         )
@@ -164,7 +162,7 @@ class PropertyEditView(LoginRequiredMixin, OwnerRequiredMixin, HTMXMixin, View):
         property_obj = self._get_property(pk)
         form = PropertyForm(instance=property_obj)
         template = (
-            "_components/properties/property_form.html"
+            "properties/partials/property_form.html"
             if self.is_htmx
             else "properties/edit.html"
         )
@@ -213,7 +211,7 @@ class PropertyEditView(LoginRequiredMixin, OwnerRequiredMixin, HTMXMixin, View):
                 return redirect("properties:detail", pk=property_obj.pk)
 
         template = (
-            "_components/properties/property_form.html"
+            "properties/partials/property_form.html"
             if self.is_htmx
             else "properties/edit.html"
         )
@@ -279,7 +277,7 @@ class PropertyFavoriteToggleView(LoginRequiredMixin, View):
             property_obj.is_favorited = is_favorited
             response = render(
                 request,
-                "_components/properties/favorite_button.html",
+                "properties/components/favorite_button.html",
                 {"property": property_obj},
             )
             return trigger_client_event(
