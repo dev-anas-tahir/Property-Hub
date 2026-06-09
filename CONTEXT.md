@@ -53,6 +53,24 @@ Domain exception raised by Services. Has `message: str` and optional `extra: dic
 **BaseModel**:
 Abstract model in `apps/shared/models.py` providing `created_at` + `updated_at`. Adopted by models that mutate over time. Skipped by `User` (uses `AbstractUser` timestamps) and `Message` (immutable).
 
+### Presentation
+
+**Shell template**:
+A project-root layout under `templates/_layouts/` (`base.html`, `auth.html`, `dashboard.html`). Owns global UI structure, theme attribute, HTMX/Alpine setup, and navigation. App pages extend a shell; HTMX partials do not.
+_Avoid_: Putting domain markup in shell templates
+
+**Field primitive**:
+The single reusable form control at `templates/_components/forms/field.html`. Renders any bound form field via `widget_tweaks` (`render_field`). App form partials compose fields; they do not hand-build `<input>` markup.
+_Avoid_: `input.html`, per-type field templates, scattering `add_class` across pages
+
+**Form partial**:
+An app-scoped template that lays out fields for one form (e.g. `login_form.html`). Returned as an HTMX fragment or included by a full page. Lives with its app domain, not in the design-system layer.
+_Avoid_: Calling full-page templates "partials"
+
+**HTMX partial**:
+A template fragment returned when `request.htmx` is true. No `extends`; swapped into an existing DOM target. Colocated with the owning app under a `partials/` directory (target layout; migration in progress).
+_Avoid_: Extending `base.html` in a partial, putting partials in root `_components/<app>/`
+
 ## Relationships
 
 - A **User** owns zero or more **Properties**

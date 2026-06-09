@@ -1,0 +1,59 @@
+{% load widget_tweaks %}
+
+<div class="form-control w-full">
+    {% if label %}
+        <label class="label" for="{{ field.id_for_label }}">
+            <span class="label-text font-medium text-base-content">
+                {{ label }}
+                {% if required %}
+                    <span class="text-error">*</span>
+                {% endif %}
+            </span>
+        </label>
+    {% endif %}
+
+    <div class="relative">
+        {% if icon %}
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-10">
+                {{ icon|safe }}
+            </div>
+        {% endif %}
+
+        {% if 'textarea' in field.field.widget.template_name %}
+            {% render_field field class="textarea textarea-bordered w-full {% if field.errors %}textarea-error{% endif %}" rows=rows|default:4 placeholder=placeholder|default:'' %}
+        {% elif 'select' in field.field.widget.template_name %}
+            {% render_field field class="select select-bordered w-full {% if field.errors %}select-error{% endif %}" %}
+        {% elif field.field.widget.input_type == 'password' %}
+            {% render_field field class="input input-bordered w-full pr-12 {% if field.errors %}input-error{% endif %}" placeholder=placeholder|default:'' %}
+            <button type="button"
+                    class="absolute inset-y-0 right-0 pr-3 flex items-center"
+                    onclick="togglePassword('{{ field.id_for_label }}', this)"
+                    aria-label="Toggle password visibility">
+                <svg class="w-5 h-5 text-base-content/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                </svg>
+            </button>
+        {% else %}
+            {% render_field field class="input input-bordered w-full {% if icon %}pl-10 {% endif %}{% if field.errors %}input-error{% endif %}" placeholder=placeholder|default:'' %}
+        {% endif %}
+    </div>
+
+    {% if field.errors %}
+        <label class="label">
+            <span class="label-text-alt text-error">
+                {{ field.errors.0 }}
+            </span>
+        </label>
+    {% endif %}
+
+    {% with hint=help_text|default:field.help_text %}
+        {% if hint %}
+            <label class="label">
+                <span class="label-text-alt text-base-content/60">
+                    {{ hint }}
+                </span>
+            </label>
+        {% endif %}
+    {% endwith %}
+</div>
