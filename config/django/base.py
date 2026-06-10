@@ -40,7 +40,6 @@ INSTALLED_APPS = [
     "axes",
     "channels",
     "django_htmx",
-    "rangefilter",
     "storages",
     "widget_tweaks",
     # Local apps
