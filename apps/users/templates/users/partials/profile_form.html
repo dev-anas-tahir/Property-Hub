@@ -19,12 +19,12 @@
 
     <!-- Name Fields -->
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {% include '_components/forms/field.html' with field=form.first_name label="First Name" placeholder="Enter your first name" required=True %}
-        {% include '_components/forms/field.html' with field=form.last_name label="Last Name" placeholder="Enter your last name" required=True %}
+        <c-forms.field :field="form.first_name" label="First Name" placeholder="Enter your first name" required />
+        <c-forms.field :field="form.last_name" label="Last Name" placeholder="Enter your last name" required />
     </div>
 
     <!-- Email Field -->
-    {% include '_components/forms/field.html' with field=form.email label="Email" placeholder="Enter your email" required=True icon="at-symbol" %}
+    <c-forms.field :field="form.email" label="Email" placeholder="Enter your email" icon="at-symbol" required />
 
     <!-- Submit Button -->
     <div class="flex justify-end space-x-4">

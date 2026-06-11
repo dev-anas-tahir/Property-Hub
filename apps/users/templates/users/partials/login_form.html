@@ -18,10 +18,10 @@
     {% endif %}
 
     <!-- Email Field -->
-    {% include '_components/forms/field.html' with field=form.email label="Email" placeholder="Enter your email" required=True icon="at-symbol" %}
+    <c-forms.field :field="form.email" label="Email" placeholder="Enter your email" icon="at-symbol" required />
 
     <!-- Password Field -->
-    {% include '_components/forms/field.html' with field=form.password label="Password" placeholder="Enter your password" required=True %}
+    <c-forms.field :field="form.password" label="Password" placeholder="Enter your password" required />
 
     <!-- Remember Me -->
     <div class="flex items-center justify-between">

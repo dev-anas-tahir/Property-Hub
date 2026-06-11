@@ -165,7 +165,7 @@
     <!-- Pagination -->
     {% if page_obj %}
         <div class="mt-8">
-            {% include '_components/ui/pagination.html' with page_obj=page_obj %}
+            <c-ui.pagination :page_obj="page_obj" />
         </div>
     {% endif %}
 

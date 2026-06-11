@@ -30,7 +30,9 @@ class ConversationDetailView(LoginRequiredMixin, View):
         except ApplicationError as e:
             return HttpResponseForbidden(e.message)
 
-        chat_messages = messages_for_conversation(conversation=conversation)
+        chat_messages = list(messages_for_conversation(conversation=conversation))
+        for message in chat_messages:
+            message.was_unread = not message.is_read and message.sender != request.user
         messages_mark_read(conversation=conversation, user=request.user)
 
         context = {

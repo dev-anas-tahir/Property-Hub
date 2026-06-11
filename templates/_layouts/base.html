@@ -42,11 +42,11 @@
       hx-on:htmx:before-request="this.classList.add('htmx-loading')"
       hx-on:htmx:after-request="this.classList.remove('htmx-loading')">
     <!-- Navigation -->
-    {% include '_components/navigation/navbar.html' %}
+    <c-navigation.navbar />
 
     <!-- Messages -->
     {% if messages %}
-        {% include '_components/ui/messages.html' %}
+        <c-ui.messages />
     {% endif %}
 
     <!-- Main Content -->
@@ -55,7 +55,7 @@
     </main>
 
     <!-- Footer -->
-    {% include '_components/navigation/footer.html' %}
+    <c-navigation.footer />
 
     {% block extra_scripts %}{% endblock %}
 </body>

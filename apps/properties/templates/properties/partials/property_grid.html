@@ -5,7 +5,7 @@
         {% include 'properties/components/property_card.html' with property=property %}
     {% empty %}
         <div class="col-span-full">
-            {% include '_components/ui/empty_state.html' with title="No properties found" subtitle="Try adjusting your search criteria or check back later for new listings." %}
+            <c-ui.empty-state title="No properties found" subtitle="Try adjusting your search criteria or check back later for new listings." />
         </div>
     {% endfor %}
 </div>
@@ -13,6 +13,6 @@
 <!-- Pagination -->
 {% if page_obj %}
     <div class="mt-8">
-        {% include '_components/ui/pagination.html' with page_obj=page_obj %}
+        <c-ui.pagination :page_obj="page_obj" />
     </div>
 {% endif %}
