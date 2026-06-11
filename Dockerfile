@@ -9,18 +9,21 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 WORKDIR /app
 
-# Install dependencies
+# Install dependencies without installing the local project yet. The project
+# package force-includes assets/static/templates, which are copied next.
 COPY pyproject.toml uv.lock ./
+RUN uv sync --frozen --no-dev --group prod --no-install-project
+
+# Copy app, install it, and build
+COPY . .
 RUN uv sync --frozen --no-dev --group prod
 
-# Copy app and build
-COPY . .
-RUN DJANGO_SETTINGS_MODULE=config.django.base \
-    uv run python manage.py tailwind build --force
+RUN DEBUG=False DJANGO_SETTINGS_MODULE=config.django.base \
+    uv run --no-sync python manage.py tailwind build --force
 
 # Collectstatic using base settings (no database/AWS required for build)
-RUN DJANGO_SETTINGS_MODULE=config.django.base \
-    uv run python manage.py collectstatic --noinput
+RUN DEBUG=False DJANGO_SETTINGS_MODULE=config.django.base \
+    uv run --no-sync python manage.py collectstatic --noinput
 
 # Stage 2: Runtime - lean production image
 FROM python:3.13-slim AS runtime

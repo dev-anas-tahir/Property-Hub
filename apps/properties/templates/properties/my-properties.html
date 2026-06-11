@@ -7,9 +7,7 @@
 
 {% block page_actions %}
 <a href="{% url 'properties:create' %}" class="btn btn-primary">
-    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-    </svg>
+    <c-ui.icon name="plus" classes="h-4 w-4 mr-2" />
     Add Property
 </a>
 {% endblock %}
@@ -19,9 +17,7 @@
 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
     <div class="stat bg-base-100 shadow-soft rounded-2xl">
         <div class="stat-figure text-primary">
-            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
-            </svg>
+            <c-ui.icon name="home" classes="h-8 w-8" />
         </div>
         <div class="stat-title">Total Properties</div>
         <div class="stat-value text-primary">{{ properties|length }}</div>
@@ -30,10 +26,7 @@
 
     <div class="stat bg-base-100 shadow-soft rounded-2xl">
         <div class="stat-figure text-success">
-            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
-            </svg>
+            <c-ui.icon name="eye" classes="h-8 w-8" />
         </div>
         <div class="stat-title">Total Views</div>
         <div class="stat-value text-success">{{ total_views|default:0 }}</div>
@@ -42,9 +35,7 @@
 
     <div class="stat bg-base-100 shadow-soft rounded-2xl">
         <div class="stat-figure text-warning">
-            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
-            </svg>
+            <c-ui.icon name="heart" classes="h-8 w-8" />
         </div>
         <div class="stat-title">Total Favorites</div>
         <div class="stat-value text-warning">{{ total_favorites|default:0 }}</div>
@@ -59,9 +50,7 @@
         <div class="flex items-center space-x-3">
             <div class="dropdown">
                 <div tabindex="0" role="button" class="btn btn-outline btn-sm">
-                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path>
-                    </svg>
+                    <c-ui.icon name="filter" classes="h-4 w-4 mr-2" />
                     Filter
                 </div>
                 <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow-large bg-base-100 rounded-box w-52">
@@ -74,9 +63,7 @@
 
             <div class="dropdown">
                 <div tabindex="0" role="button" class="btn btn-outline btn-sm">
-                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"></path>
-                    </svg>
+                    <c-ui.icon name="sort-ascending" classes="h-4 w-4 mr-2" />
                     Sort
                 </div>
                 <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow-large bg-base-100 rounded-box w-52">
@@ -105,9 +92,7 @@
                              class="w-full h-full object-cover">
                     {% else %}
                         <div class="w-full h-full bg-gradient-to-br from-primary-100 to-secondary-100 flex items-center justify-center">
-                            <svg class="w-12 h-12 text-primary-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
-                            </svg>
+                            <c-ui.icon name="home" classes="h-12 w-12 text-primary-300" />
                         </div>
                     {% endif %}
 
@@ -120,9 +105,7 @@
                     <div class="absolute top-3 right-3">
                         <div class="dropdown dropdown-end">
                             <div tabindex="0" role="button" class="btn btn-circle btn-sm bg-white/90 border-0">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"></path>
-                                </svg>
+                                <c-ui.icon name="dots-vertical" classes="h-4 w-4" />
                             </div>
                             <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow-large bg-base-100 rounded-box w-40">
                                 <li><a href="{% url 'properties:detail' property.pk %}">View</a></li>
@@ -173,18 +156,14 @@
     <!-- Empty State -->
     <div class="text-center py-16">
         <div class="w-32 h-32 bg-base-200 rounded-full flex items-center justify-center mx-auto mb-6">
-            <svg class="w-16 h-16 text-base-content/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
-            </svg>
+            <c-ui.icon name="home" classes="h-16 w-16 text-base-content/40" />
         </div>
         <h3 class="text-2xl font-semibold text-base-content mb-2">No properties yet</h3>
         <p class="text-base-content/60 mb-8 max-w-md mx-auto">
             Start building your property portfolio by adding your first listing.
         </p>
         <a href="{% url 'properties:create' %}" class="btn btn-primary btn-lg">
-            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-            </svg>
+            <c-ui.icon name="plus" classes="h-5 w-5 mr-2" />
             Add Your First Property
         </a>
     </div>

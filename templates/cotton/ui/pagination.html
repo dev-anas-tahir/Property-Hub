@@ -8,16 +8,12 @@
         {% if page_obj.has_previous %}
             <a href="?page={{ page_obj.previous_page_number }}"
                class="btn btn-outline btn-sm">
-                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
-                </svg>
+                <c-ui.icon name="chevron-left" classes="h-4 w-4 mr-1" />
                 Previous
             </a>
         {% else %}
             <span class="btn btn-outline btn-sm btn-disabled">
-                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
-                </svg>
+                <c-ui.icon name="chevron-left" classes="h-4 w-4 mr-1" />
                 Previous
             </span>
         {% endif %}
@@ -26,16 +22,12 @@
             <a href="?page={{ page_obj.next_page_number }}"
                class="btn btn-outline btn-sm ml-3">
                 Next
-                <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                </svg>
+                <c-ui.icon name="chevron-right" classes="h-4 w-4 ml-1" />
             </a>
         {% else %}
             <span class="btn btn-outline btn-sm btn-disabled ml-3">
                 Next
-                <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                </svg>
+                <c-ui.icon name="chevron-right" classes="h-4 w-4 ml-1" />
             </span>
         {% endif %}
     </div>
@@ -60,15 +52,11 @@
                 {% if page_obj.has_previous %}
                     <a href="?page={{ page_obj.previous_page_number }}"
                        class="join-item btn btn-outline btn-sm">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
-                        </svg>
+                        <c-ui.icon name="chevron-left" classes="h-4 w-4" />
                     </a>
                 {% else %}
                     <span class="join-item btn btn-outline btn-sm btn-disabled">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
-                        </svg>
+                        <c-ui.icon name="chevron-left" classes="h-4 w-4" />
                     </span>
                 {% endif %}
 
@@ -89,15 +77,11 @@
                 {% if page_obj.has_next %}
                     <a href="?page={{ page_obj.next_page_number }}"
                        class="join-item btn btn-outline btn-sm">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                        </svg>
+                        <c-ui.icon name="chevron-right" classes="h-4 w-4" />
                     </a>
                 {% else %}
                     <span class="join-item btn btn-outline btn-sm btn-disabled">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                        </svg>
+                        <c-ui.icon name="chevron-right" classes="h-4 w-4" />
                     </span>
                 {% endif %}
             </nav>

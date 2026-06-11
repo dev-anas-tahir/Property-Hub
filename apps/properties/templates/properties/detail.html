@@ -20,10 +20,7 @@
                 {{ property.name }}
             </h1>
             <div class="flex items-center text-base-content/70 mb-4">
-                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                </svg>
+                <c-ui.icon name="location-marker" classes="h-5 w-5 mr-2" />
                 {{ property.full_address }}
             </div>
             <div class="flex items-center space-x-4">
@@ -43,17 +40,13 @@
 
             {% if user == property.user %}
                 <a href="{% url 'properties:edit' property.pk %}" class="btn btn-outline">
-                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                    </svg>
+                    <c-ui.icon name="pencil" classes="h-4 w-4 mr-2" />
                     Edit
                 </a>
             {% endif %}
 
             <button class="btn btn-outline">
-                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z"></path>
-                </svg>
+                <c-ui.icon name="share" classes="h-4 w-4 mr-2" />
                 Share
             </button>
         </div>
@@ -76,9 +69,7 @@
             </div>
         {% else %}
             <div class="lg:col-span-2 h-96 bg-gradient-to-br from-primary-100 to-secondary-100 rounded-2xl flex items-center justify-center">
-                <svg class="w-24 h-24 text-primary-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
-                </svg>
+                <c-ui.icon name="home" classes="h-24 w-24 text-primary-300" />
             </div>
         {% endif %}
     </div>
@@ -94,32 +85,24 @@
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                         {% if property.bedrooms %}
                             <div class="flex items-center space-x-2">
-                                <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"></path>
-                                </svg>
+                                <c-ui.icon name="home" classes="h-5 w-5 text-primary" />
                                 <span>{{ property.bedrooms }} Bedroom{{ property.bedrooms|pluralize }}</span>
                             </div>
                         {% endif %}
                         {% if property.bathrooms %}
                             <div class="flex items-center space-x-2">
-                                <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z"></path>
-                                </svg>
+                                <c-ui.icon name="office-building" classes="h-5 w-5 text-primary" />
                                 <span>{{ property.bathrooms }} Bathroom{{ property.bathrooms|pluralize }}</span>
                             </div>
                         {% endif %}
                         {% if property.area %}
                             <div class="flex items-center space-x-2">
-                                <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path>
-                                </svg>
+                                <c-ui.icon name="arrows-expand" classes="h-5 w-5 text-primary" />
                                 <span>{{ property.area }} sq ft</span>
                             </div>
                         {% endif %}
                         <div class="flex items-center space-x-2">
-                            <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                            </svg>
+                            <c-ui.icon name="calendar" classes="h-5 w-5 text-primary" />
                             <span>{{ property.created_at|date:"M Y" }}</span>
                         </div>
                     </div>
@@ -146,9 +129,7 @@
                         <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
                             {% for amenity in property.amenities.all %}
                                 <div class="flex items-center space-x-2">
-                                    <svg class="w-4 h-4 text-success" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                                    </svg>
+                                    <c-ui.icon name="check" classes="h-4 w-4 text-success" />
                                     <span class="text-sm">{{ amenity.name }}</span>
                                 </div>
                             {% endfor %}
@@ -190,9 +171,7 @@
 
                             <!-- Message Button - Validates: Requirements 1.3, 6.1 -->
                             <a href="{% url 'chat:start_conversation' property.pk %}" class="btn btn-primary w-full" id="message-button">
-                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
-                                </svg>
+                                <c-ui.icon name="chat" classes="h-4 w-4 mr-2" />
                                 Send Message
                             </a>
                         </div>
