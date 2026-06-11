@@ -1,0 +1,126 @@
+{% load static %}
+
+<nav class="navbar bg-gradient-airbnb text-primary-content shadow-large sticky top-0 z-50">
+    <div class="container mx-auto flex justify-between items-center relative">
+        <!-- Left: Logo and Mobile Menu -->
+        <div class="flex items-center">
+            <!-- Mobile Menu Button -->
+            <div class="dropdown lg:hidden mr-2">
+                <div tabindex="0" role="button" class="btn btn-ghost">
+                    <c-ui.icon name="menu" classes="h-6 w-6" />
+                </div>
+                <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow-large bg-base-100 text-base-content rounded-2xl w-52">
+                    {% if user.is_authenticated %}
+                        <li><a href="{% url 'properties:list' %}" class="{% if request.resolver_match.url_name == 'list' %}active{% endif %}">
+                            <c-ui.icon name="view-grid" />
+                            All Properties
+                        </a></li>
+                        <li><a href="{% url 'properties:create' %}" class="{% if request.resolver_match.url_name == 'create' %}active{% endif %}">
+                            <c-ui.icon name="plus" />
+                            Add Property
+                        </a></li>
+                        <li><a href="{% url 'properties:favorites' %}" class="{% if request.resolver_match.url_name == 'favorites' %}active{% endif %}">
+                            <c-ui.icon name="heart" />
+                            Favorites
+                        </a></li>
+                        <li><a href="{% url 'properties:my-properties' %}" class="{% if request.resolver_match.url_name == 'my-properties' %}active{% endif %}">
+                            <c-ui.icon name="home" />
+                            My Properties
+                        </a></li>
+                        <li>
+                            <form method="post" action="{% url 'users:logout' %}">
+                                {% csrf_token %}
+                                <button type="submit" class="text-error w-full text-left">
+                                    <c-ui.icon name="logout" />
+                                    Logout
+                                </button>
+                            </form>
+                        </li>
+                    {% else %}
+                        <li><a href="{% url 'properties:list' %}">Browse Properties</a></li>
+                        <li><a href="{% url 'users:login' %}">Login</a></li>
+                        <li><a href="{% url 'users:signup' %}">Sign Up</a></li>
+                    {% endif %}
+                </ul>
+            </div>
+
+            <!-- Logo -->
+            <a href="{% url 'properties:list' %}" class="btn btn-ghost text-xl font-display font-bold">
+                <c-ui.icon name="home" variant="solid" classes="h-8 w-8 mr-2" />
+                PropertyHub
+            </a>
+        </div>
+
+        <!-- Center: Desktop Menu - Absolutely Centered -->
+        <div class="hidden lg:flex absolute left-1/2 transform -translate-x-1/2">
+            <ul class="menu menu-horizontal px-1 space-x-2">
+                <li>
+                    <a href="{% url 'properties:list' %}"
+                       class="btn btn-ghost {% if request.resolver_match.url_name == 'list' %}nav-link-active{% endif %}">
+                        All Properties
+                    </a>
+                </li>
+                {% if user.is_authenticated %}
+                    <li>
+                        <a href="{% url 'properties:create' %}"
+                           class="btn btn-ghost {% if request.resolver_match.url_name == 'create' %}nav-link-active{% endif %}">
+                            Add Property
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'properties:favorites' %}"
+                           class="btn btn-ghost {% if request.resolver_match.url_name == 'favorites' %}nav-link-active{% endif %}">
+                            <c-ui.icon name="heart" classes="h-5 w-5 mr-1" />
+                            Favorites
+                        </a>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+
+        <!-- Right: User Menu -->
+        <div class="flex items-center">
+            {% if user.is_authenticated %}
+                <div class="dropdown dropdown-end">
+                    <div tabindex="0" role="button" class="btn btn-ghost btn-circle avatar">
+                        <div class="w-10 rounded-full bg-white/20 flex items-center justify-center">
+                            <span class="text-white font-semibold">
+                                {{ user.email|slice:":1"|upper }}
+                            </span>
+                        </div>
+                    </div>
+                    <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow-large bg-base-100 text-base-content rounded-2xl w-52">
+                        <li class="menu-title">
+                            <span>Hello, {% if user.first_name %}{{ user.first_name }}{% else %}{{ user.email }}{% endif %}!</span>
+                        </li>
+                        <li><a href="{% url 'properties:my-properties' %}" class="{% if request.resolver_match.url_name == 'my-properties' %}active{% endif %}">
+                            <c-ui.icon name="home" />
+                            My Properties
+                        </a></li>
+                        <li><a href="{% url 'users:profile' %}" class="{% if request.resolver_match.url_name == 'profile' %}active{% endif %}">
+                            <c-ui.icon name="user" />
+                            Profile
+                        </a></li>
+                        <div class="divider my-1"></div>
+                        <li>
+                            <form method="post" action="{% url 'users:logout' %}">
+                                {% csrf_token %}
+                                <button type="submit" class="text-error">
+                                    <div class="flex items-center gap-2">
+                                        <c-ui.icon name="logout" />
+                                        Logout
+                                    </div>
+                                </button>
+                            </form>
+                        </li>
+                    </ul>
+                </div>
+            {% else %}
+                <div class="space-x-2">
+                    <a href="{% url 'users:login' %}" class="btn btn-ghost">Login</a>
+                    <a href="{% url 'users:signup' %}" class="btn btn-primary">Sign Up</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</nav>

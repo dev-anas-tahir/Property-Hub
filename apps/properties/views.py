@@ -277,7 +277,7 @@ class PropertyFavoriteToggleView(LoginRequiredMixin, View):
             property_obj.is_favorited = is_favorited
             response = render(
                 request,
-                "properties/components/favorite_button.html",
+                "cotton/properties/favorite_button.html",
                 {"property": property_obj},
             )
             return trigger_client_event(

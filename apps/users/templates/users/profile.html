@@ -7,9 +7,7 @@
 
 {% block page_actions %}
 <a href="{% url 'users:profile_edit' %}" class="btn btn-primary">
-    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-    </svg>
+    <c-ui.icon name="pencil" classes="h-4 w-4 mr-2" />
     Edit Profile
 </a>
 {% endblock %}
@@ -93,9 +91,7 @@
                                          class="w-12 h-12 object-cover rounded-lg">
                                 {% else %}
                                     <div class="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center">
-                                        <svg class="w-6 h-6 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
-                                        </svg>
+                                        <c-ui.icon name="home" classes="h-6 w-6 text-primary-600" />
                                     </div>
                                 {% endif %}
                                 <div class="flex-1">
@@ -111,9 +107,7 @@
                     </div>
                 {% else %}
                     <div class="text-center py-8">
-                        <svg class="w-16 h-16 text-base-content/40 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
-                        </svg>
+                        <c-ui.icon name="home" classes="h-16 w-16 text-base-content/40 mx-auto mb-4" />
                         <p class="text-base-content/60 mb-4">No properties listed yet</p>
                         <a href="{% url 'properties:create' %}" class="btn btn-primary btn-sm">List Your First Property</a>
                     </div>
@@ -130,27 +124,19 @@
                 <h3 class="card-title text-lg mb-4">Quick Actions</h3>
                 <div class="space-y-3">
                     <a href="{% url 'properties:create' %}" class="btn btn-outline w-full justify-start">
-                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-                        </svg>
+                        <c-ui.icon name="plus" classes="h-4 w-4 mr-2" />
                         Add Property
                     </a>
                     <a href="{% url 'properties:my-properties' %}" class="btn btn-outline w-full justify-start">
-                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
-                        </svg>
+                        <c-ui.icon name="home" classes="h-4 w-4 mr-2" />
                         My Properties
                     </a>
                     <a href="{% url 'properties:favorites' %}" class="btn btn-outline w-full justify-start">
-                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
-                        </svg>
+                        <c-ui.icon name="heart" classes="h-4 w-4 mr-2" />
                         Favorites
                     </a>
                     <a href="{% url 'users:password_change' %}" class="btn btn-outline w-full justify-start">
-                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v-2H7v-2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path>
-                        </svg>
+                        <c-ui.icon name="key" classes="h-4 w-4 mr-2" />
                         Change Password
                     </a>
                 </div>

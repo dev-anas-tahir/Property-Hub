@@ -6,9 +6,7 @@
     <!-- Form Errors -->
     {% if form.non_field_errors %}
         <div class="alert alert-error">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-            </svg>
+            <c-ui.icon name="exclamation-circle" classes="h-6 w-6" />
             <div>
                 {% for error in form.non_field_errors %}
                     <div>{{ error }}</div>
@@ -19,20 +17,18 @@
 
     <!-- Name Fields -->
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {% include '_components/forms/field.html' with field=form.first_name label="First Name" placeholder="Enter your first name" required=True %}
-        {% include '_components/forms/field.html' with field=form.last_name label="Last Name" placeholder="Enter your last name" required=True %}
+        <c-forms.field :field="form.first_name" label="First Name" placeholder="Enter your first name" required />
+        <c-forms.field :field="form.last_name" label="Last Name" placeholder="Enter your last name" required />
     </div>
 
     <!-- Email Field -->
-    {% include '_components/forms/field.html' with field=form.email label="Email" placeholder="Enter your email" required=True icon="at-symbol" %}
+    <c-forms.field :field="form.email" label="Email" placeholder="Enter your email" icon="at-symbol" required />
 
     <!-- Submit Button -->
     <div class="flex justify-end space-x-4">
         <a href="{% url 'users:profile' %}" class="btn btn-outline">Cancel</a>
         <button type="submit" class="btn btn-primary">
-            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-            </svg>
+            <c-ui.icon name="check" classes="h-5 w-5 mr-2" />
             Update Profile
         </button>
     </div>

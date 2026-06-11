@@ -16,9 +16,7 @@
 
         {% if form.non_field_errors %}
             <div class="alert alert-error">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
+                <c-ui.icon name="exclamation-circle" classes="h-6 w-6" />
                 <div>
                     {% for error in form.non_field_errors %}
                         <div>{{ error }}</div>
@@ -34,21 +32,21 @@
 
                 <div class="space-y-6">
                     <div>
-                        {% include '_components/forms/field.html' with field=form.name label="Property Title" placeholder="e.g., Beautiful 3BR House in Downtown" required=True %}
+                        <c-forms.field :field="form.name" label="Property Title" placeholder="e.g., Beautiful 3BR House in Downtown" required />
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            {% include '_components/forms/field.html' with field=form.property_type label="Property Type" placeholder="Select property type" required=True %}
+                            <c-forms.field :field="form.property_type" label="Property Type" placeholder="Select property type" required />
                         </div>
 
                         <div>
-                            {% include '_components/forms/field.html' with field=form.price label="Price" placeholder="Enter price" required=True icon="currency-dollar" %}
+                            <c-forms.field :field="form.price" label="Price" placeholder="Enter price" icon="currency-dollar" required />
                         </div>
                     </div>
 
                     <div>
-                        {% include '_components/forms/field.html' with field=form.full_address label="Address" placeholder="Enter full address" required=True icon="location-marker" %}
+                        <c-forms.field :field="form.full_address" label="Address" placeholder="Enter full address" icon="location-marker" required />
                     </div>
                 </div>
             </div>
@@ -62,29 +60,29 @@
                 <div class="space-y-6">
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div>
-                            {% include '_components/forms/field.html' with field=form.bedrooms label="Bedrooms" placeholder="Number of bedrooms" required=True %}
+                            <c-forms.field :field="form.bedrooms" label="Bedrooms" placeholder="Number of bedrooms" required />
                         </div>
 
                         <div>
-                            {% include '_components/forms/field.html' with field=form.bathrooms label="Bathrooms" placeholder="Number of bathrooms" required=True %}
+                            <c-forms.field :field="form.bathrooms" label="Bathrooms" placeholder="Number of bathrooms" required />
                         </div>
 
                         <div>
-                            {% include '_components/forms/field.html' with field=form.area label="Area (sq ft)" placeholder="Property area" required=True %}
+                            <c-forms.field :field="form.area" label="Area (sq ft)" placeholder="Property area" required />
                         </div>
                     </div>
 
                     <div>
-                        {% include '_components/forms/field.html' with field=form.description label="Description" placeholder="Describe your property, its features, and what makes it special..." rows=6 %}
+                        <c-forms.field :field="form.description" label="Description" placeholder="Describe your property, its features, and what makes it special..." rows=6 />
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            {% include '_components/forms/field.html' with field=form.phone_number label="Phone Number" placeholder="+92-3001234567" required=True %}
+                            <c-forms.field :field="form.phone_number" label="Phone Number" placeholder="+92-3001234567" required />
                         </div>
 
                         <div>
-                            {% include '_components/forms/field.html' with field=form.cnic label="CNIC" placeholder="12345-1234567-1" required=True %}
+                            <c-forms.field :field="form.cnic" label="CNIC" placeholder="12345-1234567-1" required />
                         </div>
                     </div>
 
@@ -110,9 +108,7 @@
                         <h2 class="card-title text-2xl mb-6">Property Images</h2>
 
                         <div class="border-2 border-dashed border-base-300 rounded-2xl p-8 text-center hover:border-primary transition-colors">
-                            <svg class="w-16 h-16 text-base-content/40 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
-                            </svg>
+                            <c-ui.icon name="cloud-upload" classes="h-16 w-16 text-base-content/40 mx-auto mb-4" />
                             <h3 class="text-lg font-semibold text-base-content mb-2">Upload Property Images</h3>
                             <p class="text-base-content/60 mb-4">Drag and drop images here, or click to browse</p>
                             <input type="file" name="images" multiple accept="image/*" class="file-input file-input-bordered file-input-primary w-full max-w-xs">
@@ -161,9 +157,7 @@
                 <h2 class="card-title text-2xl mb-6">Review Your Property</h2>
 
                 <div class="alert alert-info mb-6">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
+                    <c-ui.icon name="information-circle" classes="h-6 w-6" />
                     <span>Please review all information before submitting. You can go back to any step to make changes.</span>
                 </div>
 
@@ -234,9 +228,7 @@
         <div class="flex justify-between items-center">
             <div class="flex items-center space-x-3">
                 <button type="button" @click="prevStep()" x-show="currentStep > 1" class="btn btn-outline">
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
-                    </svg>
+                    <c-ui.icon name="chevron-left" classes="h-5 w-5 mr-2" />
                     Previous
                 </button>
 
@@ -248,9 +240,7 @@
                         hx-target="body"
                         class="btn btn-error btn-outline"
                     >
-                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                        </svg>
+                        <c-ui.icon name="trash" classes="h-4 w-4 mr-2" />
                         Delete Property
                     </button>
                 {% endif %}
@@ -262,21 +252,15 @@
 
                 <button type="button" @click="nextStep()" x-show="currentStep < totalSteps" class="btn btn-primary" id="nextStepBtn">
                     Next Step
-                    <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                    </svg>
+                    <c-ui.icon name="chevron-right" classes="h-5 w-5 ml-2" />
                 </button>
 
                 <button type="submit" x-show="currentStep === totalSteps" class="btn btn-primary">
                     {% if is_edit_mode %}
-                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                        </svg>
+                        <c-ui.icon name="check" classes="h-5 w-5 mr-2" />
                         Update Property
                     {% else %}
-                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-                        </svg>
+                        <c-ui.icon name="plus" classes="h-5 w-5 mr-2" />
                         Create Property
                     {% endif %}
                 </button>
@@ -353,7 +337,7 @@ function propertyForm() {
             } finally {
                 if (nextButton) {
                     nextButton.disabled = false;
-                    nextButton.innerHTML = 'Next Step <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>';
+                    nextButton.textContent = 'Next Step';
                 }
             }
         },

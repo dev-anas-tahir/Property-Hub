@@ -280,3 +280,5 @@ class ChatClient {
     return this.socket && this.socket.readyState === WebSocket.OPEN;
   }
 }
+
+window.ChatClient = ChatClient;
