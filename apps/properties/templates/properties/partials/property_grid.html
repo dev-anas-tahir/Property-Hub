@@ -2,7 +2,7 @@
 
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
     {% for property in properties %}
-        {% include 'properties/components/property_card.html' with property=property %}
+        <c-properties.property-card :property="property" />
     {% empty %}
         <div class="col-span-full">
             <c-ui.empty-state title="No properties found" subtitle="Try adjusting your search criteria or check back later for new listings." />

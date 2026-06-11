@@ -1,4 +1,5 @@
 {% load static %}
+<c-vars property />
 
 <button
   hx-post="{% url 'properties:favorite_toggle' property.pk %}"

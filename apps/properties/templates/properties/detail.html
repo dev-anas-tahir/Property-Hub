@@ -38,7 +38,7 @@
         <!-- Action Buttons -->
         <div class="flex items-center space-x-3">
             {% if user.is_authenticated and not is_owner %}
-                {% include 'properties/components/favorite_button.html' with property=property %}
+                <c-properties.favorite-button :property="property" />
             {% endif %}
 
             {% if user == property.user %}
